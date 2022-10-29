@@ -28,7 +28,9 @@ Controlled by the machine:
 * The eMPS retrives information from the user navigation system
 * The eMPS notifies the user suggestions for the recharging process at a certain CP and timeframe
 * The CPMS starts the energy flow to the vehicle
+* ~~The CPMS lock a socket after the charging process is started ?~~
 * The CPMS stops the energy flow to the vehicle
+* The CPMS unlock a socket after the charging process is finished
 * ~~The CPMS monitor the charging process(?)~~
 * The CPMS acquires information about the CPs (socket status, battery status, position)
 * The CPMS acquires information about energy prices from DSOs
