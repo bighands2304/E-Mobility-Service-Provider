@@ -23,17 +23,17 @@ Controlled by the world:
 
 Controlled by the machine:
 
-* The system notifies the user when the charging process is completed
-* The system retrives information from the user calendar
-* The system retrives information from the user navigation system
-* The system notifies the user suggestions for the recharging process at a certain CP and timeframe
-* The system starts the energy flow to the vehicle
-* The system stops the energy flow to the vehicle
-* ~~The system monitor the charging process(?)~~
-* The system acquires information about the CPs (socket status, battery status, position)
-* The system acquires information about energy prices from DSOs
-* The system changes the source of energy and acquires it
-* The system stores energy in CP battery when cheaper
-* The system retrieves the actual battery level of the user vehicle
+* The eMPS notifies the user when the charging process is completed
+* The eMPS retrives information from the user calendar
+* The eMPS retrives information from the user navigation system
+* The eMPS notifies the user suggestions for the recharging process at a certain CP and timeframe
+* The CPMS starts the energy flow to the vehicle
+* The CPMS stops the energy flow to the vehicle
+* ~~The CPMS monitor the charging process(?)~~
+* The CPMS acquires information about the CPs (socket status, battery status, position)
+* The CPMS acquires information about energy prices from DSOs
+* The CPMS  changes the source of energy and acquires it
+* The CPMS stores energy in CP battery when cheaper
+* The ? retrieves the actual battery level of the user vehicle
 {% endtab %}
 {% endtabs %}
