@@ -34,5 +34,6 @@ Controlled by the machine:
 * The system acquires information about energy prices from DSOs
 * The system changes the source of energy and acquires it
 * The system stores energy in CP battery when cheaper
+* The system retrieves the actual battery level of the user vehicle
 {% endtab %}
 {% endtabs %}
