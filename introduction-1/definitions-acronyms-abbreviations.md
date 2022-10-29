@@ -1,2 +1,0 @@
-# Definitions, Acronyms, Abbreviations
-
