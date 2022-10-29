@@ -1,13 +1,10 @@
 # Table of contents
 
-## RASD
-
-***
-
-* [Introduction](README.md)
-  * [Purpose](introduction/purpose.md)
-  * [Scope](introduction/scope.md)
-  * [Definitions, Acronyms, Abbreviations](introduction/definitions-acronyms-abbreviations.md)
-  * [Revision history](introduction/revision-history.md)
-  * [Reference Documents](introduction/reference-documents.md)
-  * [Document Structure](introduction/document-structure.md)
+* [RASD](README.md)
+  * [Introduction](rasd/introduction/README.md)
+    * [Purpose](rasd/introduction/purpose.md)
+    * [Scope](rasd/introduction/scope.md)
+    * [Definitions, Acronyms, Abbreviations](rasd/introduction/definitions-acronyms-abbreviations.md)
+    * [Revision history](rasd/introduction/revision-history.md)
+    * [Reference Documents](rasd/introduction/reference-documents.md)
+    * [Document Structure](rasd/introduction/document-structure.md)
