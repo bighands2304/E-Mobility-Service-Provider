@@ -30,7 +30,7 @@ sig User {
 	reservations: set Reservation,
 	vehicles: set Vehicle,
 	notifications: set Notification,
-	payentMethods: set PaymentMethod,
+	paymentMethods: set PaymentMethod,
 	payments: set Payment
 } //{
 	//id > 0
@@ -56,10 +56,9 @@ sig Reservation {
 
 sig ChargingSession {
 	reservation: one Reservation,
-	// socket ?
 	isFinished: one Boolean,
 	energyConsumed: one Int,
-	batteryStatusEstimation: one Int, // percentage
+	batteryStatusEstimation: one Int,
 } {
 	energyConsumed >= 0 and
 	batteryStatusEstimation >= 0
@@ -69,13 +68,15 @@ sig Vehicle {
 	vin: one Int,
 	model: one CarModel,
 	battery: one VehicleBattery
+} {
+	vin >= 0
 }
 
 sig CarModel {}
 sig VehicleBattery {
-	status: one Int // battery percentage
+	status: one Int
 } {
-	status > 0 and status < 100
+	status > 0
 }
 
 abstract sig Notification {
@@ -113,7 +114,7 @@ sig CPO {
 sig CPOPaymentReceiver {}
 
 sig ChargingStation {
-	sockets: some Socket,
+	sockets: set Socket,
 	position: one Position,
 	availableDSO: set DSOEnergySource,
 	batteries: set ChargingStationBattery, // check if lone or set
@@ -166,6 +167,7 @@ abstract sig EnergySource {
 	maxEnergyFlow > 0
 }
 
+//Is the energy offer common to all CPO? Or a DSO can make different offers to different CPOs?
 sig DSOEnergySource extends EnergySource {
 	energyOffer: one DSOEnergyOffer // check if one or set
 }
@@ -212,15 +214,16 @@ pred reservationsOverlapping[r1: Reservation, r2: Reservation] {
 	r1. from.timestamp >= r2.from.timestamp and r1.from.timestamp < r2.to.timestamp
 }
 
+// for symlicity, the range of a research here is a square and not a circle
 pred nearRange[sr: StationsResearch, cs: ChargingStation] {
-	(cs.position.latitude >= sr.position.latitude and 
+	((cs.position.latitude >= sr.position.latitude and 
 	cs.position.latitude - sr.position.latitude <= sr.distanceRange) or
 	(cs.position.latitude < sr.position.latitude and 
-	sr.position.latitude - cs.position.latitude <= sr.distanceRange) or
-	(cs.position.longitude >= sr.position.longitude and
+	sr.position.latitude - cs.position.latitude <= sr.distanceRange)) and
+	((cs.position.longitude >= sr.position.longitude and
 	cs.position.longitude - sr.position.longitude <= sr.distanceRange) or
 	(cs.position.longitude < sr.position.longitude and
-	sr.position.longitude - cs.position.longitude >= sr.distanceRange)
+	sr.position.longitude - cs.position.longitude <= sr.distanceRange))
 }
 
 --------------------------------------------------------------------------
@@ -243,6 +246,10 @@ fact allEmailAddressHaveUser {
 	all e: EmailAddress | (some u: User | u.email = e)
 }
 
+fact allUsernameHaveUser {
+	all usn: Username | (some u: User | u.username = usn)
+}
+
 fact noOverlappingReservationsOfUser {
 	no disj r1, r2: Reservation | reservationsOverlapping[r1, r2] and
 			(some u: User | r1 in u.reservations and r2 in u.reservations)
@@ -261,11 +268,8 @@ fact allStationsResearchesHaveUser {
 	all sr: StationsResearch | (one u: User | sr in u.stationResearches)
 }
 
-//a station research contains, if exists, the charging station that is in the position of the research
-//TODO: add a range distance to better constrain this fact
 fact stationsResarchesNearbyStations {
-	all sr: StationsResearch, cs: ChargingStation | 
-			nearRange[sr, cs] implies cs in sr.nearbyStations
+	all sr: StationsResearch, cs: ChargingStation | nearRange[sr, cs] implies cs in sr.nearbyStations
 }
 
 fact oneChargingSessionPerReservation {
@@ -297,6 +301,11 @@ fact allPaymentsHaveOneUser {
 	all p: Payment | (one u: User | p in u.payments)
 }
 
+fact allPaymentMethodHaveUserOrPayment {
+	all pm: PaymentMethod | (some u: User | pm in u.paymentMethods) or
+							(some p: Payment | p.paymentMethod = pm)
+}
+
 fact allVehicleHaveUser {
 	all v: Vehicle | (some u: User | v in u.vehicles)
 }
@@ -305,8 +314,16 @@ fact allCarModelHaveVehicle {
 	all cm: CarModel | (some v: Vehicle | v.model = cm)
 }
 
+fact allVehicleBatteriesHaveOnlyOneVehicle {
+	all vb: VehicleBattery | (one v: Vehicle | v.battery = vb)
+}
+
 fact uniqueVIN {
 	no disj v1, v2: Vehicle | v1.vin = v2.vin
+}
+
+fact allNotificationsHaveUser {
+	all n: Notification | (one u: User | n in u.notifications)
 }
 
 fact suggestionsVehicleOfUser {
@@ -335,7 +352,7 @@ fact allSocketsHaveChargingStation {
 }
 
 fact allChargingStationsHaveCPO {
-	all cs: ChargingStation | (some cpo: CPO | cs in cpo.chargingStations)
+	all cs: ChargingStation | (one cpo: CPO | cs in cpo.chargingStations)
 }
 
 fact allChargingSchedulePeriodHaveChargingProfile {
@@ -351,23 +368,33 @@ fact allBatteriesHaveExactlyOneChargingStation {
 									(all cs2: ChargingStation | bat not in cs2.batteries or cs = cs2))
 }
 
-//Domain assumption: the user must insert at least a vehicle in order to receive suggestions
+fact allDSOEnergyOfferHaveOnlyOneDSO {
+	all deo: DSOEnergyOffer | (one des: DSOEnergySource | des.energyOffer = deo)
+}
+
+//Requirement: The user must insert at least a vehicle in order to receive suggestions.
 fact vehicleForSuggestions {
 	all cs: ChargingSuggestion, u: User | cs in u.notifications implies #u.vehicles > 0
 }
 
-//Domain assumption: A user can book a charge if and only if he has no “pending payments”
-fact reservationNoPendingPayment {
+//Requirement: The system shall prevent the user to make new reservations if there are unsolved payment. 
+fact reservationNoUnsolvedPayment {
 	all u: User | (some r: Reservation | not (some cs1: ChargingSession | cs1.reservation = r) and r in u.reservations)
 				implies (all cs2: ChargingSession | cs2.reservation in u.reservations implies
 													(cs2 in u.payedSessions or not cs2.isFinished = TRUE))
+}
+
+//Requirement: The system shall allow the user to have only one reservation active at the same time.
+fact onlyOneActiveReservation {
+	all u: User | no disj r1, r2: Reservation | r1 in u.reservations and r2 in u.reservations and 
+						not (some cs1: ChargingSession | cs1.reservation = r1) and 
+						not (some cs2: ChargingSession | cs2.reservation = r2)
 }
 
 --------------------------------------------------------------------------------------------------------
 // ASSERTIONS
 
 //Goal: allow users to visualize nearby charging stations
-//TODO: add a range in the stations research to allow the goal
 assert allowStationsResearches {
 	all sr: StationsResearch | (some u: User | sr in u.stationResearches) and 
 									((some cs: ChargingStation | nearRange[sr, cs]) implies
@@ -384,9 +411,11 @@ assert bookCharge {
 check bookCharge for 4
 
 // Goal: allow a user to start a charging session
+//(If a charging station exist, then it is started)
 assert startChargingSession {
 	all cs: ChargingSession | (some u: User | cs.reservation in u.reservations)
 }
+check startChargingSession for 4
 
 // Goal: allow users to pay for the service
 assert payForService {
@@ -395,10 +424,16 @@ assert payForService {
 }
 check payForService for 4
 
+//Goal: allow users to receive suggestions
+assert userSuggestions {
+	all cs: ChargingSuggestion | (some u: User | cs in u.notifications)
+}
+check userSuggestions for 4
+
 --------------------------------------------------------------------------------------------------------
 // WORLDS
 
-pred world {
+pred worldTest {
 	#User = 1
 	#Reservation = 2
 	#ChargingStation = 2
@@ -407,9 +442,52 @@ pred world {
 	#ChargingStationBattery = 1
 	#StationsResearch = 1
 }
+run worldTest for 4
 
-run world
+pred world1 {
+	#User = 4
+	#CPO = 2
+	#ChargingStation >= 3
+	#Reservation >= 3
+	#Socket >= 4
+	some s: Socket | s.type = SLOW
+	some s: Socket | s.type = FAST
+	some s: Socket | s.type = RAPID
+	#ChargingSession >= 1
+	some cs: ChargingSession | cs.isFinished = TRUE
+}
+run world1 for 4
 
+//This world is focused on charging suggestions
+pred world2 {
+	#Vehicle > 3
+	#ChargingSuggestion > 3
+	#User > 2
+	#CPO = 1
+	#Reservation = 0
+}
+run world2 for 6
+
+//This world is focused on the charging points
+pred world3 {
+	#User = 0
+	#CPO >= 2
+	#ChargingStation > 4
+	#ChargingStationBattery > 2
+	#DSOEnergySource > 4
+}
+run world3 for 6
+
+//This world is focused on the user registration
+pred world4 {
+	#Vehicle > 3
+	#User > 2
+	#CPO = 0
+	some u: User | #u.vehicles > 1
+	some u: User | #u.paymentMethods > 1
+	#DateTime = 0
+}
+run world4 for 4
 
 
 
