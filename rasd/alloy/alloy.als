@@ -49,13 +49,14 @@ sig Reservation {
 	from: one DateTime,
 	to: one DateTime,
 	// check if id is needed
-	socket: one Socket
+	socket: one Socket,
+	chargingSession: lone ChargingSession
 } {
 	from.timestamp < to.timestamp
 }
 
 sig ChargingSession {
-	reservation: one Reservation,
+	//reservation: one Reservation,
 	isFinished: one Boolean,
 	energyConsumed: one Int,
 	batteryStatusEstimation: one Int,
@@ -93,7 +94,8 @@ sig ChargingSuggestion extends Notification {
 	suggestedVehicle: one Vehicle,
 	chargingStation: one ChargingStation
 } {
-	from.timestamp < to.timestamp
+	from.timestamp < to.timestamp and 
+	timestamp.timestamp <= from.timestamp
 }
 
 sig PaymentMethod {}
@@ -117,27 +119,34 @@ sig ChargingStation {
 	sockets: set Socket,
 	position: one Position,
 	availableDSO: set DSOEnergySource,
-	batteries: set ChargingStationBattery, // check if lone or set
+	batteries: set ChargingStationBattery,
 	currentEnergySource: one EnergySource,
-	baseUnitPrice: one Int,
-	specialOffer: lone SpecialOffer
+	tariffs: set Tariff
 } {
-	baseUnitPrice > 0
+	#availableDSO > 0
+	#sockets > 0
+	#tariffs > 0
 }
 
-sig SpecialOffer {
+sig Tariff {
 	unitPrice: one Int,
+	socketType: one SocketType
+} {
+	unitPrice > 0
+}
+
+sig SpecialOffer extends Tariff {
 	validFrom: one DateTime,
 	expiration: one DateTime
 } {
-	validFrom.timestamp < expiration.timestamp and 
-	unitPrice > 0
+	validFrom.timestamp < expiration.timestamp
 }
 
 sig Socket {
 	type: one SocketType,
-	chargingProfile: one ChargingProfile // check if one or set
-	// current charging session (lone) ?
+	chargingProfile: one ChargingProfile, // check if one or set
+	status: one SocketStatus,
+	reservations: set Reservation
 }
 
 sig ChargingProfile {
@@ -161,18 +170,25 @@ one sig SLOW extends SocketType {}
 one sig FAST extends SocketType {}
 one sig RAPID extends SocketType {} 
 
+abstract sig SocketStatus {}
+one sig AVAILABLE extends SocketStatus {}
+one sig RESERVED extends SocketStatus {}
+one sig NOT_AVAILABLE extends SocketStatus {} 
+one sig CHARGING extends SocketStatus {} 
+
 abstract sig EnergySource {
-	maxEnergyFlow: one Int //see if actual energy flow is needed
+	maxEnergyFlow: one Int, //see if actual energy flow is needed
+	actualEnergyFlow: one Int
 } {
-	maxEnergyFlow > 0
+	maxEnergyFlow > 0 and actualEnergyFlow > 0
 }
 
-//Is the energy offer common to all CPO? Or a DSO can make different offers to different CPOs?
 sig DSOEnergySource extends EnergySource {
-	energyOffer: one DSOEnergyOffer // check if one or set
+	dso: one DSO,
+	energyOffer: set DSOEnergyOffer
 }
 
-sig ChargingStationBattery {
+sig ChargingStationBattery extends EnergySource {
 	capacity: one Int,
 	storageStatus: one Int,
 	isInUse: one Boolean,
@@ -182,6 +198,8 @@ sig ChargingStationBattery {
 	(isInUse = TRUE implies isRecharging = FALSE) and
 	(isRecharging = TRUE implies isInUse = FALSE)
 }
+
+sig DSO {}
 
 sig DSOEnergyOffer {
 	price: one Int,
@@ -199,10 +217,6 @@ fun sockets [c: CPO] : set Socket {
 	c.chargingStations.sockets
 }
 
-fun socket[c : ChargingSession]: one Socket {
-	c.reservation.socket
-}
-
 fun payedSessions[u: User]: set ChargingSession {
 	u.payments.chargingSession
 }
@@ -214,7 +228,7 @@ pred reservationsOverlapping[r1: Reservation, r2: Reservation] {
 	r1. from.timestamp >= r2.from.timestamp and r1.from.timestamp < r2.to.timestamp
 }
 
-// for symlicity, the range of a research here is a square and not a circle
+// For symlicity, the range of a research here is a square and not a circle
 pred nearRange[sr: StationsResearch, cs: ChargingStation] {
 	((cs.position.latitude >= sr.position.latitude and 
 	cs.position.latitude - sr.position.latitude <= sr.distanceRange) or
@@ -264,6 +278,14 @@ fact allReservationsHaveExactlyOneUser {
 						(some usr: User | r in usr.reservations)
 }
 
+fact reservationSocketConsistency {
+	all r: Reservation, s: Socket | r.socket = s implies (r in s.reservations and 
+										(no r.chargingSession implies s.status = RESERVED) and
+										(r.chargingSession.isFinished = FALSE implies s.status = CHARGING))
+	all s: Socket | (all r: Reservation | r in s.reservations and r.chargingSession.isFinished = TRUE) iff
+					(s.status = AVAILABLE or s.status = NOT_AVAILABLE)
+}
+
 fact allStationsResearchesHaveUser {
 	all sr: StationsResearch | (one u: User | sr in u.stationResearches)
 }
@@ -273,14 +295,14 @@ fact stationsResarchesNearbyStations {
 }
 
 fact oneChargingSessionPerReservation {
-	no disj c1, c2: ChargingSession | c1.reservation = c2.reservation
+	all cs: ChargingSession | one r: Reservation | r.chargingSession = cs
 }
 
 fact oneNotificationPerChargingSession {
 	no disj n1, n2: ChargingEndedNotification | n1.chargingSession = n2.chargingSession
 }
 
-fact allChargingSessionHaveOnePayment {
+fact allChargingSessionHaveAtMostOnePayment {
 	no disj p1, p2: Payment | p1.chargingSession = p2.chargingSession
 }
 
@@ -289,12 +311,14 @@ fact paymentChargingSessionFinished {
 }
 
 fact paymentReservationSameUser {
-	all u: User, pm: Payment | pm in u.payments implies pm.chargingSession.reservation in u.reservations
+	all u: User, pm: Payment, r: Reservation | 
+		(pm in u.payments and pm.chargingSession = r.chargingSession) implies r in u.reservations
 }
 
 fact paymentChargingSessionSameCPO {
-	all cpo: CPO, pm: Payment | 
-		cpo.paymentReceiverInfo = pm.CPOInfo implies pm.chargingSession.socket in cpo.sockets
+	all cpo: CPO, pm: Payment | cpo.paymentReceiverInfo = pm.CPOInfo implies 
+								(one r: Reservation | r.chargingSession = pm.chargingSession and
+													r.socket in cpo.sockets)
 }
 
 fact allPaymentsHaveOneUser {
@@ -336,7 +360,7 @@ fact uniquePositionForChargingStations {
 }
 
 fact oneCPOPerPaymentReceiver {
-	no disj c1, c2: CPO | c1.paymentReceiverInfo = c2.paymentReceiverInfo
+	all pr: CPOPaymentReceiver | (one cpo: CPO | cpo.paymentReceiverInfo = pr)
 }
 
 fact oneCPOPerChargingStation {
@@ -364,13 +388,33 @@ fact allChargingProfilesHaveSocket {
 }
 
 fact allBatteriesHaveExactlyOneChargingStation {
-	all bat: ChargingStationBattery | (some cs: ChargingStation | bat in cs.batteries and
-									(all cs2: ChargingStation | bat not in cs2.batteries or cs = cs2))
+	all bat: ChargingStationBattery | (one cs: ChargingStation | bat in cs.batteries)
 }
 
-fact allDSOEnergyOfferHaveOnlyOneDSO {
+fact allDSOEnergySourceHaveChargingStation {
+	all des: DSOEnergySource | some cs: ChargingStation | des in cs.availableDSO
+}
+
+fact allDSOEnergyOfferHaveOnlyOneDSOEnergySource {
 	all deo: DSOEnergyOffer | (one des: DSOEnergySource | des.energyOffer = deo)
 }
+
+fact chargingStationAtMostOneEnergySourceOfDSO {
+	all cs: ChargingStation | (no disj des1, des2: DSOEnergySource | des1.dso = des2.dso
+									and des1 in cs.availableDSO and des2 in cs.availableDSO)
+}
+
+fact allTariffHaveOnlyOneChargingStation {
+	all tar: Tariff | (one cs: ChargingStation | tar in cs.tariffs)
+}
+
+//All type of sockets in a charging station must have a tariff
+fact socketTariff {
+	all sock: Socket, cs: ChargingStation | sock in cs.sockets implies
+										(some t: Tariff | t in cs.tariffs and t.socketType = sock.type) 
+}
+
+//special offers must be lower than base tariff
 
 //Requirement: The user must insert at least a vehicle in order to receive suggestions.
 fact vehicleForSuggestions {
@@ -379,16 +423,17 @@ fact vehicleForSuggestions {
 
 //Requirement: The system shall prevent the user to make new reservations if there are unsolved payment. 
 fact reservationNoUnsolvedPayment {
-	all u: User | (some r: Reservation | not (some cs1: ChargingSession | cs1.reservation = r) and r in u.reservations)
-				implies (all cs2: ChargingSession | cs2.reservation in u.reservations implies
-													(cs2 in u.payedSessions or not cs2.isFinished = TRUE))
+	all u: User | (some r: Reservation | no r.chargingSession and r in u.reservations)
+				implies (all cs: ChargingSession | cs in u.reservations.chargingSession implies
+													(cs in u.payedSessions or not cs.isFinished = TRUE))
+	//all u: User |  #u.reservations.chargingSession - #u.payments <= 1
 }
 
 //Requirement: The system shall allow the user to have only one reservation active at the same time.
 fact onlyOneActiveReservation {
-	all u: User | no disj r1, r2: Reservation | r1 in u.reservations and r2 in u.reservations and 
-						not (some cs1: ChargingSession | cs1.reservation = r1) and 
-						not (some cs2: ChargingSession | cs2.reservation = r2)
+	all u: User | (no disj r1, r2: Reservation | r1 in u.reservations and r2 in u.reservations and 
+						(no r1.chargingSession or r1.chargingSession.isFinished = FALSE) and 
+						(no r2.chargingSession or r1.chargingSession.isFinished = FALSE))
 }
 
 --------------------------------------------------------------------------------------------------------
@@ -405,7 +450,7 @@ check allowStationsResearches for 4
 // Goal: allow users to book a charge
 // There might be some reservations that do not have a charging session
 assert bookCharge {
-	all r: Reservation | (all cs: ChargingSession | not cs.reservation = r) implies 
+	all r: Reservation | not (some cs: ChargingSession | cs = r.chargingSession) implies 
 							(one u: User | r in u.reservations)
 }
 check bookCharge for 4
@@ -413,14 +458,14 @@ check bookCharge for 4
 // Goal: allow a user to start a charging session
 //(If a charging station exist, then it is started)
 assert startChargingSession {
-	all cs: ChargingSession | (some u: User | cs.reservation in u.reservations)
+	all cs: ChargingSession | (some u: User, r: Reservation | r in u.reservations and r.chargingSession = cs)
 }
 check startChargingSession for 4
 
 // Goal: allow users to pay for the service
 assert payForService {
 	all p: Payment | p.chargingSession.isFinished = TRUE and 
-					(one u: User | p in u.payments and p.chargingSession.reservation in u.reservations)
+					(one u: User | p in u.payments and p.chargingSession in u.reservations.chargingSession)
 }
 check payForService for 4
 
@@ -429,6 +474,8 @@ assert userSuggestions {
 	all cs: ChargingSuggestion | (some u: User | cs in u.notifications)
 }
 check userSuggestions for 4
+
+//CPO goals are represented by the structure of the domain at the moment
 
 --------------------------------------------------------------------------------------------------------
 // WORLDS
@@ -472,11 +519,11 @@ run world2 for 6
 pred world3 {
 	#User = 0
 	#CPO >= 2
-	#ChargingStation > 4
-	#ChargingStationBattery > 2
-	#DSOEnergySource > 4
+	#ChargingStation > 2
+	#ChargingStationBattery > 0
+	#DSOEnergySource > 3
 }
-run world3 for 6
+run world3 for 8
 
 //This world is focused on the user registration
 pred world4 {
@@ -489,29 +536,10 @@ pred world4 {
 }
 run world4 for 4
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+pred testShouldBeInconsistent {
+	#User = 1
+	#ChargingSession = 2
+	#Reservation = 4
+	#Payment = 2
+}
+run testShouldBeInconsistent for 6
