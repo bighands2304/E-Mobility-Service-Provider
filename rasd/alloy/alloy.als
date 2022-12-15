@@ -269,10 +269,6 @@ fact noOverlappingReservationsOfUser {
 			(some u: User | r1 in u.reservations and r2 in u.reservations)
 }
 
-fact noOverlappingReservationsOnSocket {
-	no disj r1, r2: Reservation | reservationsOverlapping[r1, r2] and r1.socket = r2.socket
-}
-
 fact allReservationsHaveExactlyOneUser {
 	all r: Reservation | (no disj u1, u2: User | r in u1.reservations and r in u2.reservations) and
 						(some usr: User | r in usr.reservations)
@@ -282,8 +278,9 @@ fact reservationSocketConsistency {
 	all r: Reservation, s: Socket | r.socket = s implies (r in s.reservations and 
 										(no r.chargingSession implies s.status = RESERVED) and
 										(r.chargingSession.isFinished = FALSE implies s.status = CHARGING))
-	all s: Socket | (all r: Reservation | r in s.reservations and r.chargingSession.isFinished = TRUE) iff
+	all s: Socket | (all r: Reservation | not r in s.reservations or r.chargingSession.isFinished = TRUE) iff
 					(s.status = AVAILABLE or s.status = NOT_AVAILABLE)
+	no disj r1, r2: Reservation | reservationsOverlapping[r1, r2] and r1.socket = r2.socket
 }
 
 fact allStationsResearchesHaveUser {
@@ -414,7 +411,7 @@ fact socketTariff {
 										(some t: Tariff | t in cs.tariffs and t.socketType = sock.type) 
 }
 
-//special offers must be lower than base tariff
+//special offers must be lower than base tariff?
 
 //Requirement: The user must insert at least a vehicle in order to receive suggestions.
 fact vehicleForSuggestions {
@@ -522,6 +519,8 @@ pred world3 {
 	#ChargingStation > 2
 	#ChargingStationBattery > 0
 	#DSOEnergySource > 3
+	#Tariff > 4
+	#SpecialOffer > 0
 }
 run world3 for 8
 

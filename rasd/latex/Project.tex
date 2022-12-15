@@ -81,6 +81,10 @@
 \usepackage{fancyhdr} % For the headers
 \fancyhf{}
 
+% -----------
+\usepackage{enumitem}
+\usepackage{tabularx}
+
 % Input of configuration file. Do not change config.tex file unless you really know what you are doing. 
 \input{Configuration_Files/config}
 
@@ -122,12 +126,12 @@
 
 \puttitle{
 	title=RASD: Requirements Analysis and Specification Document,
-	name1=Name Surname 1, % Author Name and Surname
-	name2=Name Surname 2, 
-	name3=Name Surname 3,
+	name1=Lorenzo Ferretti, % Author Name and Surname
+	name2=Lorenzo Manoni, 
+	name3=Carlo Sgaravatti,
 	academicyear=2022-2023,
-	version=0.1,
-	date=01.01.2000
+        version=0.1,
+	date=01/12/2022
 } % These info will be put into your Title page 
 
 %----------------------------------------------------------------------------
@@ -167,12 +171,459 @@
 \chapter{Introduction}
 
 \section{Purpose}
+Recent technological advances make electric vehicles (EVs) a plausible alternative to gasoline vehicles and give them the potential to enable zero or low-emission transportation. Improved batteries are cheaper and permit longer driving ranges making EVs more attractive to consumers than in the past.
+Achieving zero emissions is a goal shared by multiple countries around the world and new green technologies are incentivized all around the world. Investments in  Green transition energy projects are estimated to value 257 billion dollars. 
+
+Considering that the Charging Station infrastructure is a crucial asset to succeed in the EV strategy, our product aims to optimally manage the complex infrastructure needed for electric mobility. 
+The scope of the project aims to satisfy the both driver needs and the Charging Point Managers. 
+Drivers need new means to feel comfortable with Electric Mobility, "range out anxiety" has been defined as one of the main issues that obstacle to the adoption of Electric Vehicles in many parts of the world.
+One of our major goals is to improve EV' drivers' experience through a mobile application, the eMSP, that can help drivers to feel more comfortable, empowering users by informing them about all the charging points they can access and allowing them to reserve charging sessions at a Charging Point. To improve drivers' experience the system actively makes suggestions of stops during a trip using the navigation system and is able to access users' calendars to prone charging sessions that fit the user schedule at best. 
+The system assists the driver also during the charging sessions, providing information on the charging process and notifying him where the process is complete. The user can also benefit from our payment system to pay in a rapid and smart way. 
+
+This is not the only aspect of the EV infrastructure that we care about, in fact, the system also provides software for the management of the CP. This software is the CPMS and the scope of this product is to help the Charging Point Operators (CPOs) to manage their Charging Points. We provided all crucial functionality for all operations executed by them. We support the acquisition of energy by different energy providers (DSOs), we provide a system to manage each Charging Point allowing the CPOs to monitor the status of each socket, and the status of the battery if presented and to perform all critical operations on them (like the exclusion of the battery from the system, the management of the stock availability and the socket charging profile). 
+Our system doesn't limit to offering industry-standard operations, in fact, it has an intelligent component for optimizing energy acquisition and management. This is a crucial feature that enables CPOs to reduce costs through a cost-optimal energy choice, which can result to be a really important asset in a competitive scenario. 
+Another key feature of the system is to give to CPOs the possibility to create special offers to the customer that can directly access them through the eMSP. 
+
+Both the eMSP and the CPMS can interact with all the other systems provided by others. 
+
+
+\subsection{Goals}
+User goals:
+\begin{enumerate}[label=\textbf{G\arabic*}]
+
+    \item Allow users to visualize nearby charging stations and the relative price of energy, socket availability, and if they provide offers;
+    
+    \item Users can reserve a charge at a certain charging point for a certain time slot;
+    
+    \item Allow the user to start a charging process at a station;
+
+    \item Allow the user to monitor the status of the charging process with valuable data;
+
+    \item Allow the user to pay for the service;
+
+    \item Gives users suggestions about the optimal schedule to charge the vehicle depending on battery status, the schedule of the users, and offers provided by CPOs;
+
+\end{enumerate}
+
+CPO goals:
+\begin{enumerate}[label=\textbf{G\arabic*}]\setcounter{enumi}{6}
+
+    \item Allow CPOs dynamically decide from which DSO to acquire energy providing information on energy prices;
+
+    \item Allow CPOs dynamically decide the cost of charging and when setting special offers
+
+    \item Allow CPOs dynamically decide whether or not to store energy in their internal batteries;
+
+    \item Allow CPOs dynamically decide, during a charging process, to use the stored energy in the battery or to acquire directly from DSOs to fulfill the charge or a mix of both;
+
+    \item Allow the CPOs to manage the status of the sockets of their charging stations.
+
+\end{enumerate}
 
 \section{Scope}
 
+\subsection{World Phenomenas}
+
+\begin{enumerate}[label=\textbf{WP\arabic*}]
+    \item The user arrives at the CP with his electric car;
+
+    \item The user sets a route in the navigation system;
+
+    \item The user uses a calendar to organize a personal schedule;
+\end{enumerate}
+
+\subsection{Shared Phenomenas}
+
+\begin{table}[H]
+\centering 
+    \begin{tabularx}{\textwidth}{|p{3em}|X|c|}
+    \hline
+    \rowcolor{bluepoli!40}
+     & \textbf{Phenomena} & \textbf{Controller}\T\B \\
+    \hline \hline
+    \textbf{SP1} & The user registers to the eMSP & W\T\B\\
+    \hline
+    \textbf{SP2} & The user logins to the eMSP & W\T\B\\
+    \hline
+    \textbf{SP3} & The user checks the CP nearby & W\T\B\\
+    \hline
+    \textbf{SP4} & The user checks for the offers & W\B\\
+    \hline
+    \textbf{SP5} & The user reserves a CP & W\B\\
+    \hline
+    \textbf{SP6} & The user plugs the socket from his car when the charging process is finished & W\B\\
+    \hline
+    \textbf{SP7} & The user checks the status of the charging process & W\B\\
+    \hline
+    \textbf{SP8} & The user ends the charging process & W\B\\
+    \hline
+    \textbf{SP9} & The user pays for the service & W\B\\
+    \hline
+    \textbf{SP10} & The CPO selects the source of energy & W\B\\
+    \hline
+    \textbf{SP11} & The user checks for the offers & W\B\\
+    \hline
+    \textbf{SP12} & The CPO manages the offers & W\B\\
+    \hline
+    \textbf{SP13} & The CPO manages the charging schedules & W\B\\
+    \hline
+    \textbf{SP14} & The eMSP notifies the user when the charging process is completed & M\B\\
+    \hline
+    \textbf{SP15} & The eMSP retrieves information from the user's calendar & M\B\\
+    \hline
+    \textbf{SP16} & The eMSP retrieves information from the user navigation system & M\B\\
+    \hline
+    \textbf{SP17} & The eMSP retrieves information from the car battery & M\B\\
+    \hline
+    \textbf{SP18} & The eMSP notifies the user of suggestions for the recharging process at a certain CP and timeframe & M\B\\
+    \hline
+    \textbf{SP19} & The CPMS communicates to the CP to lock/unlock a socket & M\B\\
+    \hline
+    \textbf{SP20} & The CPMS communicates to the CP to start/end the charging process & M\B\\
+    \hline
+    \textbf{SP21} & The CPMS acquires information about the CPs (socket status, battery status, position, charging processes) & M\B\\
+    \hline
+    \textbf{SP22} & The CPMS acquires information about energy prices and availability from DSOs & M\B\\
+    \hline
+    \textbf{SP23} & The CPMS changes the source of energy & M\B\\
+    \hline
+    \textbf{SP24} & The CPMS stores energy in the CP battery when cheaper & M\B\\
+    \hline
+    \end{tabularx}
+    \\[10pt]
+    \caption{Highlighting the rows}
+    \label{table:exampleR}
+\end{table}
+
+\section{Glossary}
+
+\subsection{Definitions}
+
+\begin{itemize}
+    \item \textbf{Charging Point:} The physical system where an electric vehicle can be recharged.
+    \item \textbf{Charging Point Operator:} A company that owns some charging points.
+    \item \textbf{Socket:} A physical connector of the charging point on which a vehicle is connected when recharging.
+    \item \textbf{Charging Profile:} A schedule that defines how much energy a particular socket will provide to the connected vehicle during the charging process. Usually, the schedule is composed of a list of different periods (e.g. different time intervals of a day) on which the amount of energy that the socket will provide can be different.
+    \item \textbf{User:} The person who is registered to the service and that can make reservations in some charging stations in order to recharge his vehicle.
+    \item \textbf{Reservation:}
+    \item \textbf{Charging Session:}
+    \item \textbf{Distribution System Operator:} A company that provides energy to the charging points.
+    \item \textbf{Notification:}
+\end{itemize}
+
+\subsection{Acronyms}
+
+\begin{itemize}
+    \item \textbf{CPMS:} Charging Point Management System
+    \item \textbf{eMSP:} e-Mobility Service Provider
+    \item \textbf{OCPI:} Open Charge Point Interface, which is the communication protocol used to connect eMSP and CPMS.
+    \item \textbf{OCPP:} Open Charge Point Protocol, which is the communication protocol used to connect the CPMS and the charging point.
+\end{itemize}
+
+\subsection{Abbreviations}
+
+\begin{itemize}
+    \item \textbf{CP:} Charging Point
+    \item \textbf{CPO:} Charging Point Operator
+    \item \textbf{DSO:} Distribution System Operator
+    \item \textbf{Gn:} Goal number n
+    \item \textbf{Rn:} Requirement number n
+    \item \textbf{Dn:} Domain assumption number n
+    \item \textbf{WPn:} World phenomena number n
+    \item \textbf{SPn:} Shared phenomena number n
+\end{itemize}
+
+\section{Revision history}
+
+\section{Reference Documents}
+\begin{itemize}
+    \item OSCP 2.0 Specification.pdf
+    \item SMUD OpenADR Implementation Design Guide v1\_0.pdf
+    \item ocpp-1.6.pdf
+    \item OCPI-2.2.1.pdf
+\end{itemize}
+
+\section{Document Structure}
+
 \chapter{Overall Description}
 
+\section{Product perspective}
+
+\subsection{Scenarios}
+
+\begin{enumerate}
+    \item \textbf{A new user wants to start using the eMall service.} \newline
+    The user Luke has just bought his new electric vehicle and wants to find places where he can charge the battery of his new car. Luke decides to download it on his mobile phone and register for the eMall service. He opens the applications and inserts his data, including his car information and a payment method; he also allows the system to access his calendar and navigation system in order to use all features provided.
+
+    \item \textbf{A user insert his vehicles information.} \newline
+    John is a new user really passionate about electric cars, in his garage has 4 different electric vehicles. During the registration, he inserts all his cars, provides the related information, and selects the car that uses on a daily basis as "Currently using". The eMSP gives John suggestions considering his  "Currently using" car, also when John books a charge, the system considers only the sockets compatible with the car. On the weekend John decides to drive another car and select his truck as "Currently Using".
+
+    \item \textbf{A user receives a suggestion based on the navigation system.} \newline
+    The user Luke is driving for a long trip and his navigation system is active. While he is following the path, the system acquires information on the battery status and realizes that he will not be able to reach the destination without stopping for charging and it computes the best charging station to stop (considering the time lost for charging the vehicle and the battery status). The system sends a notification to Luke about the suggested stop for the "Currently Using" vehicle; Luke accepts the suggestion and the system reserve a socket of the correct type for his car in the suggested charging point.
+
+    \item \textbf{User recharges his vehicle and pays for the service.} \newline
+    Luke has already booked a charge in the charging station Y, arrives at the location, and parks the car in front of the correct socket. From the mobile application, he selects the option to start the charge and the CPMS unlocks the socket. Luke inserts the plug in the socket and the CPMS locks the socket. The CPMS considers all available options to transfer the energy considering the cost of the electricity of every DSO available and the CP battery, at the end it decides to use the CP battery for the energy flow and starts the charging process. After some minutes the CPMS realizes that the battery of the car is full and stops the energy flow, the eMSP sends a notification to Luke, who returns to the car. Luke ends the charging process with his mobile application, the CPMS unlocks the socket and Luke removes the plug. In the end, the eMSP pays for the service with the payment method provided by Luke. Now the socket is free and available for other users.
+
+    \item \textbf{CPO chooses a DSO as the energy source for a CP.} \newline
+    Mark works for a CPO, recently the company signed a contract with "Energy Distribution" DSO that force the company to acquire the energy only from it for an entire month. Mark login into the CPMS of the company with his credentials and select the option that forces every CP to acquire energy only from "Energy Distribution". At the end of the month, Mark reset the CMPS to let him choose the best strategy to acquire energy.
+
+    \item \textbf{CPO includes the battery as an energy source for a CP.} \newline
+    Mark, that still works for a CPO, is sent to a CPMS that must do some maintenance work for increasing the CP battery capacity, so decides to manually set the energy acquisition only from DSOs, excluding the CP battery. After a week the CP battery is repaired and Mark resets the default settings, in this way the CPMS has full control of the CP. It notices that the prices of the DSO are increased exponentially in this period and the CP battery is not used to its new full potential, so mix the energy flow with the DSOs, in order to optimize the cost.
+
+    \item \textbf{User receives a suggestion based on the calendar.} \newline
+    Luke uses his calendar on a daily basis to manage his business meetings. The eMSP acquires information from his mobile phone calendar application, considers also the battery status, and realizes that there is a convenient CP near a business meeting location. It sends a notification to Luke who accepts the suggestion. A socket of the CP is booked.
+\end{enumerate}
+
+\subsection{Class Diagram}
+
+\subsection{State Diagrams}
+
+\section{Product functions}
+
+\section{User characteristics}
+
+\section{Assumptions, dependencies and constraints}
+
 \chapter{Specific Requirements}
+
+\section{External Interface Requirements}
+
+\subsection{User Interfaces}
+
+\subsection{Hardware Interfaces}
+
+\subsection{Software Interfaces}
+
+\subsection{Communication Interfaces}
+
+\section{Functional Requirements}
+\subsection{Use Cases}
+CPO use cases:
+
+% ADD CP
+
+\begin{table}[H]
+    \begin{tabularx}{\textwidth}{| >{\columncolor{bluepoli!40}}l | X |}
+    \hline
+    \textbf{Actor} & CPO\T\B \\
+    \hline
+    \textbf{Entry Condition} & The CPO is logged on the CPMS and is on the home page\T\B\\
+    \hline
+    \textbf{Event Flow} & 
+        \begin{enumerate}
+        \item The CPO presses the “Add charging point” button;
+        \item The CPMS displays a form to the CPO;
+        \item The CPO insert the location of the CP, a list of sockets together with their type, and the price of energy that will be applied in that CP;
+        \item The CPO inserts some information about how the CPMS will be able to connect to the new CP;
+        \item The CPMS establishes a connection to the new charging point;
+        \item The new charging point accepts the connection and acknowledges the CPMS;
+        \item The CPMS notify to all the eMSP of the presence of the new charging point.
+        \end{enumerate}\B\\
+    \hline
+    \textbf{Exit Conditions} & The CPMS shows the home page to the CPO, where the new charging point is present\B\\
+    \hline
+    \textbf{Exceptions} & If the CPMS is not able to connect to the new charging point, it warns the CPO that can modify the connection parameters or remove the charging point\B\\
+    \hline
+    \end{tabularx}
+    \\[10pt]
+    \caption{Add CP}
+    \label{table:example}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{}
+    \caption{Caption of the Figure to appear in the List of Figures.}
+    \label{fig:quadtree}
+\end{figure}
+
+% MANAGE CP'S BATTERY CONNECTION
+
+\begin{table}[H]
+    \begin{tabularx}{\textwidth}{| >{\columncolor{bluepoli!40}}l | X |}
+    \hline
+    \textbf{Actor} & CPO\T\B \\
+    \hline
+    \textbf{Entry Condition} & The CPO is logged on the CPMS and is viewing the internal status of the charging point\T\B\\
+    \hline
+    \textbf{Event Flow} & 
+        \begin{enumerate}
+        \item The CPO presses the “Manage Energy Source” button;
+        \item CPMS shows a page that contains details about the battery status and about the current energy source;
+        \item The CPO presses the “Include battery” button;
+        \item The CPMS shows a form to the CPO;
+        \item The CPO inserts the percentage of energy that the charging point will take from the battery for the charging sessions and the minimum battery level, until which the charging point will take the power from it;
+        \item The CPMS displays a confirmation popup;
+        \item The CPO presses the confirm button;
+        \item The CPMS notifies the charging point about the change of strategy for the energy flow;
+        \item The charging point confirms the update;
+        \item The CPMS shows a success message to the CPO.
+        \end{enumerate}\B\\
+    \hline
+    \textbf{Exit Conditions} & The CPMS shows the home page to the CPO, where the new charging point is present\B\\
+    \hline
+    \textbf{Exceptions} & If the CPMS is not able to connect to the new charging point, it warns the CPO that can modify the connection parameters or remove the charging point\B\\
+    \hline
+    \end{tabularx}
+    \\[10pt]
+    \caption{Manage CP’s battery  connection}
+    \label{table:example}
+\end{table}
+
+% Change the socket’s charging profile
+
+\begin{table}[H]
+    \begin{tabularx}{\textwidth}{| >{\columncolor{bluepoli!40}}l | X |}
+    \hline
+    \textbf{Actor} & CPO\T\B \\
+    \hline
+    \textbf{Entry Condition} & The CPO is logged on the CPMS and is viewing the home page\T\B\\
+    \hline
+    \textbf{Event Flow} & 
+        \begin{enumerate}
+        \item The CPO press the “CP View” button;
+        \item The CPMS shows a page containing CP information;
+        \item The CPO presses the “Manage Sockets” button;
+        \item The CPMS shows a page that contains detailed information about all the sockets, including the type of sockets, the availability of the socket, how much energy the sockets are currently providing to the connected vehicles, and the estimated remaining time to complete the charging session;
+        \item The CPO clicks the “View Charging Profile” button near a socket;
+        \item The CPMS shows the current schedule of the socket, which contains the maximum energy that the socket can provide to the vehicle in a certain period of the day;
+        \item The CPO presses the “Update Charging Profile” button;
+        \item The CPMS shows a form to the CPO;
+        \item The CPO inserts the new charging profile for the socket;
+        \item The CPMS notifies the changes to the charging point;
+        \item The charging point confirms the update;
+        \item The CPMS sends a confirmation message to the CPO.
+        \end{enumerate}\B\\
+    \hline
+    \textbf{Exit Conditions} & The CPMS shows the CPO the new charging profile of the socket\B\\
+    \hline
+    \textbf{Exceptions} & 
+    \begin{enumerate}
+        \item If the charging profile inserted by the CPO is not complete (i.e. not all hours of the day are covered), the CPMS shows an error message to the CPO;
+        \item If the amount of power that the CPO has inserted in a certain period of time of the charging profile is higher than the maximum energy that the current energy source is able to provide, the CPMS will warn the CPO by showing a popup. If the CPO confirms the profile, the CPMS will apply it;
+        \item If the charging point returns an error message the CPMS undo the changes and shows an error page to the CPO.
+        \end{enumerate}\B\\
+    \hline
+    \end{tabularx}
+    \\[10pt]
+    \caption{Change the socket’s charging profile}
+    \label{table:example}
+\end{table}
+
+% Change the socket’s  availability
+
+\begin{table}[H]
+    \begin{tabularx}{\textwidth}{| >{\columncolor{bluepoli!40}}l | X |}
+    \hline
+    \textbf{Actor} & CPO, CP\T\B \\
+    \hline
+    \textbf{Entry Condition} & The CPO is logged on the CPMS and is on the home page\T\B\\
+    \hline
+    \textbf{Event Flow} & 
+        \begin{enumerate}
+        \item The CPO press the “CP View” button;
+        \item The CPMS shows a page containing CP information;
+        \item The CPO press the “Manage Sockets” button relative to a certain CP;
+        \item The CPMS shows a page containing all the sockets of a certain CP, including the type of sockets, the availability of the socket, how much energy the sockets are currently providing to the connected vehicles, and the estimated remaining time to complete the charging session;
+        \item The CPO clicks the “Change availability” button near a socket;
+        \item The CPMS shows a form where the CPO has to insert the starting date and time on which the socket will change the available;
+        \item The CPO inserts the date and the new availability;
+        \item The CPMS waits until the inserted time is reached;
+        \item The CPMS notifies the change of availability of a socket to the charging point;
+        \item The charging point confirms the update;
+        \item The CPMS sends a notification to the CPO to confirm the update;
+        \item The CPMS notifies all the connected eMSP about the update.
+        \end{enumerate}\B\\
+    \hline
+    \textbf{Exit Conditions} & The CPMS returns to the page that shows the status of the sockets of the charging point\B\\
+    \hline
+    \textbf{Exceptions} & If there is a charging session that will terminate after the timestamp inserted by the CPO, the CPMS will send an error to the CPO\B\\
+    \hline
+    \end{tabularx}
+    \\[10pt]
+    \caption{Change the socket’s  availability}
+    \label{table:example}
+\end{table}
+
+% Set charging point Tariff
+
+\begin{table}[H]
+    \begin{tabularx}{\textwidth}{| >{\columncolor{bluepoli!40}}l | X |}
+    \hline
+    \textbf{Actor} & CPO\T\B \\
+    \hline
+    \textbf{Entry Condition} & The CPO is logged on the CPMS and is on the home page\T\B\\
+    \hline
+    \textbf{Event Flow} & 
+        \begin{enumerate}
+        \item The CPO press the “CP View” button;
+        \item The CPMS shows a page containing CP information;
+        \item The CPO presses the “Price Update” button;
+        \item The CPMS shows a form to the CPO;
+        \item The CPO inserts the new price of the charging station and submits the changes;
+        \item The CPMS shows a success message;
+        \item The CPMS notifies all the connected eMSP about the change in the price.
+        \end{enumerate}\B\\
+    \hline
+    \textbf{Exit Conditions} & The price of the charging point is changed\B\\
+    \hline
+    \textbf{Exceptions} & If the price that the CPO insert is lower than the current price of energy that the CPO is paying to the DSO, the CPMS warns the CPO before applying the change\B\\
+    \hline
+    \end{tabularx}
+    \\[10pt]
+    \caption{Set charging point Tariff}
+    \label{table:example}
+\end{table}
+
+% Set charging point Special Offer
+
+\begin{table}[H]
+    \begin{tabularx}{\textwidth}{| >{\columncolor{bluepoli!40}}l | X |}
+    \hline
+    \textbf{Actor} & CPO\T\B \\
+    \hline
+    \textbf{Entry Condition} & The CPO is logged on the CPMS and is viewing the home page\T\B\\
+    \hline
+    \textbf{Event Flow} & 
+        \begin{enumerate}
+        \item The CPO press the “CP View” button;
+        \item The CPMS shows a page containing CP information;
+        \item The CPO presses the “Add special offer” button.;
+        \item The CPMS shows a form to the CPO;
+        \item The CPO inserts the new special offer for the charging station, which includes the price and the period on which the offer will be valid;
+        \item The CPMS shows a success message;
+        \item The CPMS notifies all the connected eMSP about the change in the price.
+        \end{enumerate}\B\\
+    \hline
+    \textbf{Exit Conditions} & A new special offer is created\B\\
+    \hline
+    \textbf{Exceptions} & If the price that the CPO insert is lower than the current price of energy that the CPO is paying to the DSO, the CPMS warns the CPO before applying the change\B\\
+    \hline
+    \end{tabularx}
+    \\[10pt]
+    \caption{Set charging point Special Offer}
+    \label{table:example}
+\end{table}
+
+\section{Performance Requirements}
+
+\section{Design Constraints}
+
+\subsection{Standards Compliance}
+
+\subsection{Hardware Limitations}
+
+\section{Software System Attributes}
+
+\subsection{Reliability}
+
+\subsection{Availability}
+
+\subsection{Security}
+
+\subsection{Maintainability}
+
+\subsection{Portability}
 
 \chapter{Formal Analysis Using Alloy}
 
