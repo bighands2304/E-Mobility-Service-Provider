@@ -174,7 +174,7 @@ abstract sig EnergySource {
 	maxEnergyFlow: one Int,
 	actualEnergyFlow: one Int
 } {
-	maxEnergyFlow > 0 and actualEnergyFlow > 0 and
+	maxEnergyFlow > 0 and actualEnergyFlow >= 0 and
 	actualEnergyFlow <= maxEnergyFlow
 }
 
@@ -189,9 +189,11 @@ sig ChargingStationBattery extends EnergySource {
 	isInUse: one Boolean,
 	isRecharging: one Boolean
 } {
-	capacity > 0 and storageStatus > 0 and
+	capacity > 0 and storageStatus >= 0 and
 	(isInUse = TRUE implies isRecharging = FALSE) and
-	(isRecharging = TRUE implies isInUse = FALSE)
+	(isRecharging = TRUE implies isInUse = FALSE) and
+	(actualEnergyFlow > 0 implies isInUse = TRUE) and
+	(isInUse = FALSE implies actualEnergyFlow = 0)
 }
 
 sig DSO {}
@@ -225,18 +227,24 @@ pred reservationsOverlapping[r1: Reservation, r2: Reservation] {
 
 // For simplicity, the range of a research here is a square and not a circle
 pred nearRange[sr: StationsResearch, cp: ChargingPoint] {
-	((cp.position.latitude >= sr.position.latitude and 
-	cp.position.latitude - sr.position.latitude <= sr.distanceRange) or
-	(cp.position.latitude < sr.position.latitude and 
-	sr.position.latitude - cp.position.latitude <= sr.distanceRange)) and
-	((cp.position.longitude >= sr.position.longitude and
-	cp.position.longitude - sr.position.longitude <= sr.distanceRange) or
-	(cp.position.longitude < sr.position.longitude and
-	sr.position.longitude - cp.position.longitude <= sr.distanceRange))
+	((gte[cp.position.latitude, sr.position.latitude] and 
+	lte[sub[cp.position.latitude, sr.position.latitude], sr.distanceRange]) or
+	(lt[cp.position.latitude, sr.position.latitude] and 
+	lte[sub[sr.position.latitude, cp.position.latitude], sr.distanceRange])) and
+	((gte[cp.position.longitude, sr.position.longitude] and
+	lte[sub[cp.position.longitude, sr.position.longitude], sr.distanceRange]) or
+	(lt[cp.position.longitude, sr.position.longitude] and
+	lte[sub[sr.position.longitude, cp.position.longitude], sr.distanceRange]))
+}
+
+pred isActive [r: Reservation] {
+	no r.chargingSession or r.chargingSession.isFinished = FALSE
 }
 
 --------------------------------------------------------------------------
 // FACTS
+
+-- User
 
 fact uniqueUsername {
 	no disj u1, u2: User | u1.username = u2.username
@@ -257,6 +265,8 @@ fact allEmailAddressHaveUser {
 fact allUsernameHaveUser {
 	all usn: Username | (some u: User | u.username = usn)
 }
+
+-- Reservations
 
 fact noOverlappingReservationsOfUser {
 	no disj r1, r2: Reservation | reservationsOverlapping[r1, r2] and
@@ -282,19 +292,46 @@ fact reservationSocketConsistency {
 			(r2.chargingSession.isFinished = TRUE and r2.to.timestamp < r.from.timestamp)))
 }
 
+//The system shall prevent the user to make new reservations if there are unsolved payment. 
+fact reservationNoUnsolvedPayment {
+	all u: User | 
+		(some r: Reservation | no r.chargingSession and r in u.reservations) 
+			implies (all cs: ChargingSession | cs in u.reservations.chargingSession 
+				implies (cs in u.payedSessions and cs.isFinished = TRUE))
+}
+
+//The system shall allow the user to have only one reservation active at the same time.
+fact onlyOneActiveReservation {
+	all u: User | (no disj r1, r2: Reservation | r1 in u.reservations and 
+		r2 in u.reservations and isActive[r1] and isActive[r2])
+}
+
+fact onlyTheLastReservationCanBeActive {
+	all u: User, r: Reservation | 
+		(r in u.reservations and no r.chargingSession) implies 
+			(all r2: Reservation | (r2 in u.reservations and r2 != r) implies
+				(not isActive[r2] and r2.to.timestamp <= r.from.timestamp))
+}
+
+-- Stations Researches
+
 fact allStationsResearchesHaveUser {
 	all sr: StationsResearch | (one u: User | sr in u.stationResearches)
 }
 
 fact stationsResarchesNearbyStations {
 	all sr: StationsResearch, cp: ChargingPoint | 
-		nearRange[sr, cp] implies cp in sr.nearbyStations
+		nearRange[sr, cp] iff cp in sr.nearbyStations
 }
+
+-- Charging Sessions
 
 fact oneChargingSessionPerReservation {
 	all cs: ChargingSession | one r: Reservation | r.chargingSession = cs
 }
 
+//Not all charging sessions must have a notification since the user can terminate it earlier
+//But there is at most one notification per charging session
 fact oneNotificationPerChargingSession {
 	no disj n1, n2: ChargingEndedNotification | n1.chargingSession = n2.chargingSession
 }
@@ -302,6 +339,8 @@ fact oneNotificationPerChargingSession {
 fact allChargingSessionHaveAtMostOnePayment {
 	no disj p1, p2: Payment | p1.chargingSession = p2.chargingSession
 }
+
+-- Payments
 
 fact paymentChargingSessionFinished {
 	all pm: Payment | pm.chargingSession.isFinished = TRUE
@@ -326,6 +365,8 @@ fact allPaymentMethodHaveUserOrPayment {
 				(some p: Payment | p.paymentMethod = pm)
 }
 
+-- Vehicles
+
 fact allVehicleHaveUser {
 	all v: Vehicle | (some u: User | v in u.vehicles)
 }
@@ -342,8 +383,16 @@ fact uniqueVIN {
 	no disj v1, v2: Vehicle | v1.vin = v2.vin
 }
 
+-- Notifications
+
 fact allNotificationsHaveUser {
 	all n: Notification | (one u: User | n in u.notifications)
+}
+
+fact noSuggestionsAtTheSameTimeForTheSameUser {
+	all cs1, cs2: ChargingSuggestion, u: User |
+		(cs1 in u.notifications and cs2 in u.notifications and cs1 != cs2) implies
+			cs1.timestamp.timestamp != cs2.timestamp.timestamp
 }
 
 fact suggestionsVehicleOfUser {
@@ -351,17 +400,30 @@ fact suggestionsVehicleOfUser {
 		(cs in usr.notifications) implies (cs.suggestedVehicle in usr.vehicles)
 }
 
-fact uniquePositionForChargingPoints {
-	no disj s1, s2: ChargingPoint | s1.position = s2.position
+//The user must insert at least a vehicle in order to receive suggestions.
+fact vehicleForSuggestions {
+	all cs: ChargingSuggestion, u: User | 
+		cs in u.notifications implies #u.vehicles > 0
 }
+
+-- Charging Points and CPOs
 
 fact oneCPOPerPaymentReceiver {
 	all pr: CPOPaymentReceiver | (one cpo: CPO | cpo.paymentReceiverInfo = pr)
 }
 
+fact CPOMustHaveAtLeastOneChargingPoint {
+	all cpo: CPO | some cp: ChargingPoint | cp in cpo.chargingPoints
+}
+
 fact oneCPOPerChargingPoint {
 	all s: ChargingPoint | 
 		(no disj c1, c2: CPO | s in c1.chargingPoints and s in c2.chargingPoints)
+}
+
+fact uniquePositionForChargingPoints {
+	no disj s1, s2: ChargingPoint | s1.position = s2.position
+	no disj p1, p2: Position | p1.latitude = p2.latitude and p1.longitude = p2.longitude
 }
 
 fact oneChargingStationPerSocket {
@@ -377,9 +439,15 @@ fact allChargingStationsHaveCPO {
 	all cp: ChargingPoint | (one cpo: CPO | cp in cpo.chargingPoints)
 }
 
+-- Charging Profiles
+
 fact allChargingSchedulePeriodHaveChargingProfile {
 	all csp: ChargingSchedulePeriod | 
 		(some cp: ChargingProfile | csp in cp.schedules)
+}
+
+fact atLeastOneChargingSchedulePeriodPerProfile {
+	all cp: ChargingProfile | #cp.schedules > 0
 }
 
 fact noChargingSchedulePeriodWithSameStartInsideChargingProfile {
@@ -390,6 +458,8 @@ fact noChargingSchedulePeriodWithSameStartInsideChargingProfile {
 fact allChargingProfilesHaveSocket {
 	all cp: ChargingProfile | (some sock: Socket | sock.chargingProfile = cp)
 }
+
+-- Energy Source
 
 fact currentEnergySourceIsInBatteriesOrAvailableDSO {
 	all cp: ChargingPoint, dso: DSOEnergySource |
@@ -416,6 +486,26 @@ fact chargingPointAtMostOneEnergySourceOfDSO {
 			des1.dso = des2.dso and des1 in cp.availableDSO and des2 in cp.availableDSO)
 }
 
+fact allDSOHaveAtLeastOneEnergySource {
+	all ds: DSO | some des: DSOEnergySource | des.dso = ds
+}
+
+//While a DSO can serve multiple charging points, the same energy source cannot
+//since they might have different actual energy flows
+fact noSameDSOEnergySourceForDifferentChargingPoints {
+	all esrc: DSOEnergySource | no disj cp1, cp2: ChargingPoint | 
+		esrc in cp1.availableDSO and esrc in cp2.availableDSO
+}
+
+//If energy source is not used than the actual energy flow is zero
+fact ifDSOEnergySourceIsNotUsedThenEnergyFlowIsZero {
+	all cp: ChargingPoint, esrc: DSOEnergySource |
+		(esrc in cp.availableDSO and esrc != cp.currentEnergySource)
+			implies esrc.actualEnergyFlow = 0
+}
+
+-- Tariff
+
 fact allTariffHaveOnlyOneChargingPoint {
 	all tar: Tariff | (one cp: ChargingPoint | tar in cp.tariffs)
 }
@@ -426,25 +516,10 @@ fact socketTariff {
 		sock in cp.sockets implies (some t: Tariff | t in cp.tariffs and t.socketType = sock.type) 
 }
 
-//The user must insert at least a vehicle in order to receive suggestions.
-fact vehicleForSuggestions {
-	all cs: ChargingSuggestion, u: User | 
-		cs in u.notifications implies #u.vehicles > 0
-}
-
-//The system shall prevent the user to make new reservations if there are unsolved payment. 
-fact reservationNoUnsolvedPayment {
-	all u: User | 
-		(some r: Reservation | no r.chargingSession and r in u.reservations) 
-			implies (all cs: ChargingSession | cs in u.reservations.chargingSession 
-				implies (cs in u.payedSessions or not cs.isFinished = TRUE))
-}
-
-//The system shall allow the user to have only one reservation active at the same time.
-fact onlyOneActiveReservation {
-	all u: User | (no disj r1, r2: Reservation | r1 in u.reservations and r2 in u.reservations and 
-		(no r1.chargingSession or r1.chargingSession.isFinished = FALSE) and 
-		(no r2.chargingSession or r1.chargingSession.isFinished = FALSE))
+//There shouldn't be two base tariffs on the same type of sockets (but there can 
+//some special offers and a tariffs on the same socket)
+fact onlyOneBaseTariffsOnTheSameSocketType {
+	all cp: ChargingPoint | #(cp.tariffs - SpecialOffer) = #cp.sockets.type
 }
 
 ------------------------------------------------------------------------------------
@@ -593,9 +668,10 @@ run world1 for 4
 //This world is focused on charging suggestions
 pred world2 {
 	#Vehicle > 2
-	#ChargingSuggestion > 3
-	#User > 2
+	#ChargingSuggestion > 2
+	#User = 2
 	#CPO = 1
+	#ChargingPoint > 1
 	#Reservation = 0
 }
 run world2 for 6
@@ -604,11 +680,14 @@ run world2 for 6
 pred world3 {
 	#User = 0
 	#CPO >= 2
-	#ChargingPoint > 2
 	#ChargingStationBattery > 0
 	#DSOEnergySource > 3
-	#Tariff > 4
+	#Tariff >= 4
 	#SpecialOffer > 0
+	some s: Socket | s.type = SLOW
+	some s: Socket | s.type = FAST
+	some s: Socket | s.type = RAPID
+	some cp: ChargingPoint | #cp.sockets > 1
 }
 run world3 for 8
 
@@ -626,7 +705,7 @@ run world4 for 4
 //This world is focused on reservations on the same socket
 pred world5 {
 	#Socket = 1
-	#User > 2
+	#User >= 2
 	#Reservation >= 3
 	some r: Reservation | no r.chargingSession
 	#Payment >= 2
@@ -636,10 +715,12 @@ run world5 for 6
 //This world is focused on the stations researches
 pred world6 {
 	#User > 0
-	#StationsResearch > 2
+	#StationsResearch = 2
 	#CPO = 1
-	#ChargingPoint >= 5
+	#DSO > 1
+	#ChargingPoint >= 4
 	all cp: ChargingPoint | #cp.sockets = 1
 	#Reservation = 0
+	all sr: StationsResearch | sr.distanceRange <= 3
 }
 run world6 for 6
