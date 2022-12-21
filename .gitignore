@@ -17,3 +17,6 @@
 *.fdb_latexmk
 *.synctex
 *.synctex.gz
+
+#Mac
+*.DS_Store
