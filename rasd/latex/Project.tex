@@ -134,8 +134,8 @@
 	name2=Lorenzo Manoni, 
 	name3=Carlo Sgaravatti,
 	academicyear=2022-2023,
-        version=1.0,
-	date=23/12/2022
+        version=1.1,
+	date=08/01/2023
 } % These info will be put into your Title page 
 
 %----------------------------------------------------------------------------
@@ -178,7 +178,6 @@
 
 The scope of this document consists of showing the requirements of the system to be. Since the system to be is made up of two different sub-systems the eMSP and the CPMS, that also have different final users, this document will include a description of both systems.
 Characteristics of the system are described following a top-down approach with the aim to facilitate comprehension of the readers.
-
 
 \subsection{Goals}
 User goals:
@@ -369,6 +368,11 @@ Both the eMSP and the CPMS can interact with all the other systems provided by o
 
 \begin{itemize}
     \item December 23, 2022: version 1.0 (first release)
+    \item January 8, 2023: version 1.1
+        \begin{enumerate}
+            \item Modified StartChargingSession and EndChargingSession use cases
+            \item Eliminated 7 requirements regarding the unlock of a socket and, as a consequence, fixed the mapping
+        \end{enumerate}
 \end{itemize}
 
 \section{Reference Documents}
@@ -1093,22 +1097,17 @@ Also for the payment system, there are no particular constraints.
     \hline
     \textbf{Event Flow} & 
         \begin{enumerate}
-        \item The user clicks the “Unlock” button;
-        \item The eMSP sends the unlock socket request to the CPMS;
-        \item The CPMS sends the unlock socket request to the CP;
-        \item The CP unlocks the socket;
+        \item The user clicks the “Start Session” button;
+        \item The eMSP sends the start session request to the CPMS;
+        \item The CPMS sends the start session request to the CP;
+        \item The CP accepts the command and unlocks the socket;
         \item The CP waits for the user to plug the socket;
         \item The CP recognizes a plugged socket;
-        \item The CP sends the plugged socket message to CPMS;
-        \item The CPMS sends the plugged socket message to eMSP;
-        \item The eMSP shows the “Start charging” button;
-        \item The user clicks the “Start charging” button;
-        \item The eMSP sends the start transaction request to CPMS;
-        \item The CPMS sends the start transaction request to CP;
         \item The CP locks the socket;
-        \item The CP sends the response to the CPMS; 
-        \item The CPMS sends the response to the eMSP;
-        \item The eMSP displays a success message.
+        \item The CP starts the energy flow to the vehicle;
+        \item The CP informs the CPMS that the CPMS that the energy flow is started;
+        \item The CPMS sends to the eMSP the information about the started session;
+        \item The eMSP sends a notification to the user to inform him about the start of the charging session.
         \end{enumerate}\B\\
     \hline
     \textbf{Exit Conditions} & The charging process is started\B\\
@@ -1117,7 +1116,7 @@ Also for the payment system, there are no particular constraints.
     \begin{enumerate}
         \item The CP can’t unlock the socket;
         \item The CP can’t start the charging process;
-        \item The user doesn't plug the socket correctly before pressing start charging.
+        \item If the user doesn't plug the socket after a certain timeout, the CPMS will invalidate the session.
     \end{enumerate}
     \begin{itemize}
         \item In all cases the eMSP will notify the user.
@@ -1148,7 +1147,7 @@ Also for the payment system, there are no particular constraints.
     \textbf{Entry Condition} & The user has an active charging session, is logged on and
         \begin{itemize}
             \item the battery of his car is full and he has received a notification for it, or
-            \item had stopped the energy flow before the battery was full
+            \item wants to stop the energy flow before the battery is full
         \end{itemize}\T\B\\
     \hline
     \textbf{Event Flow} & 
@@ -1159,15 +1158,17 @@ Also for the payment system, there are no particular constraints.
         \item The CP sends the charging session to the CPMS;
         \item The CPMS sends the charging session to the eMSP;
         \item The eMSP displays the charging session to the user;
-        \item The user clicks on the “end session” button;
-        \item The eMSP sends the end charging session request to the CPMS;
-        \item The CPMS sends the end charging session request to the CP;
-        \item The CP unlocks the socket;
+        \item The user clicks on the “Stop Session” button;
+        \item The eMSP sends the stop session request to the CPMS;
+        \item The CPMS sends the stop session request to the CP;
+        \item The CP acknowledges the request to the CPMS to inform him that the request will be executed;
+        \item The CPMS notifies the eMSP that the session will stop;
+        \item The eMSP notifies the user;
+        \item The CP stops the energy flow and unlocks the socket;
         \item The CP waits for the user to unplug the socket;
         \item The CP recognizes that the socket is unplugged;
-        \item The CP sends the ended charging session response to the CPMS;
-        \item The CPMS sends the ended charging session response to the eMSP;
-        \item The eMSP displays a success message.
+        \item The CP sends an update to the CPMS about the new status of the socket;
+        \item The CPMS sends a confirmation message to the CP.
         \end{enumerate}\B\\
     \hline
     \textbf{Exit Conditions} & The charging process is ended\B\\
@@ -1694,7 +1695,7 @@ Also for the payment system, there are no particular constraints.
         \item The CPMS displays a success message.
         \end{enumerate}\B\\
     \hline
-    \textbf{Exit Conditions} & The optimizer switch its state to on if is off or off if is on \B\\
+    \textbf{Exit Conditions} & The optimizer switches its state to on if is off or off if is on \B\\
     \hline
     \textbf{Exceptions} & The CP doesn't exists.\B\\
     \hline
@@ -1896,7 +1897,7 @@ R24  &
 \hline
 
 R25  &
-    The eMSP shall access the user’s GPS to retrieve his position.\B\\
+    The eMSP shall access the vehicle’s GPS to retrieve its position.\B\\
 \hline
 
 R26  &
@@ -1924,70 +1925,83 @@ R31  &
     The eMSP shall allow the user to start a charging process to a socket reserved by it.\B\\
 \hline
 
-R32  &
-   The eMSP shall allow the user to unlock the reserved socket before he starts the charging process.\B\\
-\hline
+%R32  &
+%   The eMSP shall allow the user to unlock the reserved socket before he starts the charging process.\B\\
+%\hline
 
-R33  &
+%R33 &
+R32 &
     The eMSP shall allow the user to View  the Charging Process when a socket is reserved successfully including information about battery status, the current price to pay, and the remaining time until the battery is fully recharged.\B\\
 \hline
 
-R34  &
-    The eMSP shall interact with the CPMS to unlock a socket .\B\\
-\hline
+%R34  &
+%    The eMSP shall interact with the CPMS to unlock a socket .\B\\
+%\hline
 
-R35  &
+%R35 &
+R33 &
     The eMSP shall interact with the CPMS to start a charging session.\B\\
 \hline
 
-R36  &
+%R36 &
+R34 &
     The eMSP shall allow the user to pay when a charging process is complete.\B\\
 \hline
 
-R37  &
+%R37 &
+R35 &
     The eMSP shall collect payment information when process successfully a payment, saving information about the amount paid, the payment method used, the amount of energy used, the price of energy,  the CP information such as location and CPO provider, the type of socket used (flow, fast or rapid), the duration of the Charging Session.\B\\
 \hline
 
-R38  &
+%R38 &
+R36 &
     The eMSP shall collect payment information also when the payment process fails, saving the payment in the system as an "unsolved payment".\B\\
 \hline
     
-R39  &
+%R39 &
+R37 &
     The eMSP shall display an error message to the user when the payment fails.\B\\
 \hline
     
-R40  &
+%R40 &
+R38 &
     The eMSP shall allow the user to pay the unsolved payment.\B\\
 \hline
     
-R41  &
+%R41 &
+R39 &
     The eMSP shall allow the user to set one among his payment method to pay.\B\\
 \hline
 
-R42  &
+%R42 &
+R40 &
     The eMSP shall interact with the CPMS to stop a charging session.\B\\
 \hline
 
-R43  &
+%R43 &
+R41 &
     The eMSP shall notify the User when the battery level of his vehicle is 100\%. \B\\
 \hline
 
-R44 &
+%R44 &
+R42 &
     The eMSP shall allow the user to stop a charging process before the battery is full.\B\\
     \hline
 
-R45 &
-    The eMSP shall allow the User to end a charging process once is stopped.\B\\
-\hline
+%R45 &
+%    The eMSP shall allow the User to end a charging process once is stopped.\B\\
+%\hline
     
-R46 &
-    The eMSP shall interact with the CPMS to end a Charging Process.\B\\
+%R46 &
+%    The eMSP shall interact with the CPMS to end a Charging Process.\B\\
 \hline
-R47  &
+%R47 &
+R43 &
     The eMSP shall allow CPMSs to register in order to acquire relative information. \B\\
 \hline
  
-R48  &
+%R48 &
+R44 &
     The eMSP shall allow the user to visualize the charging process data when it’s underway, including:
     \begin{itemize}
         \item remaining time to complete the charge;
@@ -2002,66 +2016,80 @@ R48  &
 
 \begin{xltabular}{\textwidth}{| >{\columncolor{bluepoli!40}}l | X |}
 \hline
-R49 &
+%R49 &
+R45 &
     The CPMS shall keep a socket reserved for twenty minutes after a User reserve it.\B\\
 \hline
 
-R50  &
+%R50 &
+R46 &
     The CPMS shall free the reserved socket if a charging process doesn’t start within 20 minutes since it's reserved.\B\\
 \hline
 
-R51  &
+%R51 &
+R47 &
     The CPMS shall interact with the CP to reserve a Socket.\B\\
 \hline
 
-R52  &
+%R52 &
+R48 &
     The CPMS shall inform all eMSP(s) when a socket changes its status.\B\\
 \hline
 
-R53  &
+%R53 &
+R49 &
     The CPMS shall interact with the CP to cancel a reservation.\B\\
 \hline
 
-R54  &
-    The CPMS shall interact with the relative CP when receiving an unlock message from the eMSP.\B\\
-\hline
+%R54  &
+%    The CPMS shall interact with the relative CP when receiving an unlock message from the eMSP.\B\\
+%\hline
 
-R55 &
-    The CPMS  notifies the eMSP when a socket is plugged.\B\\
-\hline
+%R55 &
+%    The CPMS  notifies the eMSP when a socket is plugged.\B\\
+%\hline
 
-R56 &
+%R56 &
+R50 &
     The CPMS shall interact with the CP to start a charging session.\B\\
 \hline
 
-R57  &
+%R57 &
+R51 &
     The CPMS shall allow the CPO to register to the system via CPO-code and CPO-verify API.\B\\
 \hline
 
-R58 & 
+%R58 &
+R52 &
     The CPMS shall verify the CPO code via the CPO-verify API.\B\\
 \hline
     
-R59  &
+%R59 &
+R53 &
      The CPMS shall allow the CPO to log in with the CPO code.\B\\
 \hline
-R60   &
+%R60 &
+R54 &
      The CPMS shall verify the CPO code is valid when logging into the system.\B\\
 \hline
 
-R61 &
+%R61 &
+R55 &
     The CPMS shall allow the CPO to add a CP in the system.\B\\
 \hline
 
-R62  &  
+%R62 &
+R56 &
     The CPMS shall inform all eMSP(s) when a CP is added.\B\\
 \hline
     
-R63 & 
+%R63 &
+R57 &
     The CPMS shall interact with the CP to successfully complete its registration in the system.\B\\
 \hline
 
-R64  &
+%R64 &
+R58 &
     The CPMS shall allow the CPO to visualize information about his CPs, including:
     \begin{itemize}
         \item Number of sockets available;
@@ -2072,61 +2100,75 @@ R64  &
 \hline
 
 
-R65 &
+%R65 &
+R59 &
     The CPMS shall allow the CPO to change the availability of a socket.\B\\
 \hline
 
-R66 &
+%R66 &
+R60 &
     The CPMS shall interact with the CP to change the availability of a socket.\B\\
 \hline
 
-R67 &
+%R67 &
+R61 &
     The CPMS  shall notify all eMSP(s) when a CP Tariff is updated.\B\\
     \hline
-R68 &
+%R68 &
+R62 &
     The CPMS shall allow the CPO to set the CP Energy Tariff.\B\\
 \hline
-R69  &
+%R69 &
+R63 &
     The CPMS shall allow the CPOs to create a special offer related to one or more CPs.\B\\
 \hline
 
-R70 &
+%R70 &
+R64 &
     The CPMS  shall notify all eMSP(s) when a new offer is made.\B\\
 \hline
 
-R71 &
+%R71 &
+R65 &
     The CPMS shall allow the CPO to delete a CP from the system.\B\\
 \hline
 
-R72  &
+%R72 &
+R66 &
     The CPMS shall inform all eMSP(s) when a CP is removed.\B\\
 \hline
 
-R73 &
+%R73 &
+R67 &
     The CPMS shall allow the CPO to visualize DSOs' energy offers.\B\\
 \hline
 
-R74 &
+%R74 &
+R68 &
     The CPMS shall interact with the DSO to retrieve the Energy offers.\B\\
 \hline
 
-R75 &
+%R75 &
+R69 &
     The CPMS shall interact with the CP to change DSO energy source.\B\\
 \hline
     
-R76 &
+%R76 &
+R70 &
     The CPMS shall allow the CPO to change DSO.\B\\
 \hline
 
-R77 &
-    The CPMS shall allow the CPO to set one of the following configurations for the DS selection policy for every CP:
+%R77 &
+R71 &
+    The CPMS shall allow the CPO to set one of the following configurations for the DSO selection policy for every CP:
     \begin{itemize}
         \item \textbf{Automatic mode:} The system chooses from which DSOs acquire energy satisfying all charging profile (or as many as possible if not possible) requirements and minimizing cost. In this case, the CPMS prevents the user to change manually the energy acquisition configuration.
         \item \textbf{Manual Mode:} The system allows the user to select manually from which DSO acquires energy.
     \end{itemize}\B\\
 \hline
     
-R78 &
+%R78 &
+R72 &
     The CPMS shall allow the user to set one of the following configurations for the energy management  for every CP:
     \begin{itemize}
         \item \textbf{Automatic mode:} The system chooses the optimal mix between battery and DSO as the source of Energy. In this case, the CPMS shall prevent the user to change manually the energy management configuration.
@@ -2134,51 +2176,62 @@ R78 &
     \end{itemize}\B\\
 \hline
 
-R79 &
+%R79 &
+R73 &
     The CPMS shall interact with the CP to stop a charging session.\B\\
 \hline
 
-R80 &
-    The CPMS shall interact with the CP to end a charging session in order to unlock a socket.\B\\
-\hline
+%R80 &
+%    The CPMS shall interact with the CP to end a charging session in order to unlock a socket.\B\\
+%\hline
 
-R81 &
+%R81 &
+R74 &
     The CPMS shall allow the CPO to change the availability of a battery of a CP, excluding/including it from the CP's possible "Current Energy Source".\B\\
 \hline
     
-R82 &
+%R82 &
+R75 &
     The CPMS shall not consider unavailable batteries as  a possible source of energy when the Energy Management optimizer is set in Automatic Mode.\B\\
 \hline
 
-R83 &
+%R83 &
+R76 &
     The CPMS shall prevent the CPO from setting an unavailable battery as one of the current sources of energy when the Energy Management optimizer is set in Manual Mode.\B\\
 \hline
 
-R84  &
+%R84 &
+R77 &
     The CPMS shall assign for each socket a maximum energy request based on the socket types.\B\\
 \hline
 
-R85 &
+%R85 &
+R78 &
     The CPMS shall interact with the CP to change battery availability.\B\\
 \hline
 
-R86 &
+%R86 &
+R79 &
     The CPMS shall allow the CPO to set the following  parameters for the battery (or batteries if more than on included) of CPs that have the configuration of the energy flow management set to  "Manual": Minimum Energy trigger, Maximum Energy trigger, Energy Mix.\B\\
 \hline
 
-R87 &
+%R87 &
+R80 &
     The CPMS shall interact with the CP to change the battery flow configuration.\B\\
 \hline
 
-R88  &
+%R88 &
+R81 &
     The CPMS shall register to eMSP(s) to exchange information.\B\\
 \hline
 
-R89  &
+%R89 &
+R82 &
     The CPMS shall recompute a charging profile for each socket of a CP every time the DSO relative to the CP change, to guarantee that all socket's minimum energy requests can be satisfied at the same time.\B\\
 \hline
 
-R90 &
+%R90 &
+R83 &
     The CPMS shall allow the CPO to set the Tariff policy of a certain CP in one of the following:
     \begin{enumerate}
         \item \textbf{Automatic:} The Tariff is chosen by the CPMS in order to choose competitive and profitable prices.   
@@ -2207,13 +2260,13 @@ R90 &
                 \end{itemize}\B\\
             \item \textbf{R16.} The eMSP shall use the characteristic of the favourite vehicle to filter the results when it searches for CP.
             \item \textbf{R25.} The eMSP shall access the user’s GPS to retrieve his position.
-            \item \textbf{R47.} The eMSP shall allow CPMSs to register in order to acquire relative information.
-            \item \textbf{R52.} The CPMS shall inform all eMSP(s) when a socket changes its status.
-            \item \textbf{R62.} The CPMS shall inform all eMSP(s) when a CP is added.
-            \item \textbf{R67.} The CPMS  shall notify all eMSP(s) when a CP Tariff is updated.
-            \item \textbf{R70.} The CPMS  shall notify all eMSP(s) when a new offer is made.
-            \item \textbf{R72.} The CPMS shall inform all eMSP(s) when a CP is removed.
-            \item \textbf{R88.} The CPMS shall register to eMSP(s) to exchange information.
+            \item \textbf{R43.} The eMSP shall allow CPMSs to register in order to acquire relative information.
+            \item \textbf{R48.} The CPMS shall inform all eMSP(s) when a socket changes its status.
+            \item \textbf{R56.} The CPMS shall inform all eMSP(s) when a CP is added.
+            \item \textbf{R61.} The CPMS  shall notify all eMSP(s) when a CP Tariff is updated.
+            \item \textbf{R64.} The CPMS  shall notify all eMSP(s) when a new offer is made.
+            \item \textbf{R66.} The CPMS shall inform all eMSP(s) when a CP is removed.
+            \item \textbf{R81.} The CPMS shall register to eMSP(s) to exchange information.
             \item \textbf{D7.} All the sockets of a certain type in the same charging point have the same tariff.
         \end{itemize}
     
@@ -2226,19 +2279,19 @@ R90 &
             \item \textbf{R12.} The eMSP shall prevent making a reservation if a reservation is active yet.
             \item \textbf{R13.} The eMSP shall display an error message when failing to make a reservation.
             \item \textbf{R15.} The eMSP shall allow the user to reserve a free socket.
-            \item \textbf{R17.} The eMSP shall interact with the relative CPMS when a user request to reserve a socket.
+            \item \textbf{R17.} The eMSP shall interact with the relative CPMS when a user requests to reserve a socket.
             \item \textbf{R18.} The eMSP shall notify the user when a socket is reserved successfully.
             \item \textbf{R19.} The eMSP shall allow the user to visualize the remaining time before the reservation expires.
             \item \textbf{R28.} The eMSP when a suggestion is accepted shall reserve the socket reported in the suggestion.
             \item \textbf{R29.} The eMSP shall allow the user to cancel a reservation.
             \item \textbf{R30.} The eMSP shall interact with the CPMS to cancel a reservation.
-            \item \textbf{R47.} The eMSP shall allow CPMSs to register in order to acquire relative information.
-            \item \textbf{R49.} The CPMS shall keep a socket reserved for twenty minutes after a User reserve it.
-            \item \textbf{R50.} The CPMS shall free the reserved socket if a charging process doesn’t start within 20 minutes since it's reserved.
-            \item \textbf{R51.} The CPMS shall interact with the CP to reserve a Socket.
-            \item \textbf{R52.} The CPMS shall inform all eMSP(s) when a socket changes its status.
-            \item \textbf{R62.} The CPMS shall inform all eMSP(s) when a CP is added.
-            \item \textbf{R88.} The CPMS shall register to eMSP(s) to exchange information.
+            \item \textbf{R43.} The eMSP shall allow CPMSs to register in order to acquire relative information.
+            \item \textbf{R45.} The CPMS shall keep a socket reserved for twenty minutes after a User reserve it.
+            \item \textbf{R46.} The CPMS shall free the reserved socket if a charging process doesn’t start within 20 minutes since it's reserved.
+            \item \textbf{R47.} The CPMS shall interact with the CP to reserve a Socket.
+            \item \textbf{R48.} The CPMS shall inform all eMSP(s) when a socket changes its status.
+            \item \textbf{R56.} The CPMS shall inform all eMSP(s) when a CP is added.
+            \item \textbf{R81.} The CPMS shall register to eMSP(s) to exchange information.
             \item \textbf{D2.} The user can always physically access the socket in the reserved time slot.
             \item \textbf{D12.} A reservation is valid from the moment on which is made to the following 20 minutes, after which it is cancelled.
         \end{itemize}
@@ -2249,15 +2302,11 @@ R90 &
             \item \textbf{R2.} The eMSP shall send a confirmation mail when a new user tries to register to it containing a code to confirm the account.
             \item \textbf{R3.} The eMSP shall allow the user to log in to the application using e-mail and password. 
             \item \textbf{R31.} The eMSP shall allow the user to start a charging process to a socket reserved by it.
-            \item \textbf{R32.} The eMSP shall allow the user to unlock the reserved socket before he starts the charging process.
-            \item \textbf{R34.} The eMSP shall interact with the CPMS to unlock a socket.
-            \item \textbf{R35.} The eMSP shall interact with the CPMS to start a charging session.
-            \item \textbf{R47.} The eMSP shall allow CPMSs to register in order to acquire relative information.
-            \item \textbf{R54.} The CPMS shall interact with the relative CP when receiving an unlock message from the eMSP.
-            \item \textbf{R55.} The CPMS  notifies the eMSP when a socket is plugged.
-            \item \textbf{R56} The CPMS shall interact with the CP to start a charging session.
-            \item \textbf{R62.} The CPMS shall inform all eMSP(s) when a CP is added.
-            \item \textbf{R88.} The CPMS shall register to eMSP(s) to exchange information.
+            \item \textbf{R33.} The eMSP shall interact with the CPMS to start a charging session.
+            \item \textbf{R43.} The eMSP shall allow CPMSs to register in order to acquire relative information.
+            \item \textbf{R50.} The CPMS shall interact with the CP to start a charging session.
+            \item \textbf{R56.} The CPMS shall inform all eMSP(s) when a CP is added.
+            \item \textbf{R81.} The CPMS shall register to eMSP(s) to exchange information.
             \item \textbf{D2.} The user can always physically access the socket in the reserved time slot.
             \item \textbf{D10.} The CP is able to detect when a user plugs/unplugs the socket.
             \item \textbf{D13.} A charging session can start only from an existing valid reservation.
@@ -2268,22 +2317,20 @@ R90 &
             \item \textbf{R1} The eMSP shall allow unregistered users to register via e-mail and password.
             \item \textbf{R2.} The eMSP shall send a confirmation mail when a new user tries to register to it containing a code to confirm the account.
             \item \textbf{R3.} The eMSP shall allow the user to log in to the application using e-mail and password.
-            \item \textbf{R33.} The eMSP shall allow the user to View  the Charging Process when a socket is reserved successfully including information about battery status, the current price to pay, and the remaining time until the battery is fully recharged.
-            \item \textbf{R42.} The eMSP shall interact with the CPMS to stop a charging session.
-            \item \textbf{R43.} The eMSP shall notify the User when the battery level of his vehicle is 100\%.
-            \item \textbf{R44.} The eMSP shall allow the user to stop a charging process before the battery is full.
-            \item \textbf{R45.} The eMSP shall allow the User to end a charging process once is stopped.
-            \item \textbf{R46.} The eMSP shall interact with the CPMS to end a Charging Process.
-            \item \textbf{R47.} The eMSP shall allow CPMSs to register in order to acquire relative information.
-            \item \textbf{R48.} The eMSP shall allow the user to visualize the charging process data when it’s underway, including:
+            \item \textbf{R32.} The eMSP shall allow the user to View  the Charging Process when a socket is reserved successfully including information about battery status, the current price to pay, and the remaining time until the battery is fully recharged.
+            \item \textbf{R40.} The eMSP shall interact with the CPMS to stop a charging session.
+            \item \textbf{R41.} The eMSP shall notify the User when the battery level of his vehicle is 100\%.
+            \item \textbf{R42.} The eMSP shall allow the user to stop a charging process before the battery is full.
+            \item \textbf{R43.} The eMSP shall allow CPMSs to register in order to acquire relative information.
+            \item \textbf{R44.} The eMSP shall allow the user to visualize the charging process data when it’s underway, including:
                 \begin{itemize}
                     \item remaining time to complete the charge;
                     \item current battery level;
                     \item current energy power supplying;
                     \item current amount to pay.
                 \end{itemize}
-            \item \textbf{R62.} The CPMS shall inform all eMSP(s) when a CP is added.
-            \item \textbf{R88.} The CPMS shall register to eMSP(s) to exchange information.
+            \item \textbf{R56.} The CPMS shall inform all eMSP(s) when a CP is added.
+            \item \textbf{R81.} The CPMS shall register to eMSP(s) to exchange information.
             \item \textbf{D1.} The sockets have their own sensor that is able to estimate the status of the battery of the vehicle that is connected.
             \item \textbf{D15.} The CP automatically stops the energy flow when it detects that the battery of the car is full.
         \end{itemize}
@@ -2296,15 +2343,15 @@ R90 &
             \item \textbf{R8.} The eMSP shall allow the User to add a payment method to the system.
             \item \textbf{R9.} The eMSP shall verify the validity of the payment method inserted by the user.
             \item \textbf{R10.} The eMSP shall allow the user to delete the payment method inserted.
-            \item \textbf{R36.} The eMSP shall allow the user to pay when a charging process is complete.
-            \item \textbf{R37.} The eMSP shall collect payment information when process successfully a payment, saving information about the amount paid, the payment method used, the amount of energy used, the price of energy,  the CP information such as location and CPO provider, the type of socket used (flow, fast or rapid), the duration of the Charging Session.
-            \item \textbf{R38.} The eMSP shall collect payment information also when the payment process fails, saving the payment in the system as an "unsolved payment".
-            \item \textbf{R39.} The eMSP shall display an error message to the user when the payment fails.
-            \item \textbf{R40.} The eMSP shall allow the user to pay the unsolved payment.
-            \item \textbf{R41.} The eMSP shall allow the user to set one among his payment method to pay.
-            \item \textbf{R47.} The eMSP shall allow CPMSs to register in order to acquire relative information.
-            \item \textbf{R62.} The CPMS shall inform all eMSP(s) when a CP is added.
-            \item \textbf{R88.} The CPMS shall register to eMSP(s) to exchange information.
+            \item \textbf{R34.} The eMSP shall allow the user to pay when a charging process is complete.
+            \item \textbf{R35.} The eMSP shall collect payment information when process successfully a payment, saving information about the amount paid, the payment method used, the amount of energy used, the price of energy,  the CP information such as location and CPO provider, the type of socket used (flow, fast or rapid), the duration of the Charging Session.
+            \item \textbf{R36.} The eMSP shall collect payment information also when the payment process fails, saving the payment in the system as an "unsolved payment".
+            \item \textbf{R37.} The eMSP shall display an error message to the user when the payment fails.
+            \item \textbf{R38.} The eMSP shall allow the user to pay the unsolved payment.
+            \item \textbf{R39.} The eMSP shall allow the user to set one among his payment method to pay.
+            \item \textbf{R43.} The eMSP shall allow CPMSs to register in order to acquire relative information.
+            \item \textbf{R56.} The CPMS shall inform all eMSP(s) when a CP is added.
+            \item \textbf{R81.} The CPMS shall register to eMSP(s) to exchange information.
             \item \textbf{D4.} There exists an external service that checks the validity of billing information.
             \item \textbf{D7.} All the sockets of a certain type in the same charging point have the same tariff.
         \end{itemize}
@@ -2323,13 +2370,13 @@ R90 &
             \item \textbf{R22.} The eMSP shall use the VIN API to obtain the favourite vehicle's battery information including the current energy level.
             \item \textbf{R23.} The eMSP shall access the user’s calendar application to collect information about the user’s schedule, including the time and position of the events inserted.
             \item \textbf{R24.} The eMSP shall access the user’s navigation system to collect information about the user’s navigation path if it's active.
-            \item \textbf{R25.} The eMSP shall access the user’s GPS to retrieve his position.
+            \item \textbf{R25.} The eMSP shall access the vehicle’s GPS to retrieve its position.
             \item \textbf{R26.} The eMSP shall notify the user via pop-up notification when a new suggestion is made.
             \item \textbf{R27.} The eMSP shall allow the user to accept a suggestion.
             \item \textbf{R28.} The eMSP when a suggestion is accepted shall reserve the socket reported in the suggestion.
-            \item \textbf{R47.} The eMSP shall allow CPMSs to register in order to acquire relative information.
-            \item \textbf{R62.} The CPMS shall inform all eMSP(s) when a CP is added.
-            \item \textbf{R88.} The CPMS shall register to eMSP(s) to exchange information.
+            \item \textbf{R43.} The eMSP shall allow CPMSs to register in order to acquire relative information.
+            \item \textbf{R56.} The CPMS shall inform all eMSP(s) when a CP is added.
+            \item \textbf{R81.} The CPMS shall register to eMSP(s) to exchange information.
             \item \textbf{D5.} There exists an external service that checks the validity of the VIN code of the vehicles.
             \item \textbf{D6.} There exists an external service that retrieves the status of the battery of a vehicle when a socket is not plugged.
             \item \textbf{D12.} A reservation is valid from the moment on which is made to the following 20 minutes, after which it is cancelled.
@@ -2337,24 +2384,24 @@ R90 &
 
     \item Allow CPOs dynamically decide from which DSO to acquire energy providing information on energy prices.
         \begin{itemize}
-            \item \textbf{R57.} The CPMS shall allow the CPO to register to the system via CPO-code and CPO-verify API.
-            \item \textbf{R58.} The CPMS shall verify the CPO code via CPO-verify API.
-            \item \textbf{R59.} The CPMS shall allow the CPO to log in with the CPO code.
-            \item \textbf{R60.} The CPMS shall verify the CPO code is valid when logging into the system.
-            \item \textbf{R61.} The CPMS shall allow the CPO to add a CP to the system.
-            \item \textbf{R63.} The CPMS shall interact with the CP to successfully complete its registration in the system.
-            \item \textbf{R64.} The CPMS shall allow the CPO to visualize information about his CPs, including:
+            \item \textbf{R51.} The CPMS shall allow the CPO to register to the system via CPO-code and CPO-verify API.
+            \item \textbf{R52.} The CPMS shall verify the CPO code via CPO-verify API.
+            \item \textbf{R53.} The CPMS shall allow the CPO to log in with the CPO code.
+            \item \textbf{R54.} The CPMS shall verify the CPO code is valid when logging into the system.
+            \item \textbf{R55.} The CPMS shall allow the CPO to add a CP to the system.
+            \item \textbf{R57.} The CPMS shall interact with the CP to successfully complete its registration in the system.
+            \item \textbf{R58.} The CPMS shall allow the CPO to visualize information about his CPs, including:
                 \begin{itemize}
                     \item Number of sockets available;
                     \item Current DSO used to acquire energy;
                     \item Batteries level;
                     \item Batteries status.
                 \end{itemize}
-            \item \textbf{R73.} The CPMS shall allow the CPO to visualize DSOs' energy offers.
-            \item \textbf{R74.} The CPMS shall interact with the DSO to retrieve the Energy offers.
-            \item \textbf{R75.} The CPMS shall interact with the CP to change DSO energy source.
-            \item \textbf{R76.} The CPMS shall allow the CPO to change DSO.
-            \item \textbf{R77.} The CPMS shall allow the CPO to set one of the following configurations for the DS selection policy for every CP:
+            \item \textbf{R67.} The CPMS shall allow the CPO to visualize DSOs' energy offers.
+            \item \textbf{R68.} The CPMS shall interact with the DSO to retrieve the Energy offers.
+            \item \textbf{R69.} The CPMS shall interact with the CP to change DSO energy source.
+            \item \textbf{R70.} The CPMS shall allow the CPO to change DSO.
+            \item \textbf{R71.} The CPMS shall allow the CPO to set one of the following configurations for the DS selection policy for every CP:
                 \begin{itemize}
                     \item Automatic mode: The system chooses from which DSOs acquire energy satisfying all charging profile (or as many as possible if not possible) requirements and minimizing cost. In this case, the CPMS prevents the user to change manually the energy acquisition configuration.
                     \item Manual Mode: The system allows the user to select manually from which DSO acquires energy.
@@ -2368,22 +2415,22 @@ R90 &
 
     \item Allow CPOs dynamically decide the cost of charging and when setting special offers.
         \begin{itemize}
-            \item \textbf{R57.} The CPMS shall allow the CPO to register to the system via CPO-code and CPO-verify API.
-            \item \textbf{R58.} The CPMS shall verify the CPO code via CPO-verify API.
-            \item \textbf{R59.} The CPMS shall allow the CPO to log in with the CPO code.
-            \item \textbf{R60.} The CPMS shall verify the CPO code is valid when logging into the system.
-            \item \textbf{R61.} The CPMS shall allow the CPO to add a CP to the system.
-            \item \textbf{R63.} The CPMS shall interact with the CP to successfully complete its registration in the system.
-            \item \textbf{R64.} The CPMS shall allow the CPO to visualize information about his CPs, including:
+            \item \textbf{R51.} The CPMS shall allow the CPO to register to the system via CPO-code and CPO-verify API.
+            \item \textbf{R52.} The CPMS shall verify the CPO code via CPO-verify API.
+            \item \textbf{R53.} The CPMS shall allow the CPO to log in with the CPO code.
+            \item \textbf{R54.} The CPMS shall verify the CPO code is valid when logging into the system.
+            \item \textbf{R55.} The CPMS shall allow the CPO to add a CP to the system.
+            \item \textbf{R57.} The CPMS shall interact with the CP to successfully complete its registration in the system.
+            \item \textbf{R58.} The CPMS shall allow the CPO to visualize information about his CPs, including:
                 \begin{itemize}
                     \item Number of sockets available;
                     \item Current DSO used to acquire energy;
                     \item Batteries level;
                     \item Batteries status.
                 \end{itemize}
-            \item \textbf{R68.} The CPMS shall allow the CPO to set the CP Energy Tariff.
-            \item \textbf{R69.} The CPMS shall allow the CPOs to create a special offer related to one or more CPs.
-            \item \textbf{R90.} The CPMS shall allow the CPO to set the Tariff policy of a certain CP in one of the following:
+            \item \textbf{R62.} The CPMS shall allow the CPO to set the CP Energy Tariff.
+            \item \textbf{R63.} The CPMS shall allow the CPOs to create a special offer related to one or more CPs.
+            \item \textbf{R83.} The CPMS shall allow the CPO to set the Tariff policy of a certain CP in one of the following:
                 \begin{itemize}
                     \item \textbf{Automatic:} The Tariff is chosen by the CPMS in order to choose competitive and profitable prices.   
                     \item\textbf{Manual:} The Tariff is set by the CPO. 
@@ -2394,68 +2441,68 @@ R90 &
 
     \item Allow CPOs dynamically decide whether or not to store energy in their internal batteries.
         \begin{itemize}
-            \item \textbf{R57.} The CPMS shall allow the CPO to register to the system via CPO-code and CPO-verify API.
-            \item \textbf{R58.} The CPMS shall verify the CPO code via CPO-verify API.
-            \item \textbf{R59.} The CPMS shall allow the CPO to log in with the CPO code.
-            \item \textbf{R60.} The CPMS shall verify the CPO code is valid when logging into the system.
-            \item \textbf{R61.} The CPMS shall allow the CPO to add a CP to the system.
-            \item \textbf{R63.} The CPMS shall interact with the CP to successfully complete its registration in the system.
-            \item \textbf{R64.} The CPMS shall allow the CPO to visualize information about his CPs, including:
+            \item \textbf{R51.} The CPMS shall allow the CPO to register to the system via CPO-code and CPO-verify API.
+            \item \textbf{R52.} The CPMS shall verify the CPO code via CPO-verify API.
+            \item \textbf{R53.} The CPMS shall allow the CPO to log in with the CPO code.
+            \item \textbf{R54.} The CPMS shall verify the CPO code is valid when logging into the system.
+            \item \textbf{R55.} The CPMS shall allow the CPO to add a CP to the system.
+            \item \textbf{R57.} The CPMS shall interact with the CP to successfully complete its registration in the system.
+            \item \textbf{R58.} The CPMS shall allow the CPO to visualize information about his CPs, including:
                 \begin{itemize}
                     \item Number of sockets available;
                     \item Current DSO used to acquire energy;
                     \item Batteries level;
                     \item Batteries status.
                 \end{itemize}
-            \item \textbf{R78.} The CPMS shall allow the user to set one of the following configurations for the energy management for every CP:
+            \item \textbf{R72.} The CPMS shall allow the user to set one of the following configurations for the energy management for every CP:
                 \begin{itemize}
                     \item Automatic mode: The system chooses the optimal mix between battery and DSO as the source of Energy. In this case, the CPMS shall prevent the user to change manually the energy management configuration.
                     \item Manual Mode: The system allow the user to manually  manage the energy management configuration.
                 \end{itemize}
-            \item \textbf{R81.} The CPMS shall allow the CPO to change the availability of a battery of a CP, excluding/including it from the CP's possible "Current Energy Source".
-            \item \textbf{R82.} The CPMS shall not consider unavailable batteries as  a possible source of energy when the Energy Management optimizer is set in Automatic Mode.
-            \item \textbf{R83.} The CPMS shall prevent the CPO from setting an unavailable battery as one of the current sources of energy when the Energy Management optimizer is set in Manual Mode.
-            \item \textbf{R85.} The CPMS shall interact with the CP to change battery availability.
-            \item \textbf{R86.} The CPMS shall allow the CPO to set the following  parameters for the battery (or batteries if more than on included) of CPs that have the configuration of the energy flow management set to  "Manual": Minimum Energy trigger, Maximum Energy trigger, Energy Mix.
-            \item \textbf{R87.} The CPMS shall interact with the CP to change the battery flow configuration.
+            \item \textbf{R74.} The CPMS shall allow the CPO to change the availability of a battery of a CP, excluding/including it from the CP's possible "Current Energy Source".
+            \item \textbf{R75.} The CPMS shall not consider unavailable batteries as  a possible source of energy when the Energy Management optimizer is set in Automatic Mode.
+            \item \textbf{R76.} The CPMS shall prevent the CPO from setting an unavailable battery as one of the current sources of energy when the Energy Management optimizer is set in Manual Mode.
+            \item \textbf{R78.} The CPMS shall interact with the CP to change battery availability.
+            \item \textbf{R79.} The CPMS shall allow the CPO to set the following  parameters for the battery (or batteries if more than on included) of CPs that have the configuration of the energy flow management set to  "Manual": Minimum Energy trigger, Maximum Energy trigger, Energy Mix.
+            \item \textbf{R80.} The CPMS shall interact with the CP to change the battery flow configuration.
             \item \textbf{D3.} There exists a sensor of the CP that is able to monitor the quantity of energy that the DSO is currently providing.
         \end{itemize}
 
     \item Allow CPOs dynamically decide, during a charging process, to use the stored energy in the battery or to acquire directly from DSOs to fulfil the charge or a mix of both.
         \begin{itemize}
-            \item \textbf{R57.} The CPMS shall allow the CPO to register to the system via CPO-code and CPO-verify API.
-            \item \textbf{R58.} The CPMS shall verify the CPO code via CPO-verify API.
-            \item \textbf{R59.} The CPMS shall allow the CPO to log in with the CPO code.
-            \item \textbf{R60.} The CPMS shall verify the CPO code is valid when logging into the system.
-            \item \textbf{R61.} The CPMS shall allow the CPO to add a CP to the system.
-            \item \textbf{R63.} The CPMS shall interact with the CP to successfully complete its registration in the system.
-            \item \textbf{R64.} The CPMS shall allow the CPO to visualize information about his CPs, including:
+            \item \textbf{R51.} The CPMS shall allow the CPO to register to the system via CPO-code and CPO-verify API.
+            \item \textbf{R52.} The CPMS shall verify the CPO code via CPO-verify API.
+            \item \textbf{R53.} The CPMS shall allow the CPO to log in with the CPO code.
+            \item \textbf{R54.} The CPMS shall verify the CPO code is valid when logging into the system.
+            \item \textbf{R55.} The CPMS shall allow the CPO to add a CP to the system.
+            \item \textbf{R57.} The CPMS shall interact with the CP to successfully complete its registration in the system.
+            \item \textbf{R58.} The CPMS shall allow the CPO to visualize information about his CPs, including:
                 \begin{itemize}
                     \item Number of sockets available;
                     \item Current DSO used to acquire energy;
                     \item Batteries level;
                     \item Batteries status.
                 \end{itemize}
-            \item \textbf{R73.} The CPMS shall allow the CPO to visualize DSOs' energy offers.
-            \item \textbf{R74.} The CPMS shall interact with the DSO to retrieve the Energy offers.
-            \item \textbf{R75.} The CPMS shall interact with the CP to change DSO energy source.
-            \item \textbf{R76.} The CPMS shall allow the CPO to change DSO.
-            \item \textbf{R77.} The CPMS shall allow the CPO to set one of the following configurations for the DS selection policy for every CP:
+            \item \textbf{R67.} The CPMS shall allow the CPO to visualize DSOs' energy offers.
+            \item \textbf{R68.} The CPMS shall interact with the DSO to retrieve the Energy offers.
+            \item \textbf{R69.} The CPMS shall interact with the CP to change DSO energy source.
+            \item \textbf{R70.} The CPMS shall allow the CPO to change DSO.
+            \item \textbf{R71.} The CPMS shall allow the CPO to set one of the following configurations for the DS selection policy for every CP:
                 \begin{itemize}
                     \item Automatic mode: The system chooses from which DSOs acquire energy satisfying all charging profile (or as many as possible if not possible) requirements and minimizing cost. In this case, the CPMS prevents the user to change manually the energy acquisition configuration.
                     \item Manual Mode: The system allows the user to select manually from which DSO acquires energy.
                 \end{itemize}
-            \item \textbf{R78.} The CPMS shall allow the user to set one of the following configurations for the energy management for every CP:
+            \item \textbf{R72.} The CPMS shall allow the user to set one of the following configurations for the energy management for every CP:
                 \begin{itemize}
                     \item Automatic mode: The system chooses the optimal mix between battery and DSO as the source of Energy. In this case, the CPMS shall prevent the user to change manually the energy management configuration.
                     \item Manual Mode: The system allow the user to manually  manage the energy management configuration.
                 \end{itemize}
-            \item \textbf{R81.} The CPMS shall allow the CPO to change the availability of a battery of a CP, excluding/including it from the CP's possible "Current Energy Source".
-            \item \textbf{R82.} The CPMS shall not consider unavailable batteries as  a possible source of energy when the Energy Management optimizer is set in Automatic Mode.
-            \item \textbf{R83.} The CPMS shall prevent the CPO from setting an unavailable battery as one of the current sources of energy when the Energy Management optimizer is set in Manual Mode.
-            \item \textbf{R85.} The CPMS shall interact with the CP to change battery availability.
-            \item \textbf{R86.} The CPMS shall allow the CPO to set the following  parameters for the battery (or batteries if more than on included) of CPs that have the configuration of the energy flow management set to  "Manual": Minimum Energy trigger, Maximum Energy trigger, Energy Mix.
-            \item \textbf{R87.} The CPMS shall interact with the CP to change the battery flow configuration.
+            \item \textbf{R74.} The CPMS shall allow the CPO to change the availability of a battery of a CP, excluding/including it from the CP's possible "Current Energy Source".
+            \item \textbf{R75.} The CPMS shall not consider unavailable batteries as  a possible source of energy when the Energy Management optimizer is set in Automatic Mode.
+            \item \textbf{R76.} The CPMS shall prevent the CPO from setting an unavailable battery as one of the current sources of energy when the Energy Management optimizer is set in Manual Mode.
+            \item \textbf{R78.} The CPMS shall interact with the CP to change battery availability.
+            \item \textbf{R79.} The CPMS shall allow the CPO to set the following  parameters for the battery (or batteries if more than on included) of CPs that have the configuration of the energy flow management set to  "Manual": Minimum Energy trigger, Maximum Energy trigger, Energy Mix.
+            \item \textbf{R80.} The CPMS shall interact with the CP to change the battery flow configuration.
             \item \textbf{D3.} There exists a sensor of the CP that is able to monitor the quantity of energy that the DSO is currently providing.
             \item \textbf{D11.} Each CP can have at most one DSO that provides the energy at a time.
             \item \textbf{D14.} For each charging point there exists at least one DSO that can provide the energy to it.
@@ -2465,39 +2512,35 @@ R90 &
         \begin{itemize}
             \item \textbf{R17.} The eMSP shall interact with the relative CPMS when a user request to reserve a socket.
             \item \textbf{R30.} The eMSP shall interact with the CPMS to cancel a reservation.
-            \item \textbf{R34.} The eMSP shall interact with the CPMS to unlock a socket.
-            \item \textbf{R35.} The eMSP shall interact with the CPMS to start a charging session.
-            \item \textbf{R42.} The eMSP shall interact with the CPMS to stop a charging session.
-            \item \textbf{R46.} The eMSP shall interact with the CPMS to end a Charging Process.
-            \item \textbf{R49.} The CPMS shall keep a socket reserved for twenty minutes after a User reserve it.
-            \item \textbf{R51.} The CPMS shall interact with the CP to reserve a Socket.
-            \item \textbf{R53.} The CPMS shall interact with the CP to cancel a reservation.
-            \item \textbf{R54.} The CPMS shall interact with the relative CP when receiving an unlock message from the eMSP.
-            \item \textbf{R56.} The CPMS shall interact with the CP to start a charging session.
-            \item \textbf{R57.} The CPMS shall allow the CPO to register to the system via CPO-code and CPO-verify API.
-            \item \textbf{R58.} The CPMS shall verify the CPO code via CPO-verify API.
-            \item \textbf{R59.} The CPMS shall allow the CPO to log in with the CPO code.
-            \item \textbf{R60.} The CPMS shall verify the CPO code is valid when logging into the system.
-            \item \textbf{R61.} The CPMS shall allow the CPO to add a CP to the system.
-            \item \textbf{R63.} The CPMS shall interact with the CP to successfully complete its registration in the system.
-            \item \textbf{R64.} The CPMS shall allow the CPO to visualize information about his CPs, including:
+            \item \textbf{R33.} The eMSP shall interact with the CPMS to start a charging session.
+            \item \textbf{R40.} The eMSP shall interact with the CPMS to stop a charging session.
+            \item \textbf{R45.} The CPMS shall keep a socket reserved for twenty minutes after a User reserve it.
+            \item \textbf{R47.} The CPMS shall interact with the CP to reserve a Socket.
+            \item \textbf{R49.} The CPMS shall interact with the CP to cancel a reservation.
+            \item \textbf{R50.} The CPMS shall interact with the CP to start a charging session.
+            \item \textbf{R51.} The CPMS shall allow the CPO to register to the system via CPO-code and CPO-verify API.
+            \item \textbf{R52.} The CPMS shall verify the CPO code via CPO-verify API.
+            \item \textbf{R53.} The CPMS shall allow the CPO to log in with the CPO code.
+            \item \textbf{R54.} The CPMS shall verify the CPO code is valid when logging into the system.
+            \item \textbf{R55.} The CPMS shall allow the CPO to add a CP to the system.
+            \item \textbf{R57.} The CPMS shall interact with the CP to successfully complete its registration in the system.
+            \item \textbf{R58.} The CPMS shall allow the CPO to visualize information about his CPs, including:
                 \begin{itemize}
                     \item Number of sockets available;
                     \item Current DSO used to acquire energy;
                     \item Batteries level;
                     \item Batteries status.
                 \end{itemize}
-            \item \textbf{R65.} The CPMS shall allow the CPO to change the availability of a socket.
-            \item \textbf{R66.} The CPMS shall interact with the CP to change the availability of a socket.
-            \item \textbf{R71.} The CPMS shall allow the CPO to delete a CP from the system.
-            \item \textbf{R79.} The CPMS shall interact with the CP to stop a charging session.
-            \item \textbf{R80.} The CPMS shall interact with the CP to end a charging session in order to unlock the socket.
-            \item \textbf{R84.} The CPMS shall assign for each socket a maximum energy request based on the socket types.
-            \item \textbf{R89.} The CPMS shall recompute a charging profile for each socket of a CP every time the DSO relative to the CP change, to guarantee that all socket's minimum energy requests can be satisfied at the same time.
+            \item \textbf{R59.} The CPMS shall allow the CPO to change the availability of a socket.
+            \item \textbf{R60.} The CPMS shall interact with the CP to change the availability of a socket.
+            \item \textbf{R65.} The CPMS shall allow the CPO to delete a CP from the system.
+            \item \textbf{R73.} The CPMS shall interact with the CP to stop a charging session.
+            \item \textbf{R77.} The CPMS shall assign for each socket a maximum energy request based on the socket types.
+            \item \textbf{R82.} The CPMS shall recompute a charging profile for each socket of a CP every time the DSO relative to the CP change, to guarantee that all socket's minimum energy requests can be satisfied at the same time.
             \item \textbf{D1.} The sockets have their own sensor that is able to estimate the status of the battery of the vehicle that is connected.
             \item \textbf{D7.} All the sockets of a certain type in the same charging point have the same tariff.
             \item \textbf{D10.} The CP is able to detect when a user plugs/unplugs the socket.
-            \item \textbf{D12.} A reservation is valid from the moment on which is made to the following 20 minutes, after which it is cancelled.
+            \item \textbf{D12.} A reservation is valid from the moment on which is made to the following 20 minutes, after which it is canceled.
             \item \textbf{D15.} The CP automatically stops the energy flow when it detects that the battery of the car is full.
         \end{itemize}
 
@@ -2525,43 +2568,43 @@ R90 &
     \hline
     \textbf{UC7} & R10\T\B\\
     \hline
-    \textbf{UC8} & R11, R12, R13, R14, R15, R16, R17, R18, R19, R47, R49, R51, R52, R88\T\B\\
+    \textbf{UC8} & R11, R12, R13, R14, R15, R16, R17, R18, R19, R43, R45, R47, R48, R81\T\B\\
     \hline
-    \textbf{UC9} & R11, R12, R13, R15, R17, R18, R19, R20, R21, R22, R23, R24, R25, R26, R27, R28, R47, R49, R51, R52, R88\T\B\\
+    \textbf{UC9} & R11, R12, R13, R15, R17, R18, R19, R20, R21, R22, R23, R24, R25, R26, R27, R28, R43, R45, R47, R48, R81\T\B\\
     \hline
-    \textbf{UC10} & R29, R30, R47, R50, R52, R53, R88\T\B\\
+    \textbf{UC10} & R29, R30, R43, R46, R48, R49, R81\T\B\\
     \hline
-    \textbf{UC11} & R31, R32, R33, R34, R35, R47, R48, R54, R55, R56, R88\T\B\\
+    \textbf{UC11} & R31, R32, R33, R43, R44, R50, R81\T\B\\
     \hline
-    \textbf{UC12} & R42, R43, R44, R45, R46, R47, R48, R79, R80, R88\T\B\\
+    \textbf{UC12} & R40, R41, R42, R43, R44, R73, R81\T\B\\
     \hline
-    \textbf{UC13} & R36, R37, R38, R39, R40, R41\T\B\\
+    \textbf{UC13} & R34, R35, R36, R37, R38, R39\T\B\\
     \hline
-    \textbf{UC14} & R57, R58\T\B\\
+    \textbf{UC14} & R51, R52\T\B\\
     \hline
-    \textbf{UC15} & R59, R60\T\B\\
+    \textbf{UC15} & R53, R54\T\B\\
     \hline
-    \textbf{UC16} & R47, R61, R62, R63, R88\T\B\\
+    \textbf{UC16} & R43, R55, R56, R57, R81\T\B\\
     \hline
-    \textbf{UC17} & R64, R86, R87\T\B\\
+    \textbf{UC17} & R58, R79, R80\T\B\\
     \hline
-    \textbf{UC18} & R47, R52, R64, R65, R66, R88\T\B\\
+    \textbf{UC18} & R43, R48, R58, R59, R60, R81\T\B\\
     \hline
-    \textbf{UC19} & R47, R64, R67, R68, R88\T\B\\
+    \textbf{UC19} & R43, R58, R61, R62, R81\T\B\\
     \hline
-    \textbf{UC20} & R47, R64, R69, R70, R88\T\B\\
+    \textbf{UC20} & R43, R58, R63, R64, R81\T\B\\
     \hline
-    \textbf{UC21} & R47, R71, R72, R88\T\B\\
+    \textbf{UC21} & R43, R65, R66, R81\T\B\\
     \hline
-    \textbf{UC22} & R64, R73, R74, R75, R76, R89\T\B\\
+    \textbf{UC22} & R58, R67, R68, R69, R70, R82\T\B\\
     \hline
-    \textbf{UC23} & R46, R64, R81, R82, R83, R85\T\B\\
+    \textbf{UC23} & R58, R74, R75, R76, R78\T\B\\
     \hline
-    \textbf{UC24} & R90\T\B\\
+    \textbf{UC24} & R83\T\B\\
     \hline
-    \textbf{UC25} & R77\T\B\\
+    \textbf{UC25} & R71\T\B\\
     \hline
-    \textbf{UC26} & R78\T\B\\
+    \textbf{UC26} & R72\T\B\\
     \hline
     \end{xltabular}
 \end{table}
@@ -2575,67 +2618,67 @@ R90 &
     \hline
     \textbf{G1}
     & %Requirements
-    R1, R2, R3, R14, R16, R25, R47, R52, R62, R67, R70, R72, R88
+    R1, R2, R3, R14, R16, R25, R43, R48, R56, R61, R64, R66, R81
     & %DomainAssumptions
     D7\T\B\\
     \hline
     \textbf{G2}
     & %Requirements
-    R1, R2, R3, R11, R12, R13, R15, R17, R18, R19, R28, R29, R30, R47, R49, R50, R51, R52, R62, R88
+    R1, R2, R3, R11, R12, R13, R15, R17, R18, R19, R28, R29, R30, R43, R45, R46, R47, R48, R56, R81
     & %DomainAssumptions
     D2, D12\T\B\\
     \hline
     \textbf{G3}
     & %Requirements
-    R1, R2, R3, R31, R32, R34, R35, R47, R54, R55, R56, R62, R88
+    R1, R2, R3, R31, R33, R43, R50, R56, R81
     & %DomainAssumptions
     D2, D13, D10 \T\B\\
     \hline
     \textbf{G4}
     & %Requirements
-    R1, R2, R3, R33, R42, R43, R44, R45, R46, R47, R48, R62, R88
+    R1, R2, R3, R32, R40, R41, R42, R43, R44, R56, R81
     & %DomainAssumptions
     D1, D15 \T\B\\
     \hline
     \textbf{G5}
     & %Requirements
-    R1, R2, R3, R8, R9, R10, R36, R37, R38, R39, R40, R41, R47, R62, R88
+    R1, R2, R3, R8, R9, R10, R34, R35, R36, R37, R38, R39, R43, R56, R81
     & %DomainAssumptions
     D4, D7\T\B\\
     \hline
     \textbf{G6}
     & %Requirements
-    R1, R2, R3, R4, R5, R6, R7, R20, R21, R22, R23, R24, R25, R26, R27, R28, R47, R62, R88
+    R1, R2, R3, R4, R5, R6, R7, R20, R21, R22, R23, R24, R25, R26, R27, R28, R43, R56, R81
     & %DomainAssumptions
     D5, D6, D12\T\B\\
     \hline
     \textbf{G7}
     & %Requirements
-    R57, R58, R59, R60, R61, R63, R64, R73, R74, R75, R76, R77
+    R51, R52, R53, R54, R55, R57, R58, R67, R68, R69, R70, R71
     & %DomainAssumptions
     D3, D8, D9, D11, D14\T\B\\
     \hline
     \textbf{G8}
     & %Requirements
-    R57, R58, R59, R60, R61, R63, R64, R68, R69, R90
+    R51, R52, R53, R54, R55, R57, R58, R62, R63, R83
     & %DomainAssumptions
     D7, D14 \T\B\\
     \hline
     \textbf{G9}
     & %Requirements
-    R57, R58, R59, R60, R61, R63, R64, R78, R81, R82, R83, R85, R86, R87
+    R51, R52, R53, R54, R55, R57, R58, R72, R74, R75, R76, R78, R79, R80
     & %DomainAssumptions
     D3 \T\B\\
     \hline
     \textbf{G10}
     & %Requirements
-    R57, R58, R59, R60, R61, R63, R64, R73, R74, R75, R76, R77, R78, R81, R82, R83, R85, R86, R87
+    R51, R52, R53, R54, R55, R57, R58, R67, R68, R69, R70, R71, R72, R74, R75, R76, R78, R79, R80
     & %DomainAssumptions
     D3, D11, D14 \T\B\\
     \hline
     \textbf{G11}
     & %Requirements
-    R17, R30, R34, R35, R42, R46, R49, R51, R53, R54, R56, R57, R58, R59, R60, R61, R63, R64, R65, R66, R71, R79, R80, R84, R89
+    R17, R30, R33, R40, R45, R47, R49, R50, R51, R52, R53, R54, R55, R57, R58, R59, R60, R65, R73, R77, R82
     & %DomainAssumptions
     D1, D7, D10, D12, D15 \T\B\\
     \hline
