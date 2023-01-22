@@ -1,4 +1,4 @@
-package softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel;
+package softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

@@ -1,17 +1,13 @@
-package softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel;
+package softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @Entity

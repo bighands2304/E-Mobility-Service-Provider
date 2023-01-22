@@ -2,7 +2,6 @@ package softwareEngineering.ManoniSgaravattiFerretti.emspServer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.ChargingPoint;
@@ -19,7 +18,6 @@ public class CPMSUpdateReceiver {
     @GetMapping("/getCPs")
     public List<ChargingPoint> getCPs(){
         return chargingPointService.getAllCPs();
-
     }
 
 }
