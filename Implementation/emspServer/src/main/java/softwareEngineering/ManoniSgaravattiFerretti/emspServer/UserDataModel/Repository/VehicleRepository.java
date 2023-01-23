@@ -2,12 +2,11 @@ package softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Re
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.User;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.UserVehicle;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.Vehicle;
 
+import java.util.List;
+
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
-    User findUserById(Long id);
-    User findUserByEmail(String email);
-    User findUserByUsername(String username);
+public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
 }

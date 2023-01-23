@@ -13,6 +13,13 @@ public class UserService {
     UserRepository userRepository;
 
     public User findByEmail(String mail) { return userRepository.findUserByEmail(mail);}
+    public User findByAnyCredential(String credential){
+        User user = userRepository.findUserByEmail(credential);
+        if(user == null)
+            user = userRepository.findUserByUsername(credential);
+        return user;
+    }
+    public User findByUsername(String username){return userRepository.findUserByUsername(username);}
     public User saveUser(User user){return userRepository.save(user);}
-    public Optional<User> findById(Long id){return userRepository.findById(id);}
+    public User findById(Long id){return userRepository.findUserById(id);}
 }

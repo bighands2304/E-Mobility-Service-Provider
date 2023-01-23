@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.User;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Service.UserService;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -21,10 +20,15 @@ public class RegistrationManager {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Map<String, String> payload) {
+        //Required fields
         User user = new User();
         user.setUsername(payload.get("username"));
         user.setEmail(payload.get("email"));
         user.setPassword(passwordEncoder.encode(payload.get("password")));
+
+        //Not required fields
+        user.setName(payload.get("name"));
+        user.setSurname(payload.get("surname"));
 
         try {
             userService.saveUser(user);

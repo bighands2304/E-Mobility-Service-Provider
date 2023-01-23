@@ -1,5 +1,7 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.OnDelete;
@@ -9,22 +11,21 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Data
 @Entity
 @Table
 @EnableAutoConfiguration
+@JsonIgnoreProperties(value= {"password"})
 public class User implements UserDetails {
     public User(){
         this.enable = true;
         this.accountNonExpired = true;
         this.credentialExpired = true;
         this.accountNonLocked = true;
-        this.authorities = Collections.singletonList(new SimpleGrantedAuthority("USER"));
+        this.authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
     }
     public User(User user){
         this.id = user.id;
@@ -37,7 +38,7 @@ public class User implements UserDetails {
         this.accountNonExpired = true;
         this.credentialExpired = true;
         this.accountNonLocked = true;
-        this.authorities = Collections.singletonList(new SimpleGrantedAuthority("USER"));
+        this.authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
     }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "native")
@@ -53,6 +54,7 @@ public class User implements UserDetails {
     private String password;
     @OneToMany(mappedBy = "user")
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
     private List<UserVehicle> vehicleList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
@@ -88,5 +90,9 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return enable;
+    }
+
+    public void addVehicle(UserVehicle vehicle){
+        this.vehicleList.add(vehicle);
     }
 }

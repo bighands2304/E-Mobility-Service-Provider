@@ -29,8 +29,8 @@ public class LoginManager implements UserDetailsService {
     TokenManager tokenManager;
 
     @Override
-    public User loadUserByUsername(String mail) throws UsernameNotFoundException {
-        User user = userService.findByEmail(mail);
+    public User loadUserByUsername(String credential) throws UsernameNotFoundException {
+        User user = userService.findByAnyCredential(credential);
         if (user == null){
             throw new UsernameNotFoundException("User not found");
         }
@@ -45,18 +45,23 @@ public class LoginManager implements UserDetailsService {
             //Crea un autenticazione tramite i valori username e password passati nel body
             authenticationManager.authenticate( new UsernamePasswordAuthenticationToken(username, password));
         }catch (BadCredentialsException e){
-            System.out.println(e);
-            throw new AccessDeniedException("Bad credentials");
+            return ResponseEntity.badRequest().body("Bad credentials");
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e);
         }
-        //Cerco l'esistenza dell'utente nel db
+        //Load the userdetails
         final User userDetails = loadUserByUsername(username);
-        //Genero la stringa jwt relativa a quell'utente
+        //Generate a jwt based on the user
         final String jwt = tokenManager.generateToken(userDetails);
 
-        //Invio la risposta con l'autenticazione e i dettagli dell'utente
+        //send the response with the jwt and user
         Map<String,Object> response = new HashMap<>();
-        response.put("jwt", jwt);
-        response.put("user", userService.findById(userDetails.getId()));
+        try{
+            response.put("jwt", jwt);
+            response.put("user", userService.findById(userDetails.getId()));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.toString());
+        }
         return ResponseEntity.ok(response);
     }
 }
