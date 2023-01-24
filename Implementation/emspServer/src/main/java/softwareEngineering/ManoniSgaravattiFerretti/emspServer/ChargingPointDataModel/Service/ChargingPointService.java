@@ -19,4 +19,5 @@ public class ChargingPointService {
 
     public List<ChargingPoint> getCPsInRange(Double latitude_start, Double latitude_end, Double longitude_start, Double longitude_end){return chargingPointRepository.findAllByLatitudeBetweenAndLongitudeBetween(latitude_start, latitude_end, longitude_start, longitude_end);}
 
+    public List<ChargingPoint> saveCPs(List<ChargingPoint> cps){return  chargingPointRepository.saveAll(cps);}
 }

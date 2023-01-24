@@ -10,5 +10,4 @@ import java.util.List;
 public interface ChargingPointRepository extends MongoRepository<ChargingPoint, String> {
     List<ChargingPoint> findAllByLatitudeBetweenAndLongitudeBetween(Double latitude_start, Double latitude_end, Double longitude_start, Double longitude_end);
 
-
 }

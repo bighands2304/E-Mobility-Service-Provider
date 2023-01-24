@@ -1,13 +1,14 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataManager;
 
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.AuthManager.TokenManager;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.Reservation;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.User;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.UserVehicle;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.Vehicle;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Service.ReservationService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Service.UserService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Service.UserVehicleService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Service.VehicleService;
@@ -22,13 +23,15 @@ public class UserDataController {
 
     @Autowired
     TokenManager tokenManager;
-
     @Autowired
     UserService userService;
     @Autowired
     VehicleService vehicleService;
     @Autowired
     UserVehicleService userVehicleService;
+    @Autowired
+    ReservationService reservationService;
+
     @PostMapping("/addVehicle")
     public ResponseEntity<?> addVehicle(@RequestBody Map<String, String> payload){
         User user;
@@ -52,8 +55,13 @@ public class UserDataController {
         UserVehicle uv = new UserVehicle();
         uv.setUser(user);
         uv.setVehicle(vehicle);
-        uv.setFavourite(Boolean.parseBoolean(payload.get("favourite")));
-        //TODO remove eventual old favourite
+        if(Boolean.parseBoolean(payload.get("favourite"))){
+            uv.setFavourite(true);
+            UserVehicle oldFavourite = userVehicleService.findFavouriteOfUser(user.getId());
+            oldFavourite.setFavourite(false);
+            userVehicleService.saveUserVehicle(oldFavourite);
+        }
+
         try{
             userVehicleService.saveUserVehicle(uv);
         }catch (Exception e){
@@ -67,5 +75,11 @@ public class UserDataController {
         List<UserVehicle> uv = userVehicleService.getUserVehicles(Long.parseLong(payload.get("userId")));
         List<Vehicle> vehicles = uv.stream().map(u -> u.getVehicle()).collect(Collectors.toList());
         return ResponseEntity.ok(vehicles);
+    }
+
+    @GetMapping("/getReservationsOfUser")
+    public ResponseEntity<?> getReservations(@RequestBody Map<String, String> payload){
+        List<Reservation> reservations = reservationService.getReservationsByUserId(Long.parseLong(payload.get("userId")));
+        return ResponseEntity.ok(reservations);
     }
 }

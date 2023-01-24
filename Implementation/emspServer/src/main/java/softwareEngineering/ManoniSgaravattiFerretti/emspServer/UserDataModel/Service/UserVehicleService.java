@@ -15,4 +15,6 @@ public class UserVehicleService {
     public UserVehicle saveUserVehicle(UserVehicle userVehicle) {return userVehicleRepository.save(userVehicle);}
 
     public List<UserVehicle> getUserVehicles(Long userId) {return userVehicleRepository.findAllByUserId(userId);}
+
+    public UserVehicle findFavouriteOfUser(Long userId){return userVehicleRepository.findByUserIdAndFavouriteIsTrue(userId);}
 }

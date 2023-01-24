@@ -20,6 +20,6 @@ public abstract class Reservation {
     @ManyToOne
     private User user;
 
-    private Long tariffId;
-    private Long socketId;
+    private String tariffId;
+    private String socketId;
 }
