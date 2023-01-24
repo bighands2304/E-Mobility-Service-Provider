@@ -19,8 +19,8 @@ public class ChargingPoint {
     private String cpId;
     private String name;
     private String address;
-    private String latitude;
-    private String longitude;
+    private Double latitude;
+    private Double longitude;
     private ChargingPointOperator cpo;
     private List<Socket> sockets = new ArrayList<>();
     private List<Tariff> tariffs = new ArrayList<>();

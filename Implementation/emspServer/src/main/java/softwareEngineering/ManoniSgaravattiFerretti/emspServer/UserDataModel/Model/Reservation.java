@@ -1,4 +1,4 @@
-package softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel;
+package softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -20,6 +20,6 @@ public abstract class Reservation {
     @ManyToOne
     private User user;
 
-    private Long tariffId;
-    private Long socketId;
+    private String tariffId;
+    private String socketId;
 }

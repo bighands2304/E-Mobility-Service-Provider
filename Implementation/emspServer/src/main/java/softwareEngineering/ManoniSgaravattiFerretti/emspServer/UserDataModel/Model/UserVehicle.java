@@ -1,9 +1,6 @@
-package softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel;
+package softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 
@@ -11,6 +8,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 @Entity
 @Table
 @EnableAutoConfiguration
+@IdClass(UserVehicleId.class)
 public class UserVehicle {
     @Id
     @ManyToOne
