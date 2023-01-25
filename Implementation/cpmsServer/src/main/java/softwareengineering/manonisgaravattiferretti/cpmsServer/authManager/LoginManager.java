@@ -1,5 +1,6 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.authManager;
 
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,15 +8,14 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.model.dtos.CPOLoginDTO;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.model.entities.CPO;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.model.services.CPOService;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.CPOLoginDTO;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.CPO;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.CPOService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +38,7 @@ public class LoginManager {
     }
 
     @PostMapping("/api/CPO/login")
-    public ResponseEntity<?> login(@RequestBody CPOLoginDTO loginDTO) {
+    public ResponseEntity<?> login(@RequestBody @Valid CPOLoginDTO loginDTO) {
         logger.info("Login request received: " + loginDTO);
         try{
             //Crea un autenticazione tramite i valori username e password passati nel body

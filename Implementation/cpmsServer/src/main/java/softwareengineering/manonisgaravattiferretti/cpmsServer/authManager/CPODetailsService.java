@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.model.entities.CPO;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.model.services.CPOService;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.CPO;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.CPOService;
 
 @Service
 public class CPODetailsService implements UserDetailsService {
