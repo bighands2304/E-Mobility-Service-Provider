@@ -2,6 +2,7 @@ package softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.en
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -10,7 +11,9 @@ import java.util.List;
 @Data
 @Document(collection = "sockets")
 public class Socket {
-    private int socketId;
+    @Id
+    private int id;
+    private Integer socketId; // the id visible to the emsp
     @JsonIgnore
     private String internalCpId;
     @JsonIgnore

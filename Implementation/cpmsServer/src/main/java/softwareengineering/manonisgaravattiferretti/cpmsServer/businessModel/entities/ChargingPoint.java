@@ -13,7 +13,7 @@ import java.util.List;
 public class ChargingPoint {
     @Id
     private String id;
-    private String cpId;
+    private Integer cpId;
     private String name;
     private String address;
     private String latitude;

@@ -16,15 +16,12 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.uti
 @RestController
 public class RegistrationManager {
     private final CPOService cpoService;
-    private final CPODetailsService cpoDetailsService;
     private final PasswordEncoder passwordEncoder;
     private final Logger logger = LoggerFactory.getLogger(RegistrationManager.class);
 
     @Autowired
-    public RegistrationManager(CPOService cpoService, CPODetailsService cpoDetailsService,
-                               PasswordEncoder passwordEncoder) {
+    public RegistrationManager(CPOService cpoService, PasswordEncoder passwordEncoder) {
         this.cpoService = cpoService;
-        this.cpoDetailsService = cpoDetailsService;
         this.passwordEncoder = passwordEncoder;
     }
 

@@ -3,6 +3,7 @@ package softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.en
 import lombok.Data;
 
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 public class SpecialOffer extends Tariff{
@@ -14,5 +15,5 @@ public class SpecialOffer extends Tariff{
     public Double maxCurrent;
     public Double minDuration;
     public Double maxDuration;
-    public String daysOfTheWeek;
+    public List<String> daysOfTheWeek;
 }
