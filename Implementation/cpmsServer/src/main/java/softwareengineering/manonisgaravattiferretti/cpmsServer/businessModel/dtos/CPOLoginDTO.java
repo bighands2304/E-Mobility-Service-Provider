@@ -1,7 +1,6 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data

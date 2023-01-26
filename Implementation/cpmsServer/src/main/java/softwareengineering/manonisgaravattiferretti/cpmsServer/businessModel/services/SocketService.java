@@ -9,7 +9,6 @@ public class SocketService {
     private final SocketRepository socketRepository;
 
     @Autowired
-
     public SocketService(SocketRepository socketRepository) {
         this.socketRepository = socketRepository;
     }

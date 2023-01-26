@@ -23,18 +23,16 @@ import java.util.Map;
 @RestController
 public class LoginManager {
     private final CPOService cpoService;
-    private final CPODetailsService cpoDetailsService;
     private final AuthenticationManager authenticationManager;
     private final TokenManager tokenManager;
     private final Logger logger = LoggerFactory.getLogger(LoginManager.class);
 
     @Autowired
     public LoginManager(CPOService cpoService, @Lazy AuthenticationManager authenticationManager,
-                        TokenManager tokenManager, CPODetailsService cpoDetailsService) {
+                        TokenManager tokenManager) {
         this.cpoService = cpoService;
         this.authenticationManager = authenticationManager;
         this.tokenManager = tokenManager;
-        this.cpoDetailsService = cpoDetailsService;
     }
 
     @PostMapping("/api/CPO/login")
@@ -49,7 +47,7 @@ public class LoginManager {
             throw new AccessDeniedException("Bad credentials");
         }
         //Cerco l'esistenza dell'utente nel db
-        final CPO userDetails = cpoDetailsService.loadUserByUsername(loginDTO.getCpoCode());
+        final CPO userDetails = cpoService.loadUserByUsername(loginDTO.getCpoCode());
         //Genero la stringa jwt relativa a quell'utente
         final String jwt = tokenManager.generateToken(userDetails);
 
