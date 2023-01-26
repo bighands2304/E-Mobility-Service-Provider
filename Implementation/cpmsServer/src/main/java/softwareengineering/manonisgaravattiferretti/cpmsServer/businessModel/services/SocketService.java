@@ -2,6 +2,7 @@ package softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.se
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.ChangeSocketAvailabilityDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.Socket;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.repositories.SocketRepository;
 
@@ -18,5 +19,9 @@ public class SocketService {
 
     public Optional<Socket> findSocketByCpIdAndSocketId(Integer cpId, Integer socketId) {
         return socketRepository.findSocketByCpIdAndSocketId(cpId, socketId);
+    }
+
+    public void updateSocketAvailability(ChangeSocketAvailabilityDTO changeSocketAvailabilityDTO) {
+        socketRepository.updateSocketAvailability(changeSocketAvailabilityDTO);
     }
 }

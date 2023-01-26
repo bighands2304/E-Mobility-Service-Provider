@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface SocketRepository extends MongoRepository<Socket, String> {
+public interface SocketRepository extends MongoRepository<Socket, String>, SocketCustomUpdate {
     Optional<Socket> findSocketByCpIdAndSocketId(Integer cpId, Integer socketId);
     List<Socket> findSocketsByCpId(Integer cpId);
 }

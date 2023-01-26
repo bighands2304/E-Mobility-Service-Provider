@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ChargingPointRepository extends MongoRepository<ChargingPoint, String> {
+public interface ChargingPointRepository extends MongoRepository<ChargingPoint, String>, ChargingPointCustomUpdate {
     Optional<ChargingPoint> findChargingPointByCpIdAndCpoCode(Integer cpId, String cpoCode);
     Optional<ChargingPoint> findChargingPointByCpId(Integer cpId);
     List<ChargingPoint> findChargingPointsByAddress(String address);

@@ -17,7 +17,7 @@ public class Socket {
     @JsonIgnore
     private String internalCpId;
     @JsonIgnore
-    private int cpId; //not the object id, but the id visible to the emsp
+    private Integer cpId; //not the object id, but the id visible to the emsp
     @JsonIgnore
     private String cpoCode;
     private String type;
