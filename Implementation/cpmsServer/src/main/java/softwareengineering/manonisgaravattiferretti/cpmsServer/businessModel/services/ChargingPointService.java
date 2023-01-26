@@ -1,10 +1,14 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.ChargingPoint;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.repositories.ChargingPointRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +38,21 @@ public class ChargingPointService {
         return chargingPointOptional;
     }
 
-    public Optional<ChargingPoint> findChargingPointById(String id, String cpoCode) {
+    public Optional<ChargingPoint> findChargingPointOfCpoById(Integer id, String cpoCode) {
         return chargingPointRepository.findChargingPointByCpIdAndCpoCode(id, cpoCode);
+    }
+
+    public Optional<ChargingPoint> findChargingPointById(Integer id) {
+        return chargingPointRepository.findChargingPointByCpId(id);
+    }
+
+    public Page<ChargingPoint> findAllPaginated(int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset, limit);
+        return chargingPointRepository.findAll(pageable);
+    }
+
+    public Page<ChargingPoint> findAllLastUpdatePaginated(LocalDateTime dateFrom, LocalDateTime dateTo, int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset, limit);
+        return chargingPointRepository.findAllByLastUpdatedBetween(dateFrom, dateTo, pageable);
     }
 }

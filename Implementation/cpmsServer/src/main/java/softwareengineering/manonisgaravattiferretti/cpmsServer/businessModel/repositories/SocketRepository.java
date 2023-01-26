@@ -9,6 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface SocketRepository extends MongoRepository<Socket, String> {
-    Optional<Socket> findSocketBySocketId(Integer socketId);
+    Optional<Socket> findSocketByCpIdAndSocketId(Integer cpId, Integer socketId);
     List<Socket> findSocketsByCpId(Integer cpId);
 }

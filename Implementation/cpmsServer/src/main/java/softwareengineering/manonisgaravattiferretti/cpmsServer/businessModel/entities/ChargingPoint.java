@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -25,6 +26,7 @@ public class ChargingPoint {
     @DocumentReference
     private List<Socket> sockets;
     private List<Battery> batteries;
+    private LocalDateTime lastUpdated;
     //TODO: check if it is ok to leave just the code
     // (since the performance is better like this, because no lookups are needed)
     //@DocumentReference(lazy = true)
