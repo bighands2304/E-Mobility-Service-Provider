@@ -11,7 +11,7 @@
 	<groupId>softwareEngineering.ManoniSgaravattiFerretti</groupId>
 	<artifactId>emspServer</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>emspServer</name>
 	<description>eMSPServer for the Software Engineering project</description>
 	<properties>
@@ -99,6 +99,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>spring-boot-docker</finalName>
 	</build>
 
 </project>

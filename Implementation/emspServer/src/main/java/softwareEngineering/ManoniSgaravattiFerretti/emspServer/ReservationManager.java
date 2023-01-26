@@ -26,13 +26,12 @@ public class ReservationManager {
     @PostMapping("/makeReservation")
     public ResponseEntity<?> makeReservation(@RequestBody Map<String,String> payload){
         User user = userService.findById(Long.parseLong(payload.get("userId")));
-        LocalDateTime startTime = LocalDateTime.parse(payload.get("startTime"));
         Reservation reservation = new ActiveReservation();
         reservation.setUser(user);
 
         reservation.setSocketId(payload.get("socketId"));
         reservation.setTariffId(payload.get("tariffId"));
-        reservation.setStartTime(startTime);
+        reservation.setStartTime(LocalDateTime.now());
 
         reservationService.save(reservation);
         //TODO send informations of reservation to CPMS

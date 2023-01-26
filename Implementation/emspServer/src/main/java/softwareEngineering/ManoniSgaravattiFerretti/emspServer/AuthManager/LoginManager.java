@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.ChargingPointOperator;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.ChargingPointOperatorService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.User;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Service.UserService;
 
@@ -24,6 +26,8 @@ public class LoginManager implements UserDetailsService {
     @Autowired
     UserService userService;
     @Autowired
+    ChargingPointOperatorService cpoService;
+    @Autowired
     AuthenticationManager authenticationManager;
     @Autowired
     TokenManager tokenManager;
@@ -35,6 +39,14 @@ public class LoginManager implements UserDetailsService {
             throw new UsernameNotFoundException("User not found");
         }
         return new User(user);
+    }
+
+    public ChargingPointOperator loadCPOByToken(String token) throws UsernameNotFoundException {
+        ChargingPointOperator cpo = cpoService.searchCPOByToken(token);
+        if (cpo == null){
+            throw new UsernameNotFoundException("Invalid token");
+        }
+        return new ChargingPointOperator(cpo);
     }
 
     @PostMapping("/login")

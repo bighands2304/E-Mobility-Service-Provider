@@ -1,6 +1,7 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalTime;
 
