@@ -6,4 +6,5 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dto
 @Repository
 public interface SocketCustomUpdate {
     void updateSocketAvailability(ChangeSocketAvailabilityDTO changeSocketAvailabilityDTO);
+    void updateSocketStatus(String cpInternalId, Integer socketId, String newStatus);
 }

@@ -25,44 +25,44 @@ public class OcppSender {
         this.template = template;
     }
 
-    public CompletableFuture<ConfMessage> sendChangeAvailability(Integer cpId, Integer socketId, Boolean available) {
+    public CompletableFuture<ConfMessage> sendChangeAvailability(String cpId, Integer socketId, Boolean available) {
         ChangeAvailabilityReq changeAvailabilityReq = new ChangeAvailabilityReq(
                 socketId, AvailabilityType.getFromBoolean(available));
         return send(changeAvailabilityReq, cpId, "ChangeAvailabilityConf");
     }
 
-    public CompletableFuture<ConfMessage> sendClearChargingProfile(Integer cpId) {
+    public CompletableFuture<ConfMessage> sendClearChargingProfile(String cpId) {
         return sendClearChargingProfile(cpId, 0);
     }
 
-    public CompletableFuture<ConfMessage> sendClearChargingProfile(Integer cpId, Integer socketId) {
-        ClearChargingProfileReq request = new ClearChargingProfileReq(cpId, socketId);
+    public CompletableFuture<ConfMessage> sendClearChargingProfile(String cpId, Integer socketId) {
+        ClearChargingProfileReq request = new ClearChargingProfileReq(null, socketId);
         return send(request, cpId, "ClearChargingProfileConf");
     }
 
-    public CompletableFuture<ConfMessage> sendCancelReservation(Integer cpId, Integer reservationId) {
+    public CompletableFuture<ConfMessage> sendCancelReservation(String cpId, Long reservationId) {
         CancelReservationReq request = new CancelReservationReq(reservationId);
         return send(request, cpId, "CancelReservationConf");
     }
 
-    public CompletableFuture<ConfMessage> sendRemoteStartTransaction(Integer cpId, Integer socketId,
+    public CompletableFuture<ConfMessage> sendRemoteStartTransaction(String cpId, Integer socketId,
                                                                                     ChargingProfile chargingProfile) {
         RemoteStartTransactionReq request = new RemoteStartTransactionReq(socketId, chargingProfile);
         return send(request, cpId, "RemoteStartTransactionConf");
     }
 
-    public CompletableFuture<ConfMessage> sendRemoteStopTransaction(Integer cpId, Integer transactionId) {
+    public CompletableFuture<ConfMessage> sendRemoteStopTransaction(String cpId, Integer transactionId) {
         RemoteStopTransactionReq request = new RemoteStopTransactionReq(transactionId);
         return send(request, cpId, "RemoteStopTransactionConf");
     }
 
-    public CompletableFuture<ConfMessage> sendReserveNow(Integer cpId, Integer reservationId,
-                                                                       LocalDateTime expiryDate, Integer socketId) {
+    public CompletableFuture<ConfMessage> sendReserveNow(String cpId, Long reservationId,
+                                                         LocalDateTime expiryDate, Integer socketId) {
         ReserveNowReq request = new ReserveNowReq(socketId, expiryDate, reservationId);
         return send(request, cpId, "RemoteStopTransactionConf");
     }
 
-    public CompletableFuture<ConfMessage> sendSetChargingProfile(Integer cpId, Integer socketId,
+    public CompletableFuture<ConfMessage> sendSetChargingProfile(String cpId, Integer socketId,
                                                                             ChargingProfile chargingProfile) {
         SetChargingProfileReq request = new SetChargingProfileReq(socketId, chargingProfile);
         return send(request, cpId, "RemoteStopTransactionConf");
@@ -76,7 +76,11 @@ public class OcppSender {
         }
     }
 
-    private CompletableFuture<ConfMessage> send(Object message, Integer cpId, String messageName) {
+    public Map<String, CompletableFuture<ConfMessage>> getPendingResponses() {
+        return pendingResponses;
+    }
+
+    private CompletableFuture<ConfMessage> send(Object message, String cpId, String messageName) {
         String requestId = UUID.randomUUID().toString();
         String sessionId = sessionsManager.getSessionIdFromChargingPointId(cpId);
         Map<String, Object> headers = Map.of("requestId", requestId);

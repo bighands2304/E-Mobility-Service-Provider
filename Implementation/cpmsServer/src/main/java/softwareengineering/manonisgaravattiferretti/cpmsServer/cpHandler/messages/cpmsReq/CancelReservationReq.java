@@ -7,5 +7,5 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class CancelReservationReq {
-    private Integer reservationId;
+    private Long reservationId;
 }

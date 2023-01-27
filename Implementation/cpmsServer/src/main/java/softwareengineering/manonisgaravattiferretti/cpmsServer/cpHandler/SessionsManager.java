@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class SessionsManager {
     private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
-    private final Map<Integer, String> chargingPointsSessionIds = new ConcurrentHashMap<>();
+    private final Map<String, String> chargingPointsSessionIds = new ConcurrentHashMap<>();
     private final ChargingPointService chargingPointService;
 
     @Autowired
@@ -38,7 +38,7 @@ public class SessionsManager {
         sessions.put(sessionId, session);
     }
 
-    public WebSocketSession getSessionFromChargingPointId(Integer cpId) {
+    public WebSocketSession getSessionFromChargingPointId(String cpId) {
         return sessions.get(chargingPointsSessionIds.get(cpId));
     }
 
@@ -46,7 +46,7 @@ public class SessionsManager {
         return sessions.get(sessionId);
     }
 
-    public String getSessionIdFromChargingPointId(Integer cpId) {
+    public String getSessionIdFromChargingPointId(String cpId) {
         return chargingPointsSessionIds.get(cpId);
     }
 }

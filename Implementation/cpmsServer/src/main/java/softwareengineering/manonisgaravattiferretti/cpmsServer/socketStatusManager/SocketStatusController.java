@@ -37,7 +37,7 @@ public class SocketStatusController {
     }
 
     @GetMapping("/ocpi/cpo/locations/{cpId}")
-    public ResponseEntity<ChargingPoint> getCp(@PathVariable Integer cpId) {
+    public ResponseEntity<ChargingPoint> getCp(@PathVariable String cpId) {
         Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointById(cpId);
         ChargingPoint chargingPoint = chargingPointOptional.orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Charging point not found"));
@@ -45,7 +45,7 @@ public class SocketStatusController {
     }
 
     @GetMapping("ocpi/cpo/locations/{cpId}/{socketId}")
-    public ResponseEntity<Socket> getSocket(@PathVariable Integer cpId, @PathVariable Integer socketId) {
+    public ResponseEntity<Socket> getSocket(@PathVariable String cpId, @PathVariable Integer socketId) {
         Optional<Socket> socketOptional = socketService.findSocketByCpIdAndSocketId(cpId, socketId);
         Socket socket = socketOptional.orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Socket not found"));

@@ -2,9 +2,10 @@ package softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messag
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.cpmsReq.dtos.CommandResult;
 
 @Data
 public class CancelReservationConf implements ConfMessage {
     @NotNull
-    private String status;
+    private CommandResult commandResult;
 }

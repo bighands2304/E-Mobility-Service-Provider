@@ -7,7 +7,7 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.ent
 @Repository
 public interface ChargingPointCustomUpdate {
     void updateBatteryEnergyFlow(IncludeBatteryDTO includeBatteryDTO);
-    void addTariff(String cpId, Tariff tariff);
+    void addTariff(String id, Tariff tariff);
     void updateBatteryAvailability(String id, int batteryId, Boolean available);
     void updateToggleOptimizer(String id, String optimizerType, boolean isAutomatic);
 }

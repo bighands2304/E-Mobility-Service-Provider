@@ -17,11 +17,15 @@ public class SocketService {
         this.socketRepository = socketRepository;
     }
 
-    public Optional<Socket> findSocketByCpIdAndSocketId(Integer cpId, Integer socketId) {
+    public Optional<Socket> findSocketByCpIdAndSocketId(String cpId, Integer socketId) {
         return socketRepository.findSocketByCpIdAndSocketId(cpId, socketId);
     }
 
     public void updateSocketAvailability(ChangeSocketAvailabilityDTO changeSocketAvailabilityDTO) {
         socketRepository.updateSocketAvailability(changeSocketAvailabilityDTO);
+    }
+
+    public void updateSocketStatus(String cpInternalId, Integer socketId, String status) {
+        socketRepository.updateSocketStatus(cpInternalId, socketId, status);
     }
 }

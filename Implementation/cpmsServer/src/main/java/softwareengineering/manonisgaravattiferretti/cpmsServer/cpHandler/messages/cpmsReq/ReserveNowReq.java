@@ -10,5 +10,5 @@ import java.time.LocalDateTime;
 public class ReserveNowReq {
     private Integer connectorId;
     private LocalDateTime expiryDate;
-    private Integer reservationId;
+    private Long reservationId;
 }
