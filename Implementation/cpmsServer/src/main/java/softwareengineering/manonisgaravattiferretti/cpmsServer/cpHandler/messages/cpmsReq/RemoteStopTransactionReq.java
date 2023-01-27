@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class RemoteStopTransactionReq {
-    private Integer transactionId;
+    private Long transactionId;
 }

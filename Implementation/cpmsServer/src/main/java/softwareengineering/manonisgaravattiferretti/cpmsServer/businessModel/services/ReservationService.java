@@ -29,6 +29,11 @@ public class ReservationService {
         return reservationRepository.findReservationsByLastUpdatedBetween(dateFrom, dateTo, pageable);
     }
 
+    public Page<Reservation> findAll(int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset, limit, Sort.by("lastUpdated").descending());
+        return reservationRepository.findAll(pageable);
+    }
+
     public void updateReservationStatus(Long reservationInternalId, String status, LocalDateTime timestamp) {
         reservationRepository.updateReservationStatus(status, reservationInternalId, timestamp);
     }
@@ -59,5 +64,9 @@ public class ReservationService {
 
     public Optional<Reservation> findReservationByEmspId(Long id, EmspDetails emspDetails) {
         return reservationRepository.findReservationByReservationIdEmspAndEmspDetails(id, emspDetails);
+    }
+
+    public Optional<Reservation> findReservationBySessionId(Long sessionId) {
+        return reservationRepository.findReservationBySessionId(sessionId);
     }
 }

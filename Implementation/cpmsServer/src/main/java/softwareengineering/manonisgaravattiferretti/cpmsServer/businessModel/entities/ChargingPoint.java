@@ -17,8 +17,8 @@ public class ChargingPoint {
     private String cpId;
     private String name;
     private String address;
-    private String latitude;
-    private String longitude;
+    private Double latitude;
+    private Double longitude;
     private boolean togglePriceOptimizer;
     private boolean toggleEnergyMixOptimizer;
     private boolean toggleDSOSelectionOptimizer;

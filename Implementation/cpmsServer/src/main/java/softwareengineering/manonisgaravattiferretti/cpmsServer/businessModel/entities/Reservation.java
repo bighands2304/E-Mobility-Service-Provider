@@ -19,9 +19,10 @@ public class Reservation {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private Double energyAmount;
+    private Double totalCost;
     private LocalDateTime lastUpdated;
     private LocalDateTime expiryDate;
-    @DocumentReference(lazy = true)
+    @DocumentReference
     private Socket socket;
     @DocumentReference(lazy = true)
     private EmspDetails emspDetails;

@@ -1,11 +1,13 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.socketStatusManager;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.ReserveNowDTO;
@@ -40,7 +42,8 @@ public class ReservationController {
     }
 
     @PostMapping("/ocpi/cpo/commands/RESERVE_NOW")
-    public ResponseEntity<?> reserveNow(ReserveNowDTO reserveNowDTO, @AuthenticationPrincipal EmspDetails emspDetails) {
+    public ResponseEntity<?> reserveNow(@RequestBody @Valid ReserveNowDTO reserveNowDTO,
+                                        @AuthenticationPrincipal EmspDetails emspDetails) {
         Optional<Socket> socketOptional = socketService.findSocketByCpIdAndSocketId(reserveNowDTO.getChargingPointId(),
                 reserveNowDTO.getSocketId());
         if (socketOptional.isEmpty()) {

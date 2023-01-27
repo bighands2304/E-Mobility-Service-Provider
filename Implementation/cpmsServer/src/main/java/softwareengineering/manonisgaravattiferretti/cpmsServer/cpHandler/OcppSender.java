@@ -51,7 +51,7 @@ public class OcppSender {
         return send(request, cpId, "RemoteStartTransactionConf");
     }
 
-    public CompletableFuture<ConfMessage> sendRemoteStopTransaction(String cpId, Integer transactionId) {
+    public CompletableFuture<ConfMessage> sendRemoteStopTransaction(String cpId, Long transactionId) {
         RemoteStopTransactionReq request = new RemoteStopTransactionReq(transactionId);
         return send(request, cpId, "RemoteStopTransactionConf");
     }
