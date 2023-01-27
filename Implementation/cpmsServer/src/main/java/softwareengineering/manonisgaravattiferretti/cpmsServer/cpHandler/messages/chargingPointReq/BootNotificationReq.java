@@ -1,4 +1,3 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.chargingPointReq;
 
-public class BootNotificationReq {
-}
+public class BootNotificationReq {}

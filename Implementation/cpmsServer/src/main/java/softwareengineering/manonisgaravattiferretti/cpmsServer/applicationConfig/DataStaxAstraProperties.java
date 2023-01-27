@@ -1,4 +1,4 @@
-package softwareengineering.manonisgaravattiferretti.cpmsServer;
+package softwareengineering.manonisgaravattiferretti.cpmsServer.applicationConfig;
 
 import java.io.File;
 

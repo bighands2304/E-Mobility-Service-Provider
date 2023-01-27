@@ -1,5 +1,5 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.chargingPointReq;
 
 public class StopTransactionConf {
-    // todo
+    private Long transactionId;
 }

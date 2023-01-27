@@ -39,6 +39,16 @@ public class ChargingPointsManager {
         return new ResponseEntity<>(chargingPointOptional.get(), HttpStatus.OK);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteChargingPoint(@AuthenticationPrincipal CPO cpo, @PathVariable String id) {
+        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(id, cpo.getCpoCode());
+        if (chargingPointOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Charging point not found");
+        }
+        chargingPointService.deleteChargingPoint(id);
+        return new ResponseEntity<>(chargingPointOptional.get(), HttpStatus.OK);
+    }
+
     @GetMapping("/{cpId}/sockets")
     public ResponseEntity<Socket> getSockets(@AuthenticationPrincipal CPO cpo, @PathVariable String cpId) {
         return ResponseEntity.ok(null); //TODO
@@ -61,7 +71,7 @@ public class ChargingPointsManager {
         return ResponseEntity.ok(null); //TODO
     }
 
-    @PostMapping
+    @PostMapping()
     public void addChargingPoint() {
         //Todo
     }

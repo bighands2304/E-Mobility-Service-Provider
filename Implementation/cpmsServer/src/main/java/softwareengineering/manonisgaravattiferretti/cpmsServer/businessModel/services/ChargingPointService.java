@@ -95,5 +95,9 @@ public class ChargingPointService {
         return chargingPointRepository.findChargingPointByAuthenticationKey(authKey);
     }
 
+    public void removeCpById(String id) {
+        chargingPointRepository.deleteById(id);
+    }
+
     // Todo: change dso provider, add cp
 }

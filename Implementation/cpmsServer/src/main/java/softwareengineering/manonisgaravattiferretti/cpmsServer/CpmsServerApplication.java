@@ -1,13 +1,12 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration;
 import org.springframework.boot.autoconfigure.cassandra.CqlSessionBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.applicationConfig.DataStaxAstraProperties;
 
 import java.nio.file.Path;
 

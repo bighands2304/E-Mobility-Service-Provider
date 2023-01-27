@@ -3,12 +3,14 @@ package softwareengineering.manonisgaravattiferretti.cpmsServer.socketStatusMana
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.CommandResultType;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.StartSessionDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.EmspDetails;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.Reservation;
@@ -87,5 +89,29 @@ public class ChargingSessionController {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "server error, try again later");
         }
         return ResponseEntity.ok().build();
+    }
+
+    @Async
+    void sendStartSessionResponse(CompletableFuture<ConfMessage> futureCpResponse) {
+        CommandResultType commandResultType;
+        try {
+            RemoteStopTransactionConf response = (RemoteStopTransactionConf) futureCpResponse.get();
+            commandResultType = CommandResultType.getFromCpCommandResult(response.getStatus());
+        } catch (InterruptedException | ExecutionException e) {
+            commandResultType = CommandResultType.TIMEOUT;
+        }
+        // Todo: send request
+    }
+
+    @Async
+    void sendStopSessionResponse(CompletableFuture<ConfMessage> futureCpResponse) {
+        CommandResultType commandResultType;
+        try {
+            RemoteStopTransactionConf response = (RemoteStopTransactionConf) futureCpResponse.get();
+            commandResultType = CommandResultType.getFromCpCommandResult(response.getStatus());
+        } catch (InterruptedException | ExecutionException e) {
+            commandResultType = CommandResultType.TIMEOUT;
+        }
+        // Todo: send request
     }
 }

@@ -4,14 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.ChargingSessionDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.EmspChargingPointDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.EmspSocketDTO;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.ChargingPoint;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.Reservation;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.Socket;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.*;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.ChargingPointService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.ReservationService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.SocketService;
@@ -75,5 +74,23 @@ public class SocketStatusController {
         }
         Page<ChargingSessionDTO> sessions = reservations.map(EntityFromDTOConverter::chargingSessionDTOFromReservation);
         return new ResponseEntity<>(sessions, HttpStatus.OK);
+    }
+
+    @GetMapping("/ocpi/cpo/sessions/{sessionId}")
+    public ResponseEntity<ChargingSessionDTO> getSession(@PathVariable Long sessionId) {
+        Optional<Reservation> reservationOptional = reservationService.findReservationBySessionId(sessionId);
+        if (reservationOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "session not found");
+        }
+        return new ResponseEntity<>(EntityFromDTOConverter.chargingSessionDTOFromReservation(reservationOptional.get()), HttpStatus.OK);
+    }
+
+    @GetMapping("/ocpi/cpo/tariffs")
+    public ResponseEntity<Iterable<Tariff>> getTariffs(@RequestParam(required = false) LocalDateTime dateFrom,
+                                                       @RequestParam(required = false) LocalDateTime dateTo,
+                                                       @RequestParam(defaultValue = "0") Integer offset,
+                                                       @RequestParam(defaultValue = "100") Integer limit) {
+        // todo
+        return null;
     }
 }
