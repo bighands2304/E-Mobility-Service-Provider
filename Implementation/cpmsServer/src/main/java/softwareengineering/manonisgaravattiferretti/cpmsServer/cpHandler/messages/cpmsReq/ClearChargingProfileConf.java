@@ -4,6 +4,6 @@ import lombok.Data;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.cpmsReq.dtos.CommandResult;
 
 @Data
-public class ClearChargingProfileConf {
+public class ClearChargingProfileConf implements ConfMessage {
     private CommandResult commandResult;
 }

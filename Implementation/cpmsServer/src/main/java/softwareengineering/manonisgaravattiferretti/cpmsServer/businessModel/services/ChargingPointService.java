@@ -91,5 +91,9 @@ public class ChargingPointService {
         chargingPointRepository.updateToggleOptimizer(id, optimizerType, isAutomatic);
     }
 
+    public Optional<ChargingPoint> findChargingPointByAuthKey(String authKey) {
+        return chargingPointRepository.findChargingPointByAuthenticationKey(authKey);
+    }
+
     // Todo: change dso provider, add cp
 }

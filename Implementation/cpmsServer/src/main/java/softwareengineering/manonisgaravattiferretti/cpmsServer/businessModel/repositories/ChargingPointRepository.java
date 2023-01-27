@@ -19,4 +19,5 @@ public interface ChargingPointRepository extends MongoRepository<ChargingPoint, 
     List<ChargingPoint> findChargingPointsByLatitudeBetweenAndLongitudeBetween(
             String latitudeFrom, String latitudeTo, String longitudeFrom, String LongitudeTo);
     Page<ChargingPoint> findAllByLastUpdatedBetween(LocalDateTime dateFrom, LocalDateTime dateTo, Pageable pageable);
+    Optional<ChargingPoint> findChargingPointByAuthenticationKey(String authenticationKey);
 }

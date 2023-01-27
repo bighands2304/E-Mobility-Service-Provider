@@ -33,4 +33,6 @@ public class ChargingPoint {
     //private CPO cpo;
     @JsonIgnore
     private String cpoCode;
+    @JsonIgnore
+    private String authenticationKey; // for websocket handshake
 }

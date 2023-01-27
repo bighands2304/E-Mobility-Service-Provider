@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class CancelReservationConf {
+public class CancelReservationConf implements ConfMessage {
     @NotNull
     private String status;
 }
