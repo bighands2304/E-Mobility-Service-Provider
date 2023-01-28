@@ -20,6 +20,7 @@ public class ChargingPointOperator implements UserDetails{
     public ChargingPointOperator(ChargingPointOperator cpo){
         this.cpoId=cpo.cpoId;
         this.token=cpo.token;
+        this.tokenEmsp=cpo.tokenEmsp;
         this.iban=cpo.iban;
         this.cpmsUrl=cpo.cpmsUrl;
         this.chargingPoints=cpo.chargingPoints;
@@ -30,6 +31,7 @@ public class ChargingPointOperator implements UserDetails{
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String cpoId;
     private String token;
+    private String tokenEmsp;
     private String iban;
     private String cpmsUrl;
     private List<ChargingPoint> chargingPoints = new ArrayList<>();

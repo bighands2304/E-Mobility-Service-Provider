@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSRequestSender;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.ActiveReservation;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.DeletedReservation;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.Reservation;
@@ -18,14 +19,15 @@ import java.util.Map;
 public class SessionCreator {
     @Autowired
     ReservationService reservationService;
+    @Autowired
+    CPMSRequestSender cpmsRequestSender;
 
     @PostMapping("/startChargingSession")
     public ResponseEntity<?> startChargingSession(@RequestBody Map<String,String> payload){
         Reservation reservation = reservationService.getReservationById(Long.parseLong(payload.get("reservationId")));
         if (reservation instanceof ActiveReservation) {
             ActiveReservation activeReservation = (ActiveReservation) reservation;
-            //TODO questo va preso dal cpms
-            //activeReservation.setSessionId(Long.parseLong(payload.get("sessionId")));
+            cpmsRequestSender.startSession(activeReservation);
             reservationService.save(activeReservation);
             reservationService.delete(reservation);
             return ResponseEntity.ok(activeReservation);

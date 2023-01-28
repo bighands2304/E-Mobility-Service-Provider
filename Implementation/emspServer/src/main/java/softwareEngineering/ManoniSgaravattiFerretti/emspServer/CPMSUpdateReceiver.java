@@ -1,4 +1,4 @@
-package softwareEngineering.ManoniSgaravattiFerretti.emspServer;
+/*package softwareEngineering.ManoniSgaravattiFerretti.emspServer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/ocpi")
+@RequestMapping("/ocpi/emsp/2.2")
 public class CPMSUpdateReceiver {
     @Value("${emsp.path}")
     private String emspPath;
@@ -23,20 +23,7 @@ public class CPMSUpdateReceiver {
     @Autowired
     ChargingPointOperatorService cpoService;
 
-    @PostMapping("/register")
-    public ResponseEntity<?> registerCPO(@RequestBody Map<String,String> payload){
-        ChargingPointOperator cpo = new ChargingPointOperator();
-        cpo.setCpmsUrl(payload.get("url"));
-        cpo.setIban(payload.get("iban"));
 
-        SecureRandom random = new SecureRandom();
-        byte bytes[] = new byte[20];
-        random.nextBytes(bytes);
-        cpo.setToken(bytes.toString());
-
-        cpoService.saveCPO(cpo);
-        return ResponseEntity.ok(cpo);
-    }
 
     @PostMapping("/addCPs")
     public ResponseEntity<?> addCPs(@RequestBody Map<String,String> payload){
@@ -44,7 +31,7 @@ public class CPMSUpdateReceiver {
         //TODO take CPMS payload
         //List<ChargingPoint> cps = chargingPointService.saveCPs();
         //chargingPointService.saveCPs(cps);
-        return ResponseEntity.ok(""/*cps*/);
+        return ResponseEntity.ok(""cps);
     }
 
     @GetMapping("/getCPs")
@@ -52,4 +39,5 @@ public class CPMSUpdateReceiver {
         return ResponseEntity.ok(chargingPointService.getAllCPs());
     }
 
-}
+
+}*/

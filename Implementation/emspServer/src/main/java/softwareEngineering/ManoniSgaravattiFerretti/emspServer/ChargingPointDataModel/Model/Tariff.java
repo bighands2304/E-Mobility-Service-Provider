@@ -20,6 +20,5 @@ public class Tariff {
     private Integer stepSize;
     private LocalDate startDate;
     private LocalDate endDate;
-
-
+    private Boolean isSpecialOffer=false;
 }
