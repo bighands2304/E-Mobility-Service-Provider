@@ -35,7 +35,7 @@ public class AuthorizationManager {
         http
                 .authorizeHttpRequests()
                 .requestMatchers("/").permitAll()
-                .requestMatchers("/register", "/login", "/ocpi/register").permitAll()
+                .requestMatchers("/register", "/login", "/ocpi/emsp/2.2/credentials").permitAll()
                 .requestMatchers("/ocpi/**").hasRole("CPMS")
                 .requestMatchers("/user/**").hasRole("USER")
                 .anyRequest()
