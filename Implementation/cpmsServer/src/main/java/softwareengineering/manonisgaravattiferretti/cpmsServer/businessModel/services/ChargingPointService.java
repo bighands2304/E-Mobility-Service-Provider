@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.IncludeBatteryDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.Battery;
@@ -30,8 +31,9 @@ public class ChargingPointService {
         chargingPointRepository.insert(chargingPoint);
     }
 
-    public List<ChargingPoint> getChargingPointsOfCpo(String cpoCode) {
-        return chargingPointRepository.findChargingPointsByCpoCode(cpoCode);
+    public Page<ChargingPoint> getChargingPointsOfCpo(String cpoCode, int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset, limit, Sort.by("name"));
+        return chargingPointRepository.findChargingPointsByCpoCode(cpoCode, pageable);
     }
 
     public Optional<ChargingPoint> findChargingPointByInternalId(String id, String cpoCode) {
@@ -65,17 +67,16 @@ public class ChargingPointService {
         chargingPointRepository.deleteById(id);
     }
 
-    public void updateIncludeBattery(IncludeBatteryDTO includeBatteryDTO) {
-        Optional<ChargingPoint> chargingPoint = chargingPointRepository.findById(includeBatteryDTO.getCpId());
+    public void updateIncludeBattery(IncludeBatteryDTO includeBatteryDTO, String cpId, Integer batteryId) {
+        Optional<ChargingPoint> chargingPoint = chargingPointRepository.findById(cpId);
         if (chargingPoint.isPresent()) {
             for (Battery battery: chargingPoint.get().getBatteries()) {
-                if (battery.getBatteryId().equals(includeBatteryDTO.getBatteryId())
+                if (battery.getBatteryId().equals(batteryId)
                         && battery.getStatus().equals("UNAVAILABLE")) {
-                    chargingPointRepository.updateBatteryAvailability(includeBatteryDTO.getCpId(),
-                            includeBatteryDTO.getBatteryId(), true);
+                    chargingPointRepository.updateBatteryAvailability(cpId, batteryId, true);
                 }
             }
-            chargingPointRepository.updateBatteryEnergyFlow(includeBatteryDTO);
+            chargingPointRepository.updateBatteryEnergyFlow(includeBatteryDTO, cpId, batteryId);
         }
     }
 
@@ -97,6 +98,10 @@ public class ChargingPointService {
 
     public void removeCpById(String id) {
         chargingPointRepository.deleteById(id);
+    }
+
+    public List<ChargingPoint> findAll() {
+        return chargingPointRepository.findAll();
     }
 
     // Todo: change dso provider, add cp

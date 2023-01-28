@@ -21,8 +21,8 @@ public class SocketService {
         return socketRepository.findSocketByCpIdAndSocketId(cpId, socketId);
     }
 
-    public void updateSocketAvailability(ChangeSocketAvailabilityDTO changeSocketAvailabilityDTO) {
-        socketRepository.updateSocketAvailability(changeSocketAvailabilityDTO);
+    public void updateSocketAvailability(ChangeSocketAvailabilityDTO changeSocketAvailabilityDTO, String cpId, Integer socketId) {
+        socketRepository.updateSocketAvailability(changeSocketAvailabilityDTO, cpId, socketId);
     }
 
     public void updateSocketStatus(String cpInternalId, Integer socketId, String status) {

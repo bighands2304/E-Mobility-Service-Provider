@@ -18,10 +18,10 @@ public class SocketCustomUpdateImpl implements SocketCustomUpdate {
     }
 
     @Override
-    public void updateSocketAvailability(ChangeSocketAvailabilityDTO changeSocketAvailabilityDTO) {
+    public void updateSocketAvailability(ChangeSocketAvailabilityDTO changeSocketAvailabilityDTO, String cpId, Integer socketId) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("cpId").is(changeSocketAvailabilityDTO.getCpId()));
-        query.addCriteria(Criteria.where("socketId").is(changeSocketAvailabilityDTO.getSocketId()));
+        query.addCriteria(Criteria.where("cpId").is(cpId));
+        query.addCriteria(Criteria.where("socketId").is(socketId));
         Update update = new Update();
         update.set("availability", (changeSocketAvailabilityDTO.getAvailable()) ? "AVAILABLE" : "NOT_AVAILABLE");
         mongoOperations.updateFirst(query, update, Socket.class);

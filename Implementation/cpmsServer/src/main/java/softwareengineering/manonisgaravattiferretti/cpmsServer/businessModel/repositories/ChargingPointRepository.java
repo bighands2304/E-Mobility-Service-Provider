@@ -15,7 +15,7 @@ public interface ChargingPointRepository extends MongoRepository<ChargingPoint, 
     Optional<ChargingPoint> findChargingPointByCpIdAndCpoCode(String cpId, String cpoCode);
     Optional<ChargingPoint> findChargingPointByCpId(String cpId);
     List<ChargingPoint> findChargingPointsByAddress(String address);
-    List<ChargingPoint> findChargingPointsByCpoCode(String cpoCode);
+    Page<ChargingPoint> findChargingPointsByCpoCode(String cpoCode, Pageable pageable);
     Page<ChargingPoint> findAllByLastUpdatedBetween(LocalDateTime dateFrom, LocalDateTime dateTo, Pageable pageable);
     Optional<ChargingPoint> findChargingPointByAuthenticationKey(String authenticationKey);
 }
