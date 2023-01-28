@@ -23,7 +23,7 @@ public class Tariffs {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{tariff_id")
+    @DeleteMapping("/{tariff_id}")
     public ResponseEntity<?> deleteTariff(@PathVariable String tariff_id){
         tariffService.delete(tariff_id);
         return ResponseEntity.noContent().build();

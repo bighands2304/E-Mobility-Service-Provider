@@ -27,7 +27,7 @@ public class Sessions {
         return ResponseEntity.ok(session);
     }
 
-    @PatchMapping("/{session_id")
+    @PatchMapping("/{session_id}")
     public ResponseEntity<?> patchSession(@PathVariable String session_id){
         ActiveReservation session = activeReservationRepository.findActiveReservationBySessionId(Long.parseLong(session_id));
         //TODO add field to update of the session

@@ -9,5 +9,5 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointData
 public class SocketService {
     @Autowired
     SocketRepository socketRepository;
-    public Socket getSocketById(String socketId){ return socketRepository.findSocketById(socketId);}
+    public Socket getSocketById(String socketId){ return socketRepository.findSocketBySocketId(socketId);}
 }

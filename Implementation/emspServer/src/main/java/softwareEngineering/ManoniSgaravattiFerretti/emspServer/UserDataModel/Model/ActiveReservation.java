@@ -6,9 +6,8 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 
 @Data
 @Entity
-@Table
 @Inheritance(strategy= InheritanceType.SINGLE_TABLE)
 @EnableAutoConfiguration
 public class ActiveReservation extends Reservation {
-    private Long SessionId;
+    private Long sessionId;
 }

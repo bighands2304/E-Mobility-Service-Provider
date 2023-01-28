@@ -25,5 +25,5 @@ public class ChargingPointService {
 
     public List<ChargingPoint> saveCPs(List<ChargingPoint> cps){return  chargingPointRepository.saveAll(cps);}
 
-    public ChargingPoint getCPBySocketId(String socketId){return chargingPointRepository.findChargingPointBySocketsIn((List<Socket>) socketRepository.findSocketById(socketId));}
+    public ChargingPoint getCPBySocketId(String socketId){return chargingPointRepository.findChargingPointBySocketsIn((List<Socket>) socketRepository.findSocketBySocketId(socketId));}
 }

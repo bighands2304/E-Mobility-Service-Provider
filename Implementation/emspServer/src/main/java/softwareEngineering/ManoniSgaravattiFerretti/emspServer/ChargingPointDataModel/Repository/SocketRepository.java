@@ -3,8 +3,9 @@ package softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDat
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.Socket;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.SocketId;
 
 @Repository
-public interface SocketRepository extends MongoRepository<Socket, String> {
-    Socket findSocketById(String socketId);
+public interface SocketRepository extends MongoRepository<Socket, SocketId> {
+    Socket findSocketBySocketId(String socketId);
 }
