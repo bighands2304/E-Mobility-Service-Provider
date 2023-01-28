@@ -1,4 +1,4 @@
-package softwareengineering.manonisgaravattiferretti.cpmsServer;
+package softwareengineering.manonisgaravattiferretti.cpmsServer.applicationConfig;
 
 import java.io.File;
 
@@ -10,14 +10,13 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "datastax.astra")
 @ConfigurationPropertiesScan
 public class DataStaxAstraProperties {
-
     private File secureConnectBundle;
 
     public File getSecureConnectBundle() {
         return secureConnectBundle;
     }
 
-    public void setSecureConnectBundle(File secureConnectBundle) {
-        this.secureConnectBundle = secureConnectBundle;
+    public void setSecureConnectBundle(String secureConnectBundlePath) {
+        this.secureConnectBundle = new File(secureConnectBundlePath);
     }
 }

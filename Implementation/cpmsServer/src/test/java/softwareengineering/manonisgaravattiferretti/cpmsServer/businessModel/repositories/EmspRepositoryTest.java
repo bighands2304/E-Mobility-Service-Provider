@@ -36,7 +36,4 @@ class EmspRepositoryTest {
         emspRepository.delete(emspDetailsUpdatedOptional.get());
         Assertions.assertTrue(emspRepository.findByEmspToken("token_test").isEmpty());
     }
-
-
-
 }

@@ -1,12 +1,9 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.cpManager;
 
-import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.CPO;
@@ -39,6 +36,16 @@ public class ChargingPointsManager {
         return new ResponseEntity<>(chargingPointOptional.get(), HttpStatus.OK);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteChargingPoint(@AuthenticationPrincipal CPO cpo, @PathVariable String id) {
+        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(id, cpo.getCpoCode());
+        if (chargingPointOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Charging point not found");
+        }
+        chargingPointService.deleteChargingPoint(id);
+        return new ResponseEntity<>(chargingPointOptional.get(), HttpStatus.OK);
+    }
+
     @GetMapping("/{cpId}/sockets")
     public ResponseEntity<Socket> getSockets(@AuthenticationPrincipal CPO cpo, @PathVariable String cpId) {
         return ResponseEntity.ok(null); //TODO
@@ -61,8 +68,26 @@ public class ChargingPointsManager {
         return ResponseEntity.ok(null); //TODO
     }
 
-    @PostMapping
+    @PostMapping()
     public void addChargingPoint() {
         //Todo
+    }
+
+    @PostMapping("/{id}/optimizer/{type}")
+    public ResponseEntity<?> toggleOptimizer(@PathVariable String id, @PathVariable String type,
+                                             @RequestParam boolean automatic) {
+        switch (type) {
+            case "dsoSelection" -> {
+
+            }
+            case "energyMix" -> {
+
+            }
+            case "price" -> {
+
+            }
+            default -> throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the optimizer type is not recognized");
+        }
+        return ResponseEntity.ok().build();
     }
 }

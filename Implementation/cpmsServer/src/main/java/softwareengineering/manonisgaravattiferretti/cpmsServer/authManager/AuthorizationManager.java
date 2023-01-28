@@ -13,7 +13,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.CPOService;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -33,7 +38,7 @@ public class AuthorizationManager {
         http
                 .authorizeHttpRequests()
                 .requestMatchers("/").permitAll()
-                .requestMatchers("/api/CPO/register", "/api/CPO/login", "/ocpi/cpo/credentials").permitAll()
+                .requestMatchers("/api/CPO/register", "/api/CPO/login", "/ocpi/cpo/credentials", "/ws").permitAll()
                 .requestMatchers("/ocpi/cpo").hasRole("EMSP")
                 .requestMatchers("/api/CPO/**").hasRole("CPO")
                 .anyRequest()
@@ -56,6 +61,15 @@ public class AuthorizationManager {
                 .passwordEncoder(passwordEncoder)
                 .and()
                 .build();
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
+        corsConfiguration.setAllowedMethods(Arrays.asList("*"));
+        source.registerCorsConfiguration("/**", corsConfiguration);
+        return source;
     }
 
     @Bean

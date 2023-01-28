@@ -36,7 +36,7 @@ public class EMSPCredentialsManager {
     }
 
     @PostMapping("/ocpi/cpo/credentials")
-    public ResponseEntity<?> registerEmsp(@RequestBody @Valid EmspCredentialsDTO emspCredentials) {
+    public ResponseEntity<CpmsCredentialsDTO> registerEmsp(@RequestBody @Valid EmspCredentialsDTO emspCredentials) {
         logger.info("Emsp credentials: " + emspCredentials);
         Optional<EmspDetails> emspDetails = emspDetailsService.findByEmspToken(emspCredentials.getEmspToken());
         if (emspDetails.isPresent()) {
@@ -44,15 +44,23 @@ public class EMSPCredentialsManager {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "emsp already registered");
         }
         emspDetailsService.insertEmsp(EntityFromDTOConverter.emspDetailsFromCredentials(emspCredentials));
-        try {
+        /*try {
             sendCredentials(emspCredentials.getUrl(), emspCredentials.getEmspToken());
         } catch (UnknownHostException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error");
+        }*/
+        String token = ""; //Todo
+        String url;
+        try {
+            url = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "could not send the cpms credentials");
         }
-        return ResponseEntity.ok(emspCredentials);
+        CpmsCredentialsDTO credentials = new CpmsCredentialsDTO(token, url);
+        return ResponseEntity.ok(credentials);
     }
 
-    @Async
+    /*@Async
     void sendCredentials(String emspUrl, String emspToken) throws UnknownHostException {
         String token = ""; //Todo
         String url = InetAddress.getLocalHost().getHostName();
@@ -72,5 +80,5 @@ public class EMSPCredentialsManager {
         if (resp.blockOptional().isPresent()) {
             emspDetailsService.updateEmspAddCpoToken(emspToken, token);
         }
-    }
+    }*/
 }

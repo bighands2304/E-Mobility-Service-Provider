@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -13,11 +14,11 @@ import java.util.List;
 public class ChargingPoint {
     @Id
     private String id;
-    private Integer cpId;
+    private String cpId;
     private String name;
     private String address;
-    private String latitude;
-    private String longitude;
+    private Double latitude;
+    private Double longitude;
     private boolean togglePriceOptimizer;
     private boolean toggleEnergyMixOptimizer;
     private boolean toggleDSOSelectionOptimizer;
@@ -25,10 +26,13 @@ public class ChargingPoint {
     @DocumentReference
     private List<Socket> sockets;
     private List<Battery> batteries;
+    private LocalDateTime lastUpdated;
     //TODO: check if it is ok to leave just the code
     // (since the performance is better like this, because no lookups are needed)
     //@DocumentReference(lazy = true)
     //private CPO cpo;
     @JsonIgnore
     private String cpoCode;
+    @JsonIgnore
+    private String authenticationKey; // for websocket handshake
 }

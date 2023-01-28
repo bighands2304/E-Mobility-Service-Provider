@@ -4,6 +4,9 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalTime;
+import java.util.Timer;
+
 @Data
 @Document(collection = "dsoOffers")
 public class DSOOffer {
@@ -11,6 +14,9 @@ public class DSOOffer {
     private String offerId;
     private Double price;
     private Double capacity;
-    private String chargingPointId;
-    private DSO dso;
+    private String chargingPointId; // external id (visible to both emsps and dsos)
+    private String dsoId;
+    private String companyName;
+    private LocalTime startTime;
+    private LocalTime endTime;
 }
