@@ -6,12 +6,14 @@ import org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfigurati
 import org.springframework.boot.autoconfigure.cassandra.CqlSessionBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.applicationConfig.DataStaxAstraProperties;
 
 import java.nio.file.Path;
 
 @SpringBootApplication(exclude = {CassandraAutoConfiguration.class})
 @EnableMongoRepositories
+@EnableScheduling
 public class CpmsServerApplication {
 
     public static void main(String[] args) {

@@ -23,6 +23,9 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.uti
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Optional;
 
 @RestController
@@ -44,41 +47,19 @@ public class EMSPCredentialsManager {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "emsp already registered");
         }
         emspDetailsService.insertEmsp(EntityFromDTOConverter.emspDetailsFromCredentials(emspCredentials));
-        /*try {
-            sendCredentials(emspCredentials.getUrl(), emspCredentials.getEmspToken());
-        } catch (UnknownHostException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error");
-        }*/
-        String token = ""; //Todo
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] bytes = new byte[20];
+        secureRandom.nextBytes(bytes);
+        String token = new String(bytes, StandardCharsets.UTF_8);
         String url;
         try {
             url = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "could not send the cpms credentials");
         }
-        CpmsCredentialsDTO credentials = new CpmsCredentialsDTO(token, url);
+        // todo: save credentials
+        emspDetailsService.updateEmspAddCpoToken(emspCredentials.getEmspToken(), token);
+        CpmsCredentialsDTO credentials = new CpmsCredentialsDTO(token, url, null);
         return ResponseEntity.ok(credentials);
     }
-
-    /*@Async
-    void sendCredentials(String emspUrl, String emspToken) throws UnknownHostException {
-        String token = ""; //Todo
-        String url = InetAddress.getLocalHost().getHostName();
-        CpmsCredentialsDTO credentials = new CpmsCredentialsDTO(token, url);
-        Mono<EmspCredentialsDTO> resp = WebClient.create(emspUrl)
-                .post()
-                .uri("/ocpi/emsp/credentials")
-                .bodyValue(credentials)
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .exchangeToMono(response -> {
-                    if (response.statusCode().equals(HttpStatus.OK)) {
-                        return response.bodyToMono(EmspCredentialsDTO.class);
-                    } else {
-                        return Mono.empty();
-                    }
-                });
-        if (resp.blockOptional().isPresent()) {
-            emspDetailsService.updateEmspAddCpoToken(emspToken, token);
-        }
-    }*/
 }

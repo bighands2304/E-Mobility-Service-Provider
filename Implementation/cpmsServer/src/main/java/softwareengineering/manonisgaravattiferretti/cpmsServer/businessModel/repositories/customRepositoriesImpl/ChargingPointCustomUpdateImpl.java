@@ -20,9 +20,10 @@ public class ChargingPointCustomUpdateImpl implements ChargingPointCustomUpdate 
     }
 
     @Override
-    public void updateBatteryEnergyFlow(IncludeBatteryDTO includeBatteryDTO) {
+    public void updateBatteryEnergyFlow(IncludeBatteryDTO includeBatteryDTO, String cpId, Integer batteryId) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("_id").is(includeBatteryDTO.getCpId()));
+        query.addCriteria(Criteria.where("_id").is(cpId));
+        query.addCriteria(Criteria.where("batteries.batteryId").is(batteryId));
         Update update = new Update();
         update.set("batteries.$.minLevel", includeBatteryDTO.getMinLevel());
         update.set("batteries.$.maxLevel", includeBatteryDTO.getMaxLevel());
