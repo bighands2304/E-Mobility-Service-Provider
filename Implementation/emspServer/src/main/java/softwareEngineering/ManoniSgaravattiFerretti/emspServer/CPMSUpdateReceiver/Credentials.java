@@ -2,6 +2,7 @@ package softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSUpdateReceiv
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,11 +21,13 @@ import java.util.Map;
 public class Credentials {
     @Autowired
     ChargingPointOperatorService cpoService;
+    @Value("${emsp.path}")
+    private String emspPath;
 
     @PostMapping("/credentials")
     public ResponseEntity<?> registerCPO(@RequestBody @Valid CredentialDTO credentials){
         ChargingPointOperator cpo = new ChargingPointOperator();
-        cpo.setCpmsUrl(credentials.getUrl());
+        cpo.setCpmsUrl(credentials.getCpmsUrl());
         cpo.setIban(credentials.getIban());
         cpo.setTokenEmsp(credentials.getEmspToken());
 
@@ -35,6 +38,7 @@ public class Credentials {
 
         cpo.setToken(token);
         credentials.setCpmsToken(token);
+        credentials.setEmspUrl(emspPath);
 
         cpoService.saveCPO(cpo);
 
