@@ -3,6 +3,7 @@ package softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDat
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -21,6 +22,8 @@ public class ChargingPoint {
     private String address;
     private Double latitude;
     private Double longitude;
+    @Lob
+    private List<String> photo;
     private ChargingPointOperator cpo;
     private List<Socket> sockets = new ArrayList<>();
     private List<Tariff> tariffs = new ArrayList<>();

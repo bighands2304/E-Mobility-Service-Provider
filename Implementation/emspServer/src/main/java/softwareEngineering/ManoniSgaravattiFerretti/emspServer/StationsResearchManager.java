@@ -6,9 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.ChargingPoint;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.ChargingPointService;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.UserVehicle;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.Vehicle;
 
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,9 @@ public class StationsResearchManager {
         Double latitude = Double.parseDouble(payload.get("latitude"));
         Double longitude = Double.parseDouble(payload.get("longitude"));
         Double range = Double.parseDouble(payload.get("range"));
-        cpService.getCPsInRange(latitude, latitude+range, longitude, longitude+range);
-        return ResponseEntity.ok("");
+
+        List<ChargingPoint> cps= cpService.getCPsInRange(latitude, latitude+range, longitude, longitude+range);
+
+        return ResponseEntity.ok(cps);
     }
 }
