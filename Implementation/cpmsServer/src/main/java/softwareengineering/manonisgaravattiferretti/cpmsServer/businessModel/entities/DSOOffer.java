@@ -17,6 +17,8 @@ public class DSOOffer {
     private String chargingPointId; // external id (visible to both emsps and dsos)
     private String dsoId;
     private String companyName;
-    private LocalTime startTime;
-    private LocalTime endTime;
+    private OfferTimeSlot usedTimeSlot;
+    private OfferTimeSlot availableTimeSlot;
+    private boolean isInUse;
+    private LocalTime usedStartTime;
 }

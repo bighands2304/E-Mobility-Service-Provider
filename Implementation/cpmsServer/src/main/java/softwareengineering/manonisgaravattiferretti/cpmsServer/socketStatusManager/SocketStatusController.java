@@ -90,7 +90,12 @@ public class SocketStatusController {
                                                        @RequestParam(required = false) LocalDateTime dateTo,
                                                        @RequestParam(defaultValue = "0") Integer offset,
                                                        @RequestParam(defaultValue = "100") Integer limit) {
-        // todo
-        return null;
+        Page<Tariff> tariffs;
+        if (dateFrom == null) {
+            tariffs = chargingPointService.findTariffs(offset, limit);
+        } else {
+            tariffs = chargingPointService.findTariffsBetween(dateFrom, dateTo, offset, limit);
+        }
+        return new ResponseEntity<>(tariffs, HttpStatus.OK);
     }
 }

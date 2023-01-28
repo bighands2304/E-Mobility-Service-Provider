@@ -10,4 +10,5 @@ public interface ChargingPointCustomUpdate {
     void addTariff(String id, Tariff tariff);
     void updateBatteryAvailability(String id, int batteryId, Boolean available);
     void updateToggleOptimizer(String id, String optimizerType, boolean isAutomatic);
+    void removeTariff(String id, String tariffId);
 }

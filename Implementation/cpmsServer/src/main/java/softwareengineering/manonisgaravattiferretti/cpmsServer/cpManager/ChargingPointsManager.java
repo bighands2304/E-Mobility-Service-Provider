@@ -8,12 +8,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.AddTariffDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.ChangeSocketAvailabilityDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.IncludeBatteryDTO;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.CPO;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.ChargingPoint;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.Socket;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.*;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.ChargingPointService;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.DSOOfferService;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.SocketService;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.cpManager.events.TogglePriceOptimizerEvent;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.DSOManager;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.EnergyMixManager;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.events.ToggleDsoSelectionOptimizerEvent;
@@ -24,21 +26,28 @@ import java.util.Optional;
 @RestController("/api/CPO/chargingPoints")
 public class ChargingPointsManager {
     private final ChargingPointService chargingPointService;
+    private final SocketService socketService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final EnergyMixManager energyMixManager;
     private final DSOManager dsoManager;
+    private final DSOOfferService dsoOfferService;
+    private final PriceManager priceManager;
 
     @Autowired
-    public ChargingPointsManager(ChargingPointService chargingPointService,
+    public ChargingPointsManager(ChargingPointService chargingPointService, SocketService socketService,
                                  ApplicationEventPublisher applicationEventPublisher,
-                                 EnergyMixManager energyMixManager, DSOManager dsoManager) {
+                                 EnergyMixManager energyMixManager, DSOManager dsoManager,
+                                 DSOOfferService dsoOfferService, PriceManager priceManager) {
         this.chargingPointService = chargingPointService;
+        this.socketService = socketService;
         this.applicationEventPublisher = applicationEventPublisher;
         this.energyMixManager = energyMixManager;
         this.dsoManager = dsoManager;
+        this.dsoOfferService = dsoOfferService;
+        this.priceManager = priceManager;
     }
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<Iterable<ChargingPoint>> getAllCps(@AuthenticationPrincipal CPO cpo,
                                                              @RequestParam(defaultValue = "0") int offset,
                                                              @RequestParam(defaultValue = "100") int limit) {
@@ -54,41 +63,93 @@ public class ChargingPointsManager {
         return new ResponseEntity<>(chargingPointOptional.get(), HttpStatus.OK);
     }
 
+    @PutMapping("/{externalCpId}")
+    public void addChargingPoint(@PathVariable String externalCpId, @AuthenticationPrincipal CPO cpo) {
+        //Todo
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteChargingPoint(@AuthenticationPrincipal CPO cpo, @PathVariable String id) {
         Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(id, cpo.getCpoCode());
         if (chargingPointOptional.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Charging point not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Charging point not found");
         }
         chargingPointService.deleteChargingPoint(id);
         return new ResponseEntity<>(chargingPointOptional.get(), HttpStatus.OK);
     }
 
     @GetMapping("/{cpId}/sockets")
-    public ResponseEntity<Socket> getSockets(@AuthenticationPrincipal CPO cpo, @PathVariable String cpId) {
-        return ResponseEntity.ok(null); //TODO
+    public ResponseEntity<Iterable<Socket>> getSockets(@AuthenticationPrincipal CPO cpo, @PathVariable String cpId) {
+        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(cpId, cpo.getCpoCode());
+        if (chargingPointOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Charging point not found");
+        }
+        return ResponseEntity.ok(socketService.findCpSocketsByInternalId(cpId));
     }
 
     @GetMapping("/{cpId}/sockets/{socketId}")
     public ResponseEntity<Socket> getSocketInfo(@AuthenticationPrincipal CPO cpo, @PathVariable String cpId,
-                                                @PathVariable String socketId) {
-        return ResponseEntity.ok(null); //TODO
+                                                @PathVariable Integer socketId) {
+        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(cpId, cpo.getCpoCode());
+        if (chargingPointOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Charging point not found");
+        }
+        Optional<Socket> socketOptional = socketService.findSocketByCpInternalIdAndSocketId(cpId, socketId);
+        if (socketOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Socket not found");
+        }
+        return ResponseEntity.ok(socketOptional.get());
     }
 
     @GetMapping("/{cpId}/tariffs")
-    public ResponseEntity<Socket> getTariffs(@AuthenticationPrincipal CPO cpo, @PathVariable String cpId) {
-        return ResponseEntity.ok(null); //TODO
+    public ResponseEntity<Iterable<Tariff>> getTariffs(@AuthenticationPrincipal CPO cpo, @PathVariable String cpId) {
+        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(cpId, cpo.getCpoCode());
+        if (chargingPointOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Charging point not found");
+        }
+        return ResponseEntity.ok(chargingPointOptional.get().getTariffs());
     }
 
-    @GetMapping("/{cpId}/tariffs/{tariffId}")
-    public ResponseEntity<Socket> getTariffs(@AuthenticationPrincipal CPO cpo, @PathVariable String cpId,
-                                             @PathVariable String tariffId) {
-        return ResponseEntity.ok(null); //TODO
+    @GetMapping("/{id}/tariffs/{tariffId}")
+    public ResponseEntity<Tariff> getTariff(@AuthenticationPrincipal CPO cpo, @PathVariable String id,
+                                            @PathVariable String tariffId) {
+        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(id, cpo.getCpoCode());
+        if (chargingPointOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Charging point not found");
+        }
+        Optional<Tariff> tariffOptional = chargingPointOptional.get().getTariffs().stream()
+                .filter(tariff -> tariff.getTariffId().equals(tariffId)).findFirst();
+        if (tariffOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tariff not found");
+        }
+        return ResponseEntity.ok(tariffOptional.get());
     }
 
-    @PostMapping()
-    public void addChargingPoint() {
-        //Todo
+    @PostMapping("/{id}/tariffs")
+    public ResponseEntity<Tariff> addNewTariff(@PathVariable String id, @AuthenticationPrincipal CPO cpo,
+                                          @RequestBody AddTariffDTO addTariffDTO) {
+        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(id, cpo.getCpoCode());
+        if (chargingPointOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Charging point not found");
+        }
+        return new ResponseEntity<>(priceManager.addTariff(addTariffDTO, id), HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}/tariffs/{tariffId}")
+    public ResponseEntity<?> putTariff(@PathVariable String id, @PathVariable String tariffId,
+                                       @RequestBody AddTariffDTO addTariffDTO, @AuthenticationPrincipal CPO cpo) {
+        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(id, cpo.getCpoCode());
+        if (chargingPointOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Charging point not found");
+        }
+        return new ResponseEntity<>(priceManager.putTariff(addTariffDTO, id, tariffId), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}/tariffs/{tariffId}")
+    public ResponseEntity<?> deleteTariff(@PathVariable String id, @PathVariable String tariffId,
+                                          @AuthenticationPrincipal CPO cpo) {
+        priceManager.removeTariff(id, tariffId);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{id}/optimizer/{type}")
@@ -104,7 +165,8 @@ public class ChargingPointsManager {
                 applicationEventPublisher.publishEvent(event);
             }
             case "price" -> {
-                // todo
+                TogglePriceOptimizerEvent event = new TogglePriceOptimizerEvent(this, automatic, id);
+                applicationEventPublisher.publishEvent(event);
             }
             default -> throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the optimizer type is not recognized");
         }
@@ -132,6 +194,42 @@ public class ChargingPointsManager {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "battery not found");
         }
         if (!energyMixManager.includeBattery(includeBatteryDTO, id, batteryId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "parameters not correct");
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/energySources/battery/{batteryId}/availability")
+    public ResponseEntity<?> changeBatteryAvailability(@PathVariable String id, @PathVariable Integer batteryId,
+                                                       @RequestParam boolean available, @AuthenticationPrincipal CPO cpo) {
+
+        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointOfCpoById(id, cpo.getCpoCode());
+        if (chargingPointOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "battery not found");
+        }
+        if (!energyMixManager.changeBatteryAvailability(id, batteryId, available)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "parameters not correct");
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}/dso/offers")
+    public ResponseEntity<Iterable<DSOOffer>> getChargingPointDsoOffers(@PathVariable String id, @AuthenticationPrincipal CPO cpo) {
+        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointOfCpoById(id, cpo.getCpoCode());
+        if (chargingPointOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "charging point not found");
+        }
+        return new ResponseEntity<>(dsoOfferService.findOffersOfCp(chargingPointOptional.get().getId()), HttpStatus.OK);
+    }
+
+    @PostMapping("/{id}/dso/offers/{offerId}")
+    public ResponseEntity<?> changeDsoProvider(@PathVariable String id, @PathVariable String offerId,
+                                               @RequestBody OfferTimeSlot offerTimeSlot, @AuthenticationPrincipal CPO cpo) {
+        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointOfCpoById(id, cpo.getCpoCode());
+        if (chargingPointOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "charging point not found");
+        }
+        if(!dsoManager.changeDsoProvider(id, offerId, offerTimeSlot)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "parameters not correct");
         }
         return ResponseEntity.ok().build();

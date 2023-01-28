@@ -24,6 +24,8 @@ public class AddTariffDTO {
     @NotNull
     private Integer stepSize;
 
+    private Boolean isSpecialOffer;
+
     // Optional parameters (only for add special offer)
     public LocalTime startTime;
     public LocalTime endTime;

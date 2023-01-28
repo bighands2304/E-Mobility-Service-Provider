@@ -7,13 +7,13 @@ import java.util.List;
 
 @Data
 public class SpecialOffer extends Tariff{
-    public LocalTime startTime;
-    public LocalTime endTime;
-    public Double minKWh;
-    public Double maxKWh;
-    public Double minCurrent;
-    public Double maxCurrent;
-    public Double minDuration;
-    public Double maxDuration;
-    public List<String> daysOfTheWeek;
+    private LocalTime startTime;
+    private LocalTime endTime;
+    private Double minKWh;
+    private Double maxKWh;
+    private Double minCurrent;
+    private Double maxCurrent;
+    private Double minDuration;
+    private Double maxDuration;
+    private List<String> daysOfTheWeek;
 }

@@ -41,4 +41,12 @@ public class EnergyMixManager implements ApplicationListener<ToggleEnergyMixOpti
         applicationEventPublisher.publishEvent(energyChangeEvent);
         return true;
     }
+
+    public boolean changeBatteryAvailability(String cpId, Integer batteryId, boolean available) {
+        chargingPointService.updateBatteryAvailability(cpId, batteryId, available);
+        energyMixOptimizer.optimizeCp(cpId);
+        EnergyChangeEvent energyChangeEvent = new EnergyChangeEvent(this, cpId);
+        applicationEventPublisher.publishEvent(energyChangeEvent);
+        return true;
+    }
 }

@@ -23,7 +23,7 @@ public interface ReservationRepository extends MongoRepository<Reservation, Stri
             {
                 $group:  {
                     '_id': true,\s
-                    'maxSessionId': {$max: 'sessionId'}\s
+                    'maxSessionId': {$max: '$sessionId'}\s
                 }
             }
             """, """

@@ -40,6 +40,16 @@ public class ChargingPointCustomUpdateImpl implements ChargingPointCustomUpdate 
         mongoOperations.updateFirst(query, update, ChargingPoint.class);
     }
 
+    public void removeTariff(String id, String tariffId) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("_id").is(id));
+        Update update = new Update();
+        Query tariffIdQuery = new Query();
+        tariffIdQuery.addCriteria(Criteria.where("tariffId").is(tariffId));
+        update.pull("tariffs", tariffIdQuery);
+        mongoOperations.updateFirst(query, update, ChargingPoint.class);
+    }
+
     @Override
     public void updateBatteryAvailability(String id, int batteryId, Boolean available) {
         Query query = new Query();
