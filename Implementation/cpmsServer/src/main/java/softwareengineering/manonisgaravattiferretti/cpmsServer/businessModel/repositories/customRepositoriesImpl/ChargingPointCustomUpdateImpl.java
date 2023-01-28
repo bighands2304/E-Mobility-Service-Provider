@@ -1,4 +1,4 @@
-package softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.repositories;
+package softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.repositories.customRepositoriesImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -9,6 +9,7 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dto
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.IncludeBatteryDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.ChargingPoint;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.Tariff;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.repositories.ChargingPointCustomUpdate;
 
 public class ChargingPointCustomUpdateImpl implements ChargingPointCustomUpdate {
     private final MongoOperations mongoOperations;

@@ -10,23 +10,26 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.socket.WebSocketSession;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.ChargingPointService;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.ReservationService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.chargingPointReq.*;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.cpmsReq.*;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.socketStatusManager.events.MeterValueEvent;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.socketStatusManager.events.SessionStartedEvent;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.socketStatusManager.events.SessionStoppedEvent;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.socketStatusManager.events.SocketStatusChangeEvent;
 
 @Controller
 public class OcppReceiver {
     private static final Logger logger = LoggerFactory.getLogger(OcppReceiver.class);
-
-    private final ChargingPointService chargingPointService;
+    private final ReservationService reservationService;
     private final SessionsManager sessionsManager;
     private final OcppSender ocppSender;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Autowired
-    public OcppReceiver(ChargingPointService chargingPointService, SessionsManager sessionsManager,
-                        OcppSender ocppSender, ApplicationEventPublisher applicationEventPublisher) {
-        this.chargingPointService = chargingPointService;
+    public OcppReceiver(ReservationService reservationService, SessionsManager sessionsManager, OcppSender ocppSender,
+                        ApplicationEventPublisher applicationEventPublisher) {
+        this.reservationService = reservationService;
         this.sessionsManager = sessionsManager;
         this.ocppSender = ocppSender;
         this.applicationEventPublisher = applicationEventPublisher;
@@ -49,21 +52,28 @@ public class OcppReceiver {
 
     @MessageMapping("/ocpp/MeterValues")
     public @ResponseBody MeterValueConf handleMeterValues(MeterValueReq request) {
-        //chargingPointService.handleMeterValues(request);
-        // Todo
-        return null;
+        MeterValueEvent meterValueEvent = new MeterValueEvent(this, request.getTransactionId(),
+                request.getConnectorId(), request.getMeterValue());
+        applicationEventPublisher.publishEvent(meterValueEvent);
+        return new MeterValueConf();
     }
 
     @MessageMapping("/ocpp/StartTransaction")
-    public @ResponseBody StartTransactionConf handleStartTransaction(StartTransactionReq request) {
-        // Todo
-        return null;
+    public @ResponseBody StartTransactionConf handleStartTransaction(StartTransactionReq request, WebSocketSession socketSession) {
+        Long sessionId = reservationService.maxSessionId() + 1;
+        String cpId = sessionsManager.getChargingPointFromSession(socketSession.getId());
+        SessionStartedEvent sessionStartedEvent = new SessionStartedEvent(this, request.getReservationId(),
+                sessionId, request.getTimestamp(), cpId, request.getConnectorId());
+        applicationEventPublisher.publishEvent(sessionStartedEvent);
+        return new StartTransactionConf(sessionId);
     }
 
     @MessageMapping("/ocpp/StopTransaction")
     public @ResponseBody StopTransactionConf handleStopTransaction(StopTransactionReq request) {
-        // Todo
-        return null;
+        SessionStoppedEvent sessionStoppedEvent = new SessionStoppedEvent(this, request.getTransactionId(),
+                request.getTimestamp(), request.getTransactionData());
+        applicationEventPublisher.publishEvent(sessionStoppedEvent);
+        return new StopTransactionConf();
     }
 
     @MessageMapping("/ocpp/ChangeAvailabilityConf")

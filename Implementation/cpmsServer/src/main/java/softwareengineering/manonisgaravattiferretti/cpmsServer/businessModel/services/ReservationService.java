@@ -69,4 +69,14 @@ public class ReservationService {
     public Optional<Reservation> findReservationBySessionId(Long sessionId) {
         return reservationRepository.findReservationBySessionId(sessionId);
     }
+
+    public Long maxSessionId() {
+        long maxSessionId;
+        try {
+            maxSessionId = reservationRepository.maxSessionId().getUniqueMappedResult().getMaxSessionId();
+        } catch (NullPointerException e) {
+            maxSessionId = 0;
+        }
+        return maxSessionId;
+    }
 }

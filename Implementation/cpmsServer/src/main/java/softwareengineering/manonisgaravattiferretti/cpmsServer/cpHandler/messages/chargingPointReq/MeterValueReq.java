@@ -11,7 +11,7 @@ import java.util.List;
 public class MeterValueReq {
     @NotNull
     private Integer connectorId;
-    private Integer transactionId;
+    private Long transactionId;
     @NotEmpty
     private List<MeterValue> meterValue;
 }

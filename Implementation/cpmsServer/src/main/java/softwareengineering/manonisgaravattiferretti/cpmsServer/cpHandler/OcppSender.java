@@ -76,10 +76,6 @@ public class OcppSender {
         }
     }
 
-    public Map<String, CompletableFuture<ConfMessage>> getPendingResponses() {
-        return pendingResponses;
-    }
-
     private CompletableFuture<ConfMessage> send(Object message, String cpId, String messageName) {
         String requestId = UUID.randomUUID().toString();
         String sessionId = sessionsManager.getSessionIdFromChargingPointId(cpId);

@@ -1,4 +1,4 @@
-package softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.repositories;
+package softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.repositories.customRepositoriesImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.Reservation;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.repositories.ReservationCustomUpdate;
 
 import java.time.LocalDateTime;
 

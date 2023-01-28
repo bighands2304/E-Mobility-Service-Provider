@@ -1,12 +1,9 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.cpManager;
 
-import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.CPO;
@@ -74,5 +71,23 @@ public class ChargingPointsManager {
     @PostMapping()
     public void addChargingPoint() {
         //Todo
+    }
+
+    @PostMapping("/{id}/optimizer/{type}")
+    public ResponseEntity<?> toggleOptimizer(@PathVariable String id, @PathVariable String type,
+                                             @RequestParam boolean automatic) {
+        switch (type) {
+            case "dsoSelection" -> {
+
+            }
+            case "energyMix" -> {
+
+            }
+            case "price" -> {
+
+            }
+            default -> throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the optimizer type is not recognized");
+        }
+        return ResponseEntity.ok().build();
     }
 }
