@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class EmspDetailsService implements UserDetailsService {
+public class EmspDetailsService {
 
     private final EmspRepository emspRepository;
 
@@ -36,12 +36,6 @@ public class EmspDetailsService implements UserDetailsService {
 
     public EmspDetails insertEmsp(EmspDetails emspDetails) {
         return emspRepository.save(emspDetails);
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String emspToken) throws UsernameNotFoundException {
-        return emspRepository.findByEmspToken(emspToken)
-                .orElseThrow(() -> new UsernameNotFoundException("emsp not exists"));
     }
 
     public void updateEmspCredentials(EmspCredentialsDTO emspCredentials, String emspToken) {

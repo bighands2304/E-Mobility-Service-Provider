@@ -1,14 +1,12 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.CPO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.repositories.CPORepository;
 
 @Service
-public class CPOService implements UserDetailsService {
+public class CPOService {
     private final CPORepository cpoRepository;
 
     @Autowired
@@ -22,14 +20,5 @@ public class CPOService implements UserDetailsService {
 
     public void insertCPO(CPO cpo) {
         cpoRepository.save(cpo);
-    }
-
-    @Override
-    public CPO loadUserByUsername(String code) throws UsernameNotFoundException {
-        CPO cpo = getCPOData(code);
-        if (cpo == null){
-            throw new UsernameNotFoundException("CPO not found");
-        }
-        return new CPO(cpo);
     }
 }
