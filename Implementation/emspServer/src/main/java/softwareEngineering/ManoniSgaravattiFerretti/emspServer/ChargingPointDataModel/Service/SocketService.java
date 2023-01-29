@@ -10,4 +10,5 @@ public class SocketService {
     @Autowired
     SocketRepository socketRepository;
     public Socket getSocketById(String socketId){ return socketRepository.findSocketBySocketId(socketId);}
+    public void save(Socket socket){ socketRepository.save(socket);}
 }

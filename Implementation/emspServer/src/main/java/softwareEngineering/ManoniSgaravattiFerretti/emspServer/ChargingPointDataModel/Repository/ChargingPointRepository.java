@@ -11,5 +11,6 @@ import java.util.List;
 @Repository
 public interface ChargingPointRepository extends MongoRepository<ChargingPoint, String> {
     List<ChargingPoint> findAllByLatitudeBetweenAndLongitudeBetween(Double latitude_start, Double latitude_end, Double longitude_start, Double longitude_end);
-    ChargingPoint findChargingPointBySocketsIn(List<Socket> sockets);
+    ChargingPoint findChargingPointByCpId(String cpId);
+    List<ChargingPoint> findChargingPointsByTariffsIdContains(String tariffsId);
 }

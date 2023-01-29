@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/ocpi/emsp/2.2/commands")
-public class Commands {
+@RequestMapping("/ocpi/emsp/commands")
+public class CommandsReceiver {
     @Autowired
     ReservationService reservationService;
 
@@ -71,14 +71,6 @@ public class Commands {
                 reservationService.delete(reservation);
             }
         }
-
-        if (command.equals("UNLOCK_CONNECTOR")){
-            if(commandResult.get("result").equals("ACCEPTED")){
-                //TODO insert some action
-            }
-        }
-
-
 
         return ResponseEntity.noContent().build();
     }
