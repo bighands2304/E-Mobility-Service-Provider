@@ -7,6 +7,7 @@ import java.time.LocalTime;
 @Repository
 public interface DSOOfferCustomUpdate {
     void updateOfferFromId(String id, Double price);
-    void updateOfferFromDsoIdCpIdTimeSlot(String dsoId, String cpId, LocalTime startTime, LocalTime endTime, Double price);
-    void updateCapacityFromDsoIdCpIdTimeSlot(String dsoId, String cpId, LocalTime startTime, LocalTime endTime, Double capacity);
+    void updateOfferFromDsoTokenCpIdTimeSlot(String dsoToken, String cpId, LocalTime startTime, LocalTime endTime, Double price);
+    void updateCapacityFromDsoTokenCpIdTimeSlot(String dsoToken, String cpId, LocalTime startTime, LocalTime endTime, Double capacity);
+    void updateCapacityFromDsoTokenCpId(String dsoToken, String cpId, Double capacity);
 }

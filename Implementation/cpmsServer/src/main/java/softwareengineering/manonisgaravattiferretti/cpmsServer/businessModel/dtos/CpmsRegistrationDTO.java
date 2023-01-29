@@ -5,8 +5,8 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class CpmsCredentialsDTO {
-    private String cpmsToken;
-    private String url;
+public class CpmsRegistrationDTO {
+    private String emspToken;
+    private String cpmsUrl;
     private String iban;
 }

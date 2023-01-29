@@ -9,7 +9,6 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.socket.WebSocketSession;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.ChargingPointService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.ReservationService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.chargingPointReq.*;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.cpmsReq.*;

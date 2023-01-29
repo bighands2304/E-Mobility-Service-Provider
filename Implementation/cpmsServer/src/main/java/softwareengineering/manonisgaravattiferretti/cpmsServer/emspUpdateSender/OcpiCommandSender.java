@@ -15,6 +15,7 @@ import java.time.Duration;
 @Component
 public class OcpiCommandSender {
     private final Logger logger = LoggerFactory.getLogger(OcpiCommandSender.class);
+
     @Async
     public void sendCommandResult(EmspDetails emspDetails, Long emspReservationId,
                                   CommandResultType commandResultType, String commandType) {

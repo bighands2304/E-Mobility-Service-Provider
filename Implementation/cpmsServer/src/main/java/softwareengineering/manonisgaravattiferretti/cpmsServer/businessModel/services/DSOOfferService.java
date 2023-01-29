@@ -19,8 +19,8 @@ public class DSOOfferService {
         this.dsoOfferRepository = dsoOfferRepository;
     }
 
-    public List<DSOOffer> findOffersOfCp(String cpId) {
-        return dsoOfferRepository.findDSOOffersByChargingPointId(cpId);
+    public List<DSOOffer> findOffersOfCp(String cpExternalId) {
+        return dsoOfferRepository.findDSOOffersByChargingPointId(cpExternalId).stream().filter(DSOOffer::isValid).toList();
     }
 
     public Optional<DSOOffer> findOfferById(String id) {
@@ -31,14 +31,18 @@ public class DSOOfferService {
         dsoOfferRepository.updateOfferFromId(id, price);
     }
 
-    public void updateOfferByDsoCpTimeSlot(String dsoId, String cpId, LocalTime startTime,
+    public void updateOfferByDsoCpTimeSlot(String dsoToken, String cpId, LocalTime startTime,
                                            LocalTime endTime, Double price) {
-        dsoOfferRepository.updateOfferFromDsoIdCpIdTimeSlot(dsoId, cpId, startTime, endTime, price);
+        dsoOfferRepository.updateOfferFromDsoTokenCpIdTimeSlot(dsoToken, cpId, startTime, endTime, price);
     }
 
-    public void updateCapacityByDsoCpTimeSlot(String dsoId, String cpId, LocalTime startTime,
-                                           LocalTime endTime, Double capacity) {
-        dsoOfferRepository.updateCapacityFromDsoIdCpIdTimeSlot(dsoId, cpId, startTime, endTime, capacity);
+    public void updateCapacityByDsoCpTimeSlot(String dsoToken, String cpId, LocalTime startTime,
+                                              LocalTime endTime, Double capacity) {
+        dsoOfferRepository.updateCapacityFromDsoTokenCpIdTimeSlot(dsoToken, cpId, startTime, endTime, capacity);
+    }
+
+    public void updateCapacityByDsoCp(String dsoToken, String cpId, Double capacity) {
+        dsoOfferRepository.updateCapacityFromDsoTokenCpId(dsoToken, cpId, capacity);
     }
 
     public void insertOffer(DSOOffer dsoOffer) {
@@ -47,5 +51,18 @@ public class DSOOfferService {
 
     public Optional<DSOOffer> findDSOOfferFromCpAndTimeSlot(String cpId, OfferTimeSlot offerTimeSlot, boolean inUse) {
         return dsoOfferRepository.findDSOOfferByChargingPointIdAndAvailableTimeSlotAndInUse(cpId, offerTimeSlot, inUse);
+    }
+
+    public void registerDso(String dsoId, String cpId, String dsoToken, String dsoUrl, String companyName, String cpoToken) {
+        DSOOffer dsoOffer = new DSOOffer();
+        dsoOffer.setDsoId(dsoId);
+        dsoOffer.setDsoUrl(dsoUrl);
+        dsoOffer.setDsoToken(dsoToken);
+        dsoOffer.setCpoToken(cpoToken);
+        dsoOffer.setCompanyName(companyName);
+        dsoOffer.setChargingPointId(cpId);
+        dsoOffer.setValid(false);
+        dsoOffer.setAvailableTimeSlot(new OfferTimeSlot(LocalTime.MIN, LocalTime.MAX));
+        insertOffer(dsoOffer);
     }
 }

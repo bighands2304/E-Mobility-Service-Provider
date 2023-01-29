@@ -1,11 +1,7 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.EmspCredentialsDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.EmspDetails;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.repositories.EmspRepository;
 
@@ -34,12 +30,8 @@ public class EmspDetailsService {
         return emspRepository.findByEmspToken(emspToken);
     }
 
-    public EmspDetails insertEmsp(EmspDetails emspDetails) {
-        return emspRepository.save(emspDetails);
-    }
-
-    public void updateEmspCredentials(EmspCredentialsDTO emspCredentials, String emspToken) {
-        emspRepository.updateEmspCredentials(emspToken, emspCredentials);
+    public void insertEmsp(EmspDetails emspDetails) {
+        emspRepository.save(emspDetails);
     }
 
     public void updateEmspAddCpoToken(String emspToken, String cpoToken) {
