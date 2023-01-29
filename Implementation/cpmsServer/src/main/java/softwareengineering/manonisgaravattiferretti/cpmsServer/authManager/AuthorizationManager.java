@@ -39,7 +39,7 @@ public class AuthorizationManager {
                 .authorizeHttpRequests()
                 .requestMatchers("/").permitAll()
                 .requestMatchers("/api/CPO/register", "/api/CPO/login", "/ocpi/cpo/credentials", "/ws").permitAll()
-                .requestMatchers("/ocpi/cpo").hasRole("EMSP")
+                //.requestMatchers("/ocpi/cpo").hasRole("EMSP")
                 .requestMatchers("/api/CPO/**").hasRole("CPO")
                 .anyRequest()
                 .authenticated()
