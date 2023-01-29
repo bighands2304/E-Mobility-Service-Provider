@@ -20,6 +20,7 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.DSO
 import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.EnergyMixManager;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.events.ToggleDsoSelectionOptimizerEvent;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.events.ToggleEnergyMixOptimizerEvent;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.socketStatusManager.events.SocketAvailabilityEvent;
 
 import java.util.Optional;
 
@@ -181,7 +182,9 @@ public class ChargingPointsManager {
         if (chargingPointOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "socket not found");
         }
-        // todo: send to socket status
+        SocketAvailabilityEvent socketAvailabilityEvent = new SocketAvailabilityEvent(this,
+                socketAvailabilityDTO, id, socketId);
+        applicationEventPublisher.publishEvent(socketAvailabilityEvent);
         return ResponseEntity.ok().build();
     }
 

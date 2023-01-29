@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 @Data
 public class ChargingSessionDTO {
     private Long sessionId;
+    private Long reservationId;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
     private Double kwh;

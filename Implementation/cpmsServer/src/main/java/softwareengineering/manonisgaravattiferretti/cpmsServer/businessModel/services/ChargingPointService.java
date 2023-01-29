@@ -44,6 +44,10 @@ public class ChargingPointService {
         return chargingPointOptional;
     }
 
+    public Optional<ChargingPoint> findChargingPointByInternalId(String id) {
+        return chargingPointRepository.findById(id);
+    }
+
     public Optional<ChargingPoint> findChargingPointOfCpoById(String id, String cpoCode) {
         return chargingPointRepository.findChargingPointByCpIdAndCpoCode(id, cpoCode);
     }

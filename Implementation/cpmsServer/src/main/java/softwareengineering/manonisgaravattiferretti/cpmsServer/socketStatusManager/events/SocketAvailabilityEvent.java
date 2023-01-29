@@ -4,9 +4,9 @@ import org.springframework.context.ApplicationEvent;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.ChangeSocketAvailabilityDTO;
 
 public class SocketAvailabilityEvent extends ApplicationEvent {
-    private ChangeSocketAvailabilityDTO changeSocketAvailabilityDTO;
-    private String cpId;
-    private Integer socketId;
+    private final ChangeSocketAvailabilityDTO changeSocketAvailabilityDTO;
+    private final String cpId;
+    private final Integer socketId;
 
     public SocketAvailabilityEvent(Object source, ChangeSocketAvailabilityDTO changeSocketAvailabilityDTO,
                                    String cpId, Integer socketId) {
