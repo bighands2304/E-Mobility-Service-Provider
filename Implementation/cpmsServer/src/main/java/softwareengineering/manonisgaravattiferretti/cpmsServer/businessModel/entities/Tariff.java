@@ -1,9 +1,11 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 public class Tariff {
@@ -14,4 +16,6 @@ public class Tariff {
     private LocalDate endDate;
     private Double price;
     private Integer stepSize;
+    @JsonIgnore
+    private LocalDateTime lastUpdated;
 }

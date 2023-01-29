@@ -17,6 +17,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.CPOService;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.EmspDetailsService;
 
 import java.util.Arrays;
 
@@ -37,9 +38,8 @@ public class AuthorizationManager {
         http.cors();
         http
                 .authorizeHttpRequests()
-                .requestMatchers("/").permitAll()
-                .requestMatchers("/api/CPO/register", "/api/CPO/login", "/ocpi/cpo/credentials", "/ws").permitAll()
-                .requestMatchers("/ocpi/cpo").hasRole("EMSP")
+                .requestMatchers("/", "/api/CPO/register", "/api/CPO/login", "/ocpi/cpo/**", "/ws").permitAll()
+                //.requestMatchers("/ocpi/cpo/**").hasRole("EMSP")
                 .requestMatchers("/api/CPO/**").hasRole("CPO")
                 .anyRequest()
                 .authenticated()
@@ -55,7 +55,7 @@ public class AuthorizationManager {
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http, PasswordEncoder passwordEncoder,
-                                                       CPOService userDetailService) throws Exception {
+                                                       UserDetailsServiceImpl userDetailService) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
                 .userDetailsService(userDetailService)
                 .passwordEncoder(passwordEncoder)

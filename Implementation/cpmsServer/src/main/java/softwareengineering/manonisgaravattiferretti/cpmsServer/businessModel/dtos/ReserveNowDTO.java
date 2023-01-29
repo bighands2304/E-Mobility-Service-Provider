@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 
 @Data
 public class ReserveNowDTO {
-    @NotBlank
-    private String reservationId;
+    @NotNull
+    private Long reservationId;
     @NotNull
     private String chargingPointId;
     @NotNull

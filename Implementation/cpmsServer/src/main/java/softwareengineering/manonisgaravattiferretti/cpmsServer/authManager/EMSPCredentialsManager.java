@@ -4,17 +4,13 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
-import reactor.core.publisher.Mono;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.CpmsCredentialsDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.EmspCredentialsDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.EmspDetails;
@@ -25,17 +21,20 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
-import java.util.Arrays;
 import java.util.Optional;
 
 @RestController
 public class EMSPCredentialsManager {
     private final EmspDetailsService emspDetailsService;
     private final Logger logger = LoggerFactory.getLogger(EMSPCredentialsManager.class);
+    private final TokenManager tokenManager;
+    @Value("${cpms.path}")
+    private String cpmsUrl;
 
     @Autowired
-    public EMSPCredentialsManager(EmspDetailsService emspDetailsService) {
+    public EMSPCredentialsManager(EmspDetailsService emspDetailsService, TokenManager tokenManager) {
         this.emspDetailsService = emspDetailsService;
+        this.tokenManager = tokenManager;
     }
 
     @PostMapping("/ocpi/cpo/credentials")
@@ -46,20 +45,11 @@ public class EMSPCredentialsManager {
             // emsp is already registered
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "emsp already registered");
         }
-        emspDetailsService.insertEmsp(EntityFromDTOConverter.emspDetailsFromCredentials(emspCredentials));
-        SecureRandom secureRandom = new SecureRandom();
-        byte[] bytes = new byte[20];
-        secureRandom.nextBytes(bytes);
-        String token = new String(bytes, StandardCharsets.UTF_8);
-        String url;
-        try {
-            url = InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "could not send the cpms credentials");
-        }
-        // todo: save credentials
+        EmspDetails emspDetailsEntity = emspDetailsService
+                .insertEmsp(EntityFromDTOConverter.emspDetailsFromCredentials(emspCredentials));
+        String token = tokenManager.generateToken(emspDetailsEntity);
         emspDetailsService.updateEmspAddCpoToken(emspCredentials.getEmspToken(), token);
-        CpmsCredentialsDTO credentials = new CpmsCredentialsDTO(token, url, null);
+        CpmsCredentialsDTO credentials = new CpmsCredentialsDTO(token, cpmsUrl, null);
         return ResponseEntity.ok(credentials);
     }
 }

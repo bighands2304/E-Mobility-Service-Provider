@@ -5,15 +5,19 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.CPO;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.EmspDetails;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.CPOService;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.EmspDetailsService;
 
 @Service
-public class CPODetailsService implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
     private final CPOService cpoService;
+    private final EmspDetailsService emspDetailsService;
 
     @Autowired
-    public CPODetailsService(CPOService cpoService) {
+    public UserDetailsServiceImpl(CPOService cpoService, EmspDetailsService emspDetailsService) {
         this.cpoService = cpoService;
+        this.emspDetailsService = emspDetailsService;
     }
 
     @Override
@@ -23,5 +27,10 @@ public class CPODetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("CPO not found");
         }
         return new CPO(cpo);
+    }
+
+    public EmspDetails loadEmspByToken(String token) throws UsernameNotFoundException {
+        return emspDetailsService.findByEmspToken(token)
+                .orElseThrow(() -> new UsernameNotFoundException("emsp not exists"));
     }
 }

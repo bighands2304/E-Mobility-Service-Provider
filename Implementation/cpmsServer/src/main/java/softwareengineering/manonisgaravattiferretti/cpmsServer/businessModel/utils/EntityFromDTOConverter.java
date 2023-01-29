@@ -44,4 +44,18 @@ public class EntityFromDTOConverter {
         chargingSessionDTO.setKwh(reservation.getEnergyAmount());
         return chargingSessionDTO;
     }
+
+    public static Tariff fromAddTariffDTOToTariff(AddTariffDTO addTariffDTO, String id) {
+        Tariff tariff = new Tariff();
+        BeanUtils.copyProperties(addTariffDTO, tariff);
+        tariff.setTariffId(id);
+        return tariff;
+    }
+
+    public static SpecialOffer fromAddTariffDTOToSpecialOffer(AddTariffDTO addTariffDTO, String id) {
+        SpecialOffer tariff = new SpecialOffer();
+        BeanUtils.copyProperties(addTariffDTO, tariff);
+        tariff.setTariffId(id);
+        return tariff;
+    }
 }

@@ -1,16 +1,15 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.stereotype.Service;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.IncludeBatteryDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.Battery;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.ChargingPoint;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.Tariff;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.repositories.ChargingPointRepository;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.repositories.aggregationResults.TariffUnwind;
 
 import java.time.LocalDateTime;
 import java.util.Base64;
@@ -88,6 +87,10 @@ public class ChargingPointService {
         chargingPointRepository.addTariff(id, tariff);
     }
 
+    public void removeTariff(String id, String tariffId) {
+        chargingPointRepository.removeTariff(id, tariffId);
+    }
+
     public void updateToggleOptimizer(String id, String optimizerType, boolean isAutomatic) {
         chargingPointRepository.updateToggleOptimizer(id, optimizerType, isAutomatic);
     }
@@ -104,5 +107,20 @@ public class ChargingPointService {
         return chargingPointRepository.findAll();
     }
 
-    // Todo: change dso provider, add cp
+    public Page<Tariff> findTariffsBetween(LocalDateTime startDate, LocalDateTime endDate, int offset, int limit) {
+        AggregationResults<TariffUnwind> tariffsAggregation = chargingPointRepository
+                .findAllTariffsBetween(startDate, endDate, offset * limit, limit);
+        Pageable pageable = PageRequest.of(offset, limit);
+        List<Tariff> tariffs = tariffsAggregation.getMappedResults().stream().map(TariffUnwind::getTariff).toList();
+        return new PageImpl<>(tariffs, pageable, tariffs.size());
+    }
+
+    public Page<Tariff> findTariffs(int offset, int limit) {
+        AggregationResults<TariffUnwind> tariffsAggregation = chargingPointRepository.findAllTariffs(offset * limit, limit);
+        Pageable pageable = PageRequest.of(offset, limit);
+        List<Tariff> tariffs = tariffsAggregation.getMappedResults().stream().map(TariffUnwind::getTariff).toList();
+        return new PageImpl<>(tariffs, pageable, tariffs.size());
+    }
+
+    // Todo: add cp
 }

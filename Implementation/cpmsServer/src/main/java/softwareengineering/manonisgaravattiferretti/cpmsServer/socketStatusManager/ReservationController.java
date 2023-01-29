@@ -22,8 +22,8 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.OcppSen
 import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.cpmsReq.CancelReservationConf;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.cpmsReq.ConfMessage;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.cpmsReq.ReserveNowConf;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.cpmsReq.dtos.CommandResult;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.cpmsReq.dtos.ReservationStatus;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.emspUpdateSender.OcpiCommandSender;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -36,12 +36,15 @@ public class ReservationController {
     private final ReservationService reservationService;
     private final SocketService socketService;
     private final OcppSender ocppSender;
+    private final OcpiCommandSender ocpiCommandSender;
 
     @Autowired
-    public ReservationController(ReservationService reservationService, SocketService socketService, OcppSender ocppSender) {
+    public ReservationController(ReservationService reservationService, SocketService socketService,
+                                 OcppSender ocppSender, OcpiCommandSender ocpiCommandSender) {
         this.reservationService = reservationService;
         this.socketService = socketService;
         this.ocppSender = ocppSender;
+        this.ocpiCommandSender = ocpiCommandSender;
     }
 
     @PostMapping("/ocpi/cpo/commands/RESERVE_NOW")
@@ -58,7 +61,7 @@ public class ReservationController {
         long id = reservationService.getReservationsCount() + 1;
         CompletableFuture<ConfMessage> responseFuture = ocppSender.sendReserveNow(reserveNowDTO.getChargingPointId(), id,
                 reserveNowDTO.getExpiryDate(), reserveNowDTO.getSocketId());
-        sendReserveNowResponse(responseFuture, socketOptional.get(), reserveNowDTO, emspDetails, id);
+        sendReserveNowResponse(responseFuture, socketOptional.get(), id, reserveNowDTO, emspDetails);
         return ResponseEntity.ok().build();
     }
 
@@ -71,38 +74,42 @@ public class ReservationController {
         String cpId = reservationOptional.get().getSocket().getCpId();
         Long reservationId = reservationOptional.get().getInternalReservationId();
         CompletableFuture<ConfMessage> responseFuture = ocppSender.sendCancelReservation(cpId, reservationId);
-        sendCancelReservationResponse(responseFuture, cpId, reservationOptional.get().getSocket().getSocketId(),
-                reservationOptional.get().getInternalReservationId());
+        sendCancelReservationResponse(responseFuture, cpId, id, reservationOptional.get().getSocket().getSocketId(),
+                reservationOptional.get().getInternalReservationId(), emspDetails);
         return ResponseEntity.ok().build();
     }
 
     @Async
-    void sendReserveNowResponse(CompletableFuture<ConfMessage> futureCpResponse, Socket socket,
-                                ReserveNowDTO reserveNowDTO, EmspDetails emspDetails, Long internalReservationId) {
+    void sendReserveNowResponse(CompletableFuture<ConfMessage> futureCpResponse, Socket socket, Long internalReservationId,
+                                ReserveNowDTO reserveNowDTO, EmspDetails emspDetails) {
         CommandResultType commandResultType;
         try {
             ReserveNowConf response = (ReserveNowConf) futureCpResponse.orTimeout(5, TimeUnit.SECONDS).get();
             commandResultType = CommandResultType.getFromReservationStatus(response.getReservationStatus());
-            socketService.updateSocketStatus(reserveNowDTO.getChargingPointId(), reserveNowDTO.getSocketId(), "RESERVED");
-            reservationService.insertReservation(reserveNowDTO, internalReservationId, socket, emspDetails);
+            if (response.getReservationStatus() == ReservationStatus.ACCEPTED) {
+                socketService.updateSocketStatus(reserveNowDTO.getChargingPointId(), reserveNowDTO.getSocketId(), "RESERVED");
+                reservationService.insertReservation(reserveNowDTO, internalReservationId, socket, emspDetails);
+            }
         } catch (InterruptedException | ExecutionException e) {
             commandResultType = CommandResultType.TIMEOUT;
         }
-        // Todo: send request
+        ocpiCommandSender.sendCommandResult(emspDetails, reserveNowDTO.getReservationId(), commandResultType, "RESERVE_NOW");
     }
 
     @Async
-    void sendCancelReservationResponse(CompletableFuture<ConfMessage> futureCpResponse, String cpId,
-                                       Integer socketId, Long internalReservationId) {
+    void sendCancelReservationResponse(CompletableFuture<ConfMessage> futureCpResponse, String cpId, Long emspReservationId,
+                                       Integer socketId, Long internalReservationId, EmspDetails emspDetails) {
         CommandResultType commandResultType;
         try {
             CancelReservationConf response = (CancelReservationConf) futureCpResponse.get();
             commandResultType = CommandResultType.getFromCpCommandResult(response.getCommandResult());
-            socketService.updateSocketStatus(cpId, socketId, "RESERVED");
-            reservationService.updateReservationStatus(internalReservationId, "DELETED", LocalDateTime.now());
+            if (commandResultType == CommandResultType.ACCEPTED) {
+                socketService.updateSocketStatus(cpId, socketId, "AVAILABLE");
+                reservationService.updateReservationStatus(internalReservationId, "DELETED", LocalDateTime.now());
+            }
         } catch (InterruptedException | ExecutionException e) {
             commandResultType = CommandResultType.TIMEOUT;
         }
-        // Todo: send request
+        ocpiCommandSender.sendCommandResult(emspDetails, emspReservationId, commandResultType, "CANCEL_RESERVATION");
     }
 }

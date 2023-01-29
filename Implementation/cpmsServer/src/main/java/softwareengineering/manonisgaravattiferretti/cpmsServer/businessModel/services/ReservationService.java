@@ -50,7 +50,7 @@ public class ReservationService {
         Reservation reservation = new Reservation();
         reservation.setInternalReservationId(reservationId);
         reservation.setEmspDetails(emspDetails);
-        reservation.setReservationIdEmsp(reservation.getReservationIdEmsp());
+        reservation.setReservationIdEmsp(reserveNowDTO.getReservationId());
         reservation.setSocket(socket);
         reservation.setExpiryDate(reserveNowDTO.getExpiryDate());
         reservation.setStatus("RESERVED");
