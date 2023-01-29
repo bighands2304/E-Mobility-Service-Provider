@@ -29,7 +29,7 @@ public class TokenManager extends OncePerRequestFilter {
     LoginManager userDetails;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException{
         final String authorizationHeader = request.getHeader("Authorization");
         String username=null;
         String jwt=null;

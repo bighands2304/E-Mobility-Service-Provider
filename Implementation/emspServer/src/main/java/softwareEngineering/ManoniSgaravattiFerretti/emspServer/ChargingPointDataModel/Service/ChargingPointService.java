@@ -20,10 +20,8 @@ public class ChargingPointService {
     public List<ChargingPoint> getAllCPs(){
         return chargingPointRepository.findAll();
     }
-
     public List<ChargingPoint> getCPsInRange(Double latitude_start, Double latitude_end, Double longitude_start, Double longitude_end){return chargingPointRepository.findAllByLatitudeBetweenAndLongitudeBetween(latitude_start, latitude_end, longitude_start, longitude_end);}
+    public void save(ChargingPoint cp) {chargingPointRepository.save(cp);}
+    public ChargingPoint getCPById(String cpId){ return  chargingPointRepository.findChargingPointByCpId(cpId);}
 
-    public List<ChargingPoint> saveCPs(List<ChargingPoint> cps){return  chargingPointRepository.saveAll(cps);}
-
-    public ChargingPoint getCPBySocketId(String socketId){return chargingPointRepository.findChargingPointBySocketsIn((List<Socket>) socketRepository.findSocketBySocketId(socketId));}
 }

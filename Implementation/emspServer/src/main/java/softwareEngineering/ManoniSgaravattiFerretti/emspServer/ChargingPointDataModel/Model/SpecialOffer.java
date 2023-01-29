@@ -1,9 +1,8 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 public class SpecialOffer extends Tariff{
@@ -16,7 +15,7 @@ public class SpecialOffer extends Tariff{
     private Double maxKWh;
     private Double minCurrent;
     private Double maxCurrent;
-    private Double minDuration;
-    private Double maxDuration;
-    private String daysOfTheWeek;
+    private Integer minDuration;
+    private Integer maxDuration;
+    private List<String> daysOfTheWeek;
 }

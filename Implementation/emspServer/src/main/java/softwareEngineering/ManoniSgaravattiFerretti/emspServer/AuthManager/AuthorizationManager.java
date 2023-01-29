@@ -34,8 +34,7 @@ public class AuthorizationManager {
         http.cors();
         http
                 .authorizeHttpRequests()
-                .requestMatchers("/").permitAll()
-                .requestMatchers("/register", "/login", "/ocpi/emsp/2.2/credentials").permitAll()
+                .requestMatchers("/**", "/ocpi/emsp/credentials").permitAll()
                 .requestMatchers("/ocpi/**").hasRole("CPMS")
                 .requestMatchers("/user/**").hasRole("USER")
                 .anyRequest()
