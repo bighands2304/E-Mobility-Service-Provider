@@ -11,8 +11,8 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Mod
 
 @Service
 public class CommandsSender {
-    private String ocpiPath="/ocpi/cpo";
-    private RestTemplate restTemplate = new RestTemplate();
+    private final String ocpiPath="/ocpi/cpo";
+    private final RestTemplate restTemplate = new RestTemplate();
 
     public void reserveNow(ChargingPoint cp, Reservation reservation) {
         HttpHeaders headers = new HttpHeaders();

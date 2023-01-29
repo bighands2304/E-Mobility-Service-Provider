@@ -1,6 +1,5 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingSessionManager;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,11 +17,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/user")
 public class SessionCreator {
-    @Autowired
     ReservationService reservationService;
-    @Autowired
     ChargingPointService cpService;
-    @Autowired
     CommandsSender commandsSender;
 
 
@@ -30,8 +26,7 @@ public class SessionCreator {
     public ResponseEntity<?> startChargingSession(@RequestBody Map<String,String> payload){
         Reservation reservation = reservationService.getReservationById(Long.parseLong(payload.get("reservationId")));
         ChargingPoint cp = cpService.getCPById(payload.get("cpId"));
-        if (reservation instanceof ActiveReservation) {
-            ActiveReservation activeReservation = (ActiveReservation) reservation;
+        if (reservation instanceof ActiveReservation activeReservation) {
             //send start request to the CPMS
             commandsSender.startSession(activeReservation, cp);
             reservationService.save(activeReservation);

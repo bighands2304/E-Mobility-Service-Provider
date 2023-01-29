@@ -1,10 +1,6 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingSessionManager;
 
-import org.hibernate.sql.Delete;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,19 +15,17 @@ import java.util.Map;
 
 @RestController("/user")
 public class StatusMonitor {
-    @Autowired
     ReservationService reservationService;
 
     @PostMapping("/deleteReservation")
     public ResponseEntity<?> deleteReservation(@RequestBody Map<String,String> payload){
         Reservation reservation = reservationService.getReservationById(Long.parseLong(payload.get("reservationId")));
-        if (reservation instanceof ActiveReservation) {
-            if (((ActiveReservation) reservation).getSessionId()==null) {
+        if (reservation instanceof ActiveReservation activeReservation) {
+            if (activeReservation.getSessionId()==null) {
                 DeletedReservation deletedReservation = (DeletedReservation) reservation;
                 deletedReservation.setDeletionTime(LocalDateTime.now());
                 //TODO sendDeletion to CPMS
                 reservationService.save(deletedReservation);
-                reservationService.delete(reservation);
                 return ResponseEntity.ok(deletedReservation);
             }else {
                 return ResponseEntity.badRequest().body("That's not an active reservation");

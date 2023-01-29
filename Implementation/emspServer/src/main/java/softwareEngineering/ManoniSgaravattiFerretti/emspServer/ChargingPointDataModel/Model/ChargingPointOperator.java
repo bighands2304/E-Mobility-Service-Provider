@@ -19,14 +19,6 @@ public class ChargingPointOperator implements UserDetails{
     public ChargingPointOperator(){
         this.authorities.add(new SimpleGrantedAuthority("ROLE_CPMS"));
     }
-    public ChargingPointOperator(ChargingPointOperator cpo){
-        this.cpoId=cpo.cpoId;
-        this.token=cpo.token;
-        this.tokenEmsp=cpo.tokenEmsp;
-        this.iban=cpo.iban;
-        this.cpmsUrl=cpo.cpmsUrl;
-        this.authorities.add(new SimpleGrantedAuthority("ROLE_CPMS"));
-    }
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")

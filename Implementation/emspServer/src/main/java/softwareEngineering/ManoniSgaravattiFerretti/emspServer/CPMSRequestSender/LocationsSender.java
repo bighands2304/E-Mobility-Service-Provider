@@ -1,6 +1,5 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSRequestSender;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.http.*;
@@ -18,18 +17,16 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.SocketDT
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class LocationsSender {
-    @Autowired
     ChargingPointService cpService;
-    @Autowired
     SocketService socketService;
-    @Autowired
     TariffService tariffService;
 
-    private String ocpiPath="/ocpi/cpo";
-    private RestTemplate restTemplate = new RestTemplate();
+    private final String ocpiPath="/ocpi/cpo";
+    private final RestTemplate restTemplate = new RestTemplate();
 
 
     public void getCps(ChargingPointOperator cpo){
@@ -40,7 +37,7 @@ public class LocationsSender {
 
         String urlTemplate = UriComponentsBuilder.fromHttpUrl(cpo.getCpmsUrl()+ocpiPath+"/locations").encode().toUriString();
 
-        ParameterizedTypeReference<Page<ChargingPointDTO>> typo = new ParameterizedTypeReference<Page<ChargingPointDTO>>() {};
+        ParameterizedTypeReference<Page<ChargingPointDTO>> typo = new ParameterizedTypeReference<>() {};
         ResponseEntity<Page<ChargingPointDTO>> response = restTemplate.exchange(
                 urlTemplate,
                 HttpMethod.GET,
@@ -49,7 +46,7 @@ public class LocationsSender {
         );
 
 
-        List<ChargingPointDTO> cps= response.getBody().getContent();
+        List<ChargingPointDTO> cps= Objects.requireNonNull(response.getBody()).getContent();
         for (ChargingPointDTO cp: cps) {
             ChargingPoint newCp = cpService.getCPById(cp.getCpId());
             if(newCp==null){
@@ -96,7 +93,7 @@ public class LocationsSender {
         //?date_from={DateTime}&date_to={DateTime}&offset=0&limit=10
         String urlTemplate = UriComponentsBuilder.fromHttpUrl(cp.getCpo().getCpmsUrl()+ocpiPath+"/locations/"+cp.getCpId()).encode().toUriString();
 
-        ParameterizedTypeReference<Page<ChargingPointDTO>> typo = new ParameterizedTypeReference<Page<ChargingPointDTO>>() {};
+        ParameterizedTypeReference<Page<ChargingPointDTO>> typo = new ParameterizedTypeReference<>() {};
         ResponseEntity<Page<ChargingPointDTO>> response = restTemplate.exchange(
                 urlTemplate,
                 HttpMethod.GET,
@@ -104,7 +101,7 @@ public class LocationsSender {
                 typo
         );
 
-        ChargingPointDTO cpResponse = response.getBody().getContent().get(0);
+        ChargingPointDTO cpResponse = Objects.requireNonNull(response.getBody()).getContent().get(0);
 
         ChargingPoint newCp = cpService.getCPById(cp.getCpId());
         if(newCp==null){
@@ -147,7 +144,7 @@ public class LocationsSender {
         //?date_from={DateTime}&date_to={DateTime}&offset=0&limit=10
         String urlTemplate = UriComponentsBuilder.fromHttpUrl(cp.getCpo().getCpmsUrl()+ocpiPath+"/locations/"+ cp.getCpId() + "/" + socket.getSocketId()).encode().toUriString();
 
-        ParameterizedTypeReference<Page<SocketDTO>> typo = new ParameterizedTypeReference<Page<SocketDTO>>() {};
+        ParameterizedTypeReference<Page<SocketDTO>> typo = new ParameterizedTypeReference<>() {};
         ResponseEntity<Page<SocketDTO>> response = restTemplate.exchange(
                 urlTemplate,
                 HttpMethod.GET,
@@ -155,7 +152,7 @@ public class LocationsSender {
                 typo
         );
 
-        SocketDTO socketResponse = response.getBody().getContent().get(0);
+        SocketDTO socketResponse = Objects.requireNonNull(response.getBody()).getContent().get(0);
 
         Socket newSocket = socketService.getSocketById(socketResponse.getSocketId().toString());
         if (newSocket==null){

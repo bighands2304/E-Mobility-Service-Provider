@@ -1,6 +1,5 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,12 +10,10 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointData
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/user")
 public class StationsResearchManager {
-    @Autowired
     ChargingPointService cpService;
     @GetMapping("/getCPsInRange")
     public ResponseEntity<?> getUserVehicles(@RequestBody Map<String, String> payload){

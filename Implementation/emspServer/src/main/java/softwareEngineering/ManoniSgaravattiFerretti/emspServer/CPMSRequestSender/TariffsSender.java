@@ -1,6 +1,5 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSRequestSender;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.http.*;
@@ -14,13 +13,12 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointData
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.TariffDTO;
 
 import java.util.List;
+import java.util.Objects;
+
 @Service
 public class TariffsSender {
-    @Autowired
     TariffService tariffService;
-
-    private String ocpiPath="/ocpi/cpo";
-    private RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate = new RestTemplate();
 
     public void getTariffs(ChargingPoint cp) {
         HttpHeaders headers = new HttpHeaders();
@@ -28,10 +26,10 @@ public class TariffsSender {
         headers.set("Authorization", cp.getCpo().getTokenEmsp());
         HttpEntity<?> entity = new HttpEntity<>(headers);
 
+        String ocpiPath = "/ocpi/cpo";
         String urlTemplate = UriComponentsBuilder.fromHttpUrl(cp.getCpo().getCpmsUrl() + ocpiPath + "/tariffs").encode().toUriString();
 
-        ParameterizedTypeReference<Page<TariffDTO>> typo = new ParameterizedTypeReference<Page<TariffDTO>>() {
-        };
+        ParameterizedTypeReference<Page<TariffDTO>> typo = new ParameterizedTypeReference<>() {};
         ResponseEntity<Page<TariffDTO>> response = restTemplate.exchange(
                 urlTemplate,
                 HttpMethod.GET,
@@ -39,7 +37,7 @@ public class TariffsSender {
                 typo
         );
 
-        List<TariffDTO> tariffs = response.getBody().getContent();
+        List<TariffDTO> tariffs = Objects.requireNonNull(response.getBody()).getContent();
         for (TariffDTO t: tariffs) {
             Tariff newTariff = tariffService.getTariffById(t.getTariffId());
             if (newTariff==null){

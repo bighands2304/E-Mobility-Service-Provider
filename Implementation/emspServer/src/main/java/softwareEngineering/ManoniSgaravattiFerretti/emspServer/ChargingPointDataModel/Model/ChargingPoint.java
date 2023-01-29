@@ -3,10 +3,8 @@ package softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDat
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 

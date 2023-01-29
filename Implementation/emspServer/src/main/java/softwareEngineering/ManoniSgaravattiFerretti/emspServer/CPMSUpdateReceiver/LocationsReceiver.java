@@ -1,6 +1,5 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSUpdateReceiver;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.ChargingPointDTO;
@@ -14,11 +13,8 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointData
 @RestController
 @RequestMapping("/ocpi/emsp/locations")
 public class LocationsReceiver {
-    @Autowired
     ChargingPointService cpService;
-    @Autowired
     SocketService socketService;
-    @Autowired
     ChargingPointOperatorService cpoService;
 
     @PutMapping("/{cp_id}")
@@ -83,7 +79,7 @@ public class LocationsReceiver {
     }
 
     @PatchMapping("/{cp_id}/{socket_id}")
-    public ResponseEntity<?> patchSocket(@PathVariable String cp_id, String socket_id, @RequestBody SocketDTO updatedSocket){
+    public ResponseEntity<?> patchSocket(@PathVariable String cp_id, @PathVariable String socket_id, @RequestBody SocketDTO updatedSocket){
         ChargingPoint chargingPoint = cpService.getCPById(cp_id);
         Socket socket = chargingPoint.getSockets().stream().filter(socket1 -> socket1.getSocketId().equals(socket_id)).toList().get(0);
 

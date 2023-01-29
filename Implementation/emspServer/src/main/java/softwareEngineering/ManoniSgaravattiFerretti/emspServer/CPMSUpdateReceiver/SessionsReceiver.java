@@ -1,6 +1,5 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSUpdateReceiver;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.SessionDTO;
@@ -12,7 +11,6 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Ser
 @RestController
 @RequestMapping("/ocpi/emsp/sessions")
 public class SessionsReceiver {
-    @Autowired
     ReservationService reservationService;
 
     @PutMapping("/{session_id}")
@@ -21,7 +19,7 @@ public class SessionsReceiver {
 
         reservation.setStartTime(session.getStartDateTime());
         reservation.setId(session.getReservationId());
-        reservation.setSessionId(Long.parseLong(session.getSessionId()));
+        reservation.setSessionId(Long.parseLong(session_id));
         reservation.setSocketId(session.getSocketId());
 
         reservationService.save(reservation);
@@ -36,7 +34,7 @@ public class SessionsReceiver {
 
             reservation.setStartTime(session.getStartDateTime());
             reservation.setId(session.getReservationId());
-            reservation.setSessionId(Long.parseLong(session.getSessionId()));
+            reservation.setSessionId(Long.parseLong(session_id));
             reservation.setSocketId(session.getSocketId());
 
             reservationService.save(reservation);

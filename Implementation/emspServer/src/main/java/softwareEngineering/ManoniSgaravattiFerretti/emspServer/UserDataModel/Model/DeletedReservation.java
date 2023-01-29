@@ -2,9 +2,11 @@ package softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Mo
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 
 import java.time.LocalDateTime;
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
 @EnableAutoConfiguration
