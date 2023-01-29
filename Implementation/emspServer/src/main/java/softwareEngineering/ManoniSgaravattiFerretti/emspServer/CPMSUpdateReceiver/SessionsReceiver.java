@@ -53,7 +53,7 @@ public class SessionsReceiver {
             reservationService.save(reservation);
         }
 
-        if (session.getStatus().equals("ENDED")) {
+        if (session.getStatus().equals("COMPLETED")) {
             EndedReservation reservation = (EndedReservation) reservationService.getReservationById(session.getReservationId());
 
             reservation.setStartTime(session.getStartDateTime());

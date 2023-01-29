@@ -26,7 +26,6 @@ public class TariffsReceiver {
         newTariff.setSocketType(tariff.getSocketType());
         newTariff.setStartDate(tariff.getStartDate());
         newTariff.setStepSize(tariff.getStepSize());
-        newTariff.setChargingPoint(cpService.getCPById(tariff.getCpId()));
 
         if(tariff.isSpecialOffer()){
             SpecialOffer newSpecialOffer = (SpecialOffer) newTariff;

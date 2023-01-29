@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSRequestSender.CommandsSender;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.ChargingPoint;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.ChargingPointService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.SocketService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.ActiveReservation;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.Reservation;
@@ -21,25 +24,31 @@ public class ReservationManager {
     @Autowired
     ReservationService reservationService;
     @Autowired
+    ChargingPointService cpService;
+    @Autowired
     UserService userService;
     @Autowired
     SocketService socketService;
+    @Autowired
+    CommandsSender commandsSender;
 
     @PostMapping("/makeReservation")
     public ResponseEntity<?> makeReservation(@RequestBody Map<String,String> payload){
         //Collect the payload
         Long userId = Long.parseLong(payload.get("userId"));
+        String cpId = payload.get("cpId");
         String socketId = payload.get("socketId");
-        String tariffId = payload.get("tariffId");
 
         //Create the reservation
         User user = userService.findById(userId);
+        ChargingPoint cp = cpService.getCPById(cpId);
         Reservation reservation = new ActiveReservation();
         reservation.setUser(user);
         reservation.setSocketId(socketId);
-        reservation.setTariffId(tariffId);
 
-        //TODO send the reservation to the cpms
+        //send the reservation to the cpms
+        commandsSender.reserveNow(cp, reservation);
+
 
         //Save the reservation in the DB
         reservationService.save(reservation);

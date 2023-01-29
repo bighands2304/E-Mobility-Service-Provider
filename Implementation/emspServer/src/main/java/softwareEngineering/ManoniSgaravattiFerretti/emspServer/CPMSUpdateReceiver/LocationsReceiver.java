@@ -40,8 +40,6 @@ public class LocationsReceiver {
             newSocket.setStatus(s.getStatus());
             newSocket.setLastUpdate(s.getLastUpdate());
             newSocket.setAvailability(s.getAvailability());
-            newSocket.setChargingPoint(newCp);
-
             newCp.addSocket(newSocket);
 
             socketService.save(newSocket);
@@ -60,7 +58,6 @@ public class LocationsReceiver {
         newSocket.setStatus(socket.getStatus());
         newSocket.setLastUpdate(socket.getLastUpdate());
         newSocket.setAvailability(socket.getAvailability());
-        newSocket.setChargingPoint(chargingPoint);
 
         chargingPoint.addSocket(newSocket);
 
