@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 public class EmspChargingPointDTO {
-    private String cpId;
+    //private String cpId;
     private String name;
     private String address;
     private Double longitude;

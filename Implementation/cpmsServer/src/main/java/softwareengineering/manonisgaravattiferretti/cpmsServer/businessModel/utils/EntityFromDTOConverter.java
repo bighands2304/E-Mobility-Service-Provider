@@ -11,9 +11,9 @@ public class EntityFromDTOConverter {
         return cpo;
     }
 
-    public static EmspDetails emspDetailsFromCredentials(EmspCredentialsDTO emspCredentials) {
+    public static EmspDetails emspDetailsFromCredentialsDTO(CredentialsDTO credentialsDTO) {
         EmspDetails emspDetails = new EmspDetails();
-        BeanUtils.copyProperties(emspCredentials, emspDetails);
+        BeanUtils.copyProperties(credentialsDTO, emspDetails);
         return emspDetails;
     }
 
@@ -23,9 +23,18 @@ public class EntityFromDTOConverter {
         return emspSocketDTO;
     }
 
+    public static EmspChargingPointDTOWithId emspChargingPointDTOWithIdFromChargingPoint(ChargingPoint chargingPoint) {
+        EmspChargingPointDTOWithId emspChargingPointDTO = new EmspChargingPointDTOWithId();
+        emspChargingPointDTO.setCpId(chargingPoint.getCpId());
+        return (EmspChargingPointDTOWithId) setCpDTOProperties(chargingPoint, emspChargingPointDTO);
+    }
+
     public static EmspChargingPointDTO emspChargingPointDTOFromChargingPoint(ChargingPoint chargingPoint) {
         EmspChargingPointDTO emspChargingPointDTO = new EmspChargingPointDTO();
-        emspChargingPointDTO.setCpId(chargingPoint.getCpId());
+        return setCpDTOProperties(chargingPoint, emspChargingPointDTO);
+    }
+
+    private static EmspChargingPointDTO setCpDTOProperties(ChargingPoint chargingPoint, EmspChargingPointDTO emspChargingPointDTO) {
         emspChargingPointDTO.setName(chargingPoint.getName());
         emspChargingPointDTO.setAddress(chargingPoint.getAddress());
         emspChargingPointDTO.setLatitude(chargingPoint.getLatitude());
