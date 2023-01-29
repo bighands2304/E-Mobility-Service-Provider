@@ -103,10 +103,6 @@ public class ChargingPointService {
         return chargingPointRepository.findChargingPointByAuthenticationKey(authKey);
     }
 
-    public void removeCpById(String id) {
-        chargingPointRepository.deleteById(id);
-    }
-
     public List<ChargingPoint> findAll() {
         return chargingPointRepository.findAll();
     }

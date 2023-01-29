@@ -43,7 +43,6 @@ public class SessionStartedListener implements ApplicationListener<SessionStarte
         reservation.setLastUpdated(event.getTime());
         ocpiSessionSender.putSession(EntityFromDTOConverter.chargingSessionDTOFromReservation(reservation),
                 reservation.getEmspDetails());
-        // todo : apply tariff
         socketStatusListener.onSocketUpdate(cpId, socketId);
     }
 }

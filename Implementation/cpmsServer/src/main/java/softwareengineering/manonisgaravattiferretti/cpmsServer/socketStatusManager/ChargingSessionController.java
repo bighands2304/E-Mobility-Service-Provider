@@ -17,13 +17,12 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.ent
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.ReservationService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.SocketService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.OcppSender;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.cpmsReq.CancelReservationConf;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.cpmsReq.ConfMessage;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.cpmsReq.RemoteStartTransactionConf;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.cpmsReq.RemoteStopTransactionConf;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.cpmsReq.dtos.CommandResult;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.emspUpdateSender.OcpiCommandSender;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -31,13 +30,14 @@ import java.util.concurrent.ExecutionException;
 @RestController
 public class ChargingSessionController {
     private final ReservationService reservationService;
-    private final SocketService socketService;
     private final OcppSender ocppSender;
+    private final OcpiCommandSender ocpiCommandSender;
 
-    public ChargingSessionController(ReservationService reservationService, SocketService socketService, OcppSender ocppSender) {
+    public ChargingSessionController(ReservationService reservationService, OcppSender ocppSender,
+                                     OcpiCommandSender ocpiCommandSender) {
         this.reservationService = reservationService;
-        this.socketService = socketService;
         this.ocppSender = ocppSender;
+        this.ocpiCommandSender = ocpiCommandSender;
     }
 
     @PostMapping("/ocpi/cpo/commands/START_SESSION")
@@ -56,19 +56,12 @@ public class ChargingSessionController {
         // Todo: select a charging profile?
         CompletableFuture<ConfMessage> responseFuture = ocppSender.sendRemoteStartTransaction(
                 startSessionDTO.getChargingPointId(), startSessionDTO.getSocketId(), null);
-        try {
-            RemoteStartTransactionConf response = (RemoteStartTransactionConf) responseFuture.get();
-            if (response.getCommandResult() != CommandResult.ACCEPTED) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "could not start the session");
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "server error, try again later");
-        }
+        sendStartSessionResponse(responseFuture, emspDetails, reservationOptional.get().getReservationIdEmsp());
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/ocpi/cpo/commands/STOP_SESSION/{sessionId}")
-    public ResponseEntity<?> startSession(@PathVariable Long sessionId,
+    public ResponseEntity<?> stopSession(@PathVariable Long sessionId,
                                           @AuthenticationPrincipal EmspDetails emspDetails) {
         Optional<Reservation> reservationOptional = reservationService.findReservationBySessionId(sessionId);
         if (reservationOptional.isEmpty() ||
@@ -80,19 +73,12 @@ public class ChargingSessionController {
         }
         CompletableFuture<ConfMessage> responseFuture = ocppSender.sendRemoteStopTransaction(
                 reservationOptional.get().getSocket().getCpId(), sessionId);
-        try {
-            RemoteStopTransactionConf response = (RemoteStopTransactionConf) responseFuture.get();
-            if (response.getStatus() != CommandResult.ACCEPTED) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "could not stop the session");
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "server error, try again later");
-        }
+        sendStopSessionResponse(responseFuture, emspDetails, reservationOptional.get().getReservationIdEmsp());
         return ResponseEntity.ok().build();
     }
 
     @Async
-    void sendStartSessionResponse(CompletableFuture<ConfMessage> futureCpResponse) {
+    void sendStartSessionResponse(CompletableFuture<ConfMessage> futureCpResponse, EmspDetails emspDetails, Long reservationId) {
         CommandResultType commandResultType;
         try {
             RemoteStopTransactionConf response = (RemoteStopTransactionConf) futureCpResponse.get();
@@ -100,11 +86,11 @@ public class ChargingSessionController {
         } catch (InterruptedException | ExecutionException e) {
             commandResultType = CommandResultType.TIMEOUT;
         }
-        // Todo: send request
+        ocpiCommandSender.sendCommandResult(emspDetails, reservationId, commandResultType, "START_SESSION");
     }
 
     @Async
-    void sendStopSessionResponse(CompletableFuture<ConfMessage> futureCpResponse) {
+    void sendStopSessionResponse(CompletableFuture<ConfMessage> futureCpResponse, EmspDetails emspDetails, Long reservationId) {
         CommandResultType commandResultType;
         try {
             RemoteStopTransactionConf response = (RemoteStopTransactionConf) futureCpResponse.get();
@@ -112,6 +98,6 @@ public class ChargingSessionController {
         } catch (InterruptedException | ExecutionException e) {
             commandResultType = CommandResultType.TIMEOUT;
         }
-        // Todo: send request
+        ocpiCommandSender.sendCommandResult(emspDetails, reservationId, commandResultType, "STOP_SESSION");
     }
 }
