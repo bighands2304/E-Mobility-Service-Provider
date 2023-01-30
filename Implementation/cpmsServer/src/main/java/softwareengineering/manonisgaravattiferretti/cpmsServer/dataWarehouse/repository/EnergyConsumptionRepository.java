@@ -1,0 +1,8 @@
+package softwareengineering.manonisgaravattiferretti.cpmsServer.dataWarehouse.repository;
+
+import org.springframework.data.cassandra.repository.CassandraRepository;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.dataWarehouse.entity.DimensionsPrimaryKey;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.dataWarehouse.entity.EnergyConsumption;
+
+public interface EnergyConsumptionRepository extends CassandraRepository<EnergyConsumption, DimensionsPrimaryKey> {
+}
