@@ -6,6 +6,7 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.dataWarehouse.ent
 import softwareengineering.manonisgaravattiferretti.cpmsServer.dataWarehouse.entity.EnergyConsumption;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.dataWarehouse.groupByDtos.EnergyConsumptionByYear;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.dataWarehouse.groupByDtos.EnergyConsumptionByYearMonth;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.dataWarehouse.groupByDtos.MeanConsumption;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.dataWarehouse.repository.EnergyConsumptionRepository;
 
 import java.time.LocalDateTime;
@@ -43,5 +44,9 @@ public class EnergyConsumptionService {
 
     public Optional<EnergyConsumption> find(String cpId, String dsoId, LocalDateTime timestamp) {
         return energyConsumptionRepository.findById(new DimensionsPrimaryKey(dsoId, cpId, timestamp));
+    }
+
+    public double findMeanConsumption(String cpId, LocalDateTime from, LocalDateTime to) {
+        return energyConsumptionRepository.getMeanConsumption(cpId, from, to);
     }
 }

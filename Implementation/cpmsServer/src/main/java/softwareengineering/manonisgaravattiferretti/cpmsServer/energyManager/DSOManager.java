@@ -6,7 +6,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.DSOOffer;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.OfferTimeSlot;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.repositories.DSOOfferRepository;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.ChargingPointService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.DSOOfferService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.events.EnergyChangeEvent;
@@ -36,7 +35,7 @@ public class DSOManager implements ApplicationListener<ToggleDsoSelectionOptimiz
         dsoSelectionOptimizer.switchOptimizer(event.getCpId(), event.isAutomatic());
     }
 
-    public boolean changeDsoProvider(String cpId, String offerId, OfferTimeSlot offerTimeSlot) {
+    public boolean changeDsoProviderManual(String cpId, String offerId, OfferTimeSlot offerTimeSlot) {
         Optional<DSOOffer> dsoOfferOptional = dsoOfferService.findOfferById(offerId);
         if (dsoOfferOptional.isEmpty() || !dsoOfferOptional.get().getChargingPointId().equals(cpId)) {
             return false;
@@ -46,6 +45,11 @@ public class DSOManager implements ApplicationListener<ToggleDsoSelectionOptimiz
         if (dsoOffer.isInUse()) {
             return true;
         }
+        changeDsoProvider(cpId, dsoOffer, offerTimeSlot);
+        return true;
+    }
+
+    public void changeDsoProvider(String cpId, DSOOffer dsoOffer, OfferTimeSlot offerTimeSlot) {
         Optional<DSOOffer> currentOffer = dsoOfferService.findDSOOfferFromCpAndTimeSlot(cpId,
                 dsoOffer.getAvailableTimeSlot(), true);
         currentOffer.ifPresent(currentOff -> {
@@ -57,6 +61,5 @@ public class DSOManager implements ApplicationListener<ToggleDsoSelectionOptimiz
         dsoOfferService.insertOffer(dsoOffer);
         EnergyChangeEvent energyChangeEvent = new EnergyChangeEvent(this, cpId);
         applicationEventPublisher.publishEvent(energyChangeEvent);
-        return true;
     }
 }

@@ -19,8 +19,8 @@ public class DSOOfferService {
         this.dsoOfferRepository = dsoOfferRepository;
     }
 
-    public List<DSOOffer> findOffersOfCp(String cpExternalId) {
-        return dsoOfferRepository.findDSOOffersByChargingPointId(cpExternalId).stream().filter(DSOOffer::isValid).toList();
+    public List<DSOOffer> findOffersOfCp(String cpInternalId) {
+        return dsoOfferRepository.findDSOOffersByChargingPointId(cpInternalId).stream().filter(DSOOffer::isValid).toList();
     }
 
     public Optional<DSOOffer> findOfferById(String id) {
@@ -50,7 +50,7 @@ public class DSOOfferService {
     }
 
     public Optional<DSOOffer> findDSOOfferFromCpAndTimeSlot(String cpId, OfferTimeSlot offerTimeSlot, boolean inUse) {
-        return dsoOfferRepository.findDSOOfferByChargingPointIdAndAvailableTimeSlotAndInUse(cpId, offerTimeSlot, inUse);
+        return dsoOfferRepository.findDSOOfferByChargingPointInternalIdAndAvailableTimeSlotAndInUse(cpId, offerTimeSlot, inUse);
     }
 
     public void registerDso(String dsoId, String cpId, String dsoToken, String dsoUrl, String companyName, String cpoToken) {

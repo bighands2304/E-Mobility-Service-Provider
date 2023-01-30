@@ -3,6 +3,7 @@ package softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.en
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalTime;
@@ -17,7 +18,10 @@ public class DSOOffer {
     @JsonIgnore
     private boolean valid;
     private double capacity;
+    @Indexed
     private String chargingPointId; // external id (visible to both emsps and dsos)
+    @Indexed
+    private String chargingPointInternalId;
     private String dsoId;
     private String companyName;
     @JsonIgnore

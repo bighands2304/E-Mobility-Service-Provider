@@ -16,8 +16,8 @@ public class EnergyConsumption {
     private DimensionsPrimaryKey dimensionsPrimaryKey;
     @Column(value = "battery_usage_kw")
     private double batteryUsageKw;
-    @Column(value = "total_energy_amount_kw")
-    private double totalEnergyAmountKw;
+    @Column(value = "total_energy_amount")
+    private double totalEnergyAmount;
     @Column(value = "cost")
     private double cost;
 }

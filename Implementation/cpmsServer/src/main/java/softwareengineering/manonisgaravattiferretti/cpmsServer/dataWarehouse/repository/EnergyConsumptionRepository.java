@@ -7,6 +7,7 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.dataWarehouse.ent
 import softwareengineering.manonisgaravattiferretti.cpmsServer.dataWarehouse.entity.EnergyConsumption;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.dataWarehouse.groupByDtos.EnergyConsumptionByYear;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.dataWarehouse.groupByDtos.EnergyConsumptionByYearMonth;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.dataWarehouse.groupByDtos.MeanConsumption;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,4 +34,9 @@ public interface EnergyConsumptionRepository extends CassandraRepository<EnergyC
             "GROUP BY FLOOR(datetime, 1y)" +
             "ALLOW FILTERING")
     List<EnergyConsumptionByYearMonth> findBetweenGroupByYearAndMonth(String cpId, String dsoId, LocalDateTime dateFrom, LocalDateTime dateTo);
+
+    @Query("SELECT AVG(total_energy_amount) AS mean_consumption FROM energy_consumption " +
+            "WHERE cp_id = ?0 AND datetime >= ?1 AND datetime <= ?2" +
+            "ALLOW FILTERING")
+    double getMeanConsumption(String cpId, LocalDateTime dateFrom, LocalDateTime dateTo);
 }

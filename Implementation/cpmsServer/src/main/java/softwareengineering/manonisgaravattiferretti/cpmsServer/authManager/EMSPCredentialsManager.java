@@ -35,6 +35,6 @@ public class EMSPCredentialsManager {
         } catch (EmspResponseTimeoutException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

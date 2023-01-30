@@ -39,7 +39,7 @@ public class PriceOptimizer {
     public void fetchChargingPointsPeriodically() {
         List<ChargingPoint> chargingPoints = chargingPointService.findAll();
         for (ChargingPoint chargingPoint: chargingPoints) {
-            optimizerSet.put(chargingPoint.getCpId(), chargingPoint.isTogglePriceOptimizer());
+            optimizerSet.put(chargingPoint.getId(), chargingPoint.isTogglePriceOptimizer());
         }
     }
 

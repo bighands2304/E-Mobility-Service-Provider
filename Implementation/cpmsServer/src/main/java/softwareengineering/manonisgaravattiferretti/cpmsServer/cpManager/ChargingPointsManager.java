@@ -136,7 +136,7 @@ public class ChargingPointsManager {
         if (chargingPointOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Charging point not found");
         }
-        return new ResponseEntity<>(priceManager.addTariff(addTariffDTO, id), HttpStatus.OK);
+        return new ResponseEntity<>(priceManager.addTariff(addTariffDTO, id), HttpStatus.CREATED);
     }
 
     @PutMapping("/api/CPO/chargingPoints/{id}/tariffs/{tariffId}")
@@ -146,7 +146,7 @@ public class ChargingPointsManager {
         if (chargingPointOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Charging point not found");
         }
-        return new ResponseEntity<>(priceManager.putTariff(addTariffDTO, id, tariffId), HttpStatus.OK);
+        return new ResponseEntity<>(priceManager.putTariff(addTariffDTO, id, tariffId), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/api/CPO/chargingPoints/{id}/tariffs/{tariffId}")
@@ -188,10 +188,10 @@ public class ChargingPointsManager {
         SocketAvailabilityEvent socketAvailabilityEvent = new SocketAvailabilityEvent(this,
                 socketAvailabilityDTO, id, socketId);
         applicationEventPublisher.publishEvent(socketAvailabilityEvent);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PutMapping("/api/CPO/chargingPoints/{id}/energySources/battery/{batteryId}")
+    @PatchMapping("/api/CPO/chargingPoints/{id}/energySources/battery/{batteryId}")
     public ResponseEntity<?> includeBattery(@PathVariable String id, @PathVariable Integer batteryId,
                                             @RequestBody @Valid IncludeBatteryDTO includeBatteryDTO,
                                             @AuthenticationPrincipal CPO cpo) {
@@ -202,13 +202,12 @@ public class ChargingPointsManager {
         if (!energyMixManager.includeBattery(includeBatteryDTO, id, batteryId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "parameters not correct");
         }
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PutMapping("/api/CPO/chargingPoints/{id}/energySources/battery/{batteryId}/availability")
+    @PatchMapping("/api/CPO/chargingPoints/{id}/energySources/battery/{batteryId}/availability")
     public ResponseEntity<?> changeBatteryAvailability(@PathVariable String id, @PathVariable Integer batteryId,
                                                        @RequestParam boolean available, @AuthenticationPrincipal CPO cpo) {
-
         Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointOfCpoById(id, cpo.getCpoCode());
         if (chargingPointOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "battery not found");
@@ -216,7 +215,7 @@ public class ChargingPointsManager {
         if (!energyMixManager.changeBatteryAvailability(id, batteryId, available)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "parameters not correct");
         }
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/api/CPO/chargingPoints/{id}/dso/offers")
@@ -228,16 +227,16 @@ public class ChargingPointsManager {
         return new ResponseEntity<>(dsoOfferService.findOffersOfCp(chargingPointOptional.get().getId()), HttpStatus.OK);
     }
 
-    @PostMapping("/api/CPO/chargingPoints/{id}/dso/offers/{offerId}")
+    @PatchMapping("/api/CPO/chargingPoints/{id}/dso/offers/{offerId}")
     public ResponseEntity<?> changeDsoProvider(@PathVariable String id, @PathVariable String offerId,
                                                @RequestBody OfferTimeSlot offerTimeSlot, @AuthenticationPrincipal CPO cpo) {
         Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointOfCpoById(id, cpo.getCpoCode());
         if (chargingPointOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "charging point not found");
         }
-        if(!dsoManager.changeDsoProvider(id, offerId, offerTimeSlot)) {
+        if(!dsoManager.changeDsoProviderManual(id, offerId, offerTimeSlot)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "parameters not correct");
         }
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

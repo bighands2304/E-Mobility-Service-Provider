@@ -8,7 +8,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication(exclude = {CassandraAutoConfiguration.class})
 @EnableMongoRepositories
-@EnableScheduling
+// todo: enable this when optimizer are really ready
+//@EnableScheduling
 public class CpmsServerApplication {
 
     public static void main(String[] args) {

@@ -62,7 +62,7 @@ public class LoginManager {
         Map<String,Object> response = new HashMap<>();
         response.put("jwt", jwt);
         response.put("user", cpoService.getCPOData(loginDTO.getCpoCode()));
-        return ResponseEntity.ok(response);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PostMapping("/api/CPO/changePassword")
@@ -73,6 +73,6 @@ public class LoginManager {
         }
         cpo.setPassword(changePasswordDTO.getNewPassword());
         cpoService.insertCPO(cpo);
-        return new ResponseEntity<>(cpo, HttpStatus.OK);
+        return new ResponseEntity<>(cpo, HttpStatus.CREATED);
     }
 }
