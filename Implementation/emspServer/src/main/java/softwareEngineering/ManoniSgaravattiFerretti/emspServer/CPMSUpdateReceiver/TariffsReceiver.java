@@ -1,5 +1,6 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSUpdateReceiver;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.TariffDTO;
@@ -10,6 +11,7 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointData
 @RestController
 @RequestMapping("/ocpi/emsp/tariffs")
 public class TariffsReceiver {
+    @Autowired
     TariffService tariffService;
 
     @PutMapping ("/{tariff_id}")

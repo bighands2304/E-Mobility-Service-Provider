@@ -1,5 +1,6 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +15,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/user")
 public class StationsResearchManager {
+    @Autowired
     ChargingPointService cpService;
     @GetMapping("/getCPsInRange")
     public ResponseEntity<?> getUserVehicles(@RequestBody Map<String, String> payload){

@@ -1,6 +1,7 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSUpdateReceiver;
 
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,7 +18,9 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/ocpi/emsp")
 public class CredentialsReceiver {
+    @Autowired
     LocationsSender locations;
+    @Autowired
     ChargingPointOperatorService cpoService;
     @Value("${emsp.path}")
     private String emspPath;

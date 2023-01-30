@@ -1,5 +1,6 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSRequestSender;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.http.*;
@@ -21,8 +22,11 @@ import java.util.Objects;
 
 @Service
 public class LocationsSender {
+    @Autowired
     ChargingPointService cpService;
+    @Autowired
     SocketService socketService;
+    @Autowired
     TariffService tariffService;
 
     private final String ocpiPath="/ocpi/cpo";

@@ -1,5 +1,6 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.AuthManager;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -21,9 +22,13 @@ import java.util.Map;
 @Service
 @RestController
 public class LoginManager implements UserDetailsService {
+    @Autowired
     UserService userService;
+    @Autowired
     ChargingPointOperatorService cpoService;
+    @Autowired
     AuthenticationManager authenticationManager;
+    @Autowired
     TokenManager tokenManager;
 
     @Override

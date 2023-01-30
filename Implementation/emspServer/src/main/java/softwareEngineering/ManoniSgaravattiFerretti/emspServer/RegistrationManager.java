@@ -1,5 +1,6 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,7 +13,9 @@ import java.util.Map;
 
 @RestController
 public class RegistrationManager {
+    @Autowired
     UserService userService;
+    @Autowired
     PasswordEncoder passwordEncoder;
 
     @PostMapping("/register")

@@ -1,5 +1,6 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingSessionManager;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,8 +18,11 @@ import java.util.Map;
 @RestController
 @RequestMapping("/user")
 public class SessionCreator {
+    @Autowired
     ReservationService reservationService;
+    @Autowired
     ChargingPointService cpService;
+    @Autowired
     CommandsSender commandsSender;
 
 
