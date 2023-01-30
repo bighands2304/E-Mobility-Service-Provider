@@ -3,6 +3,7 @@ package softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.en
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
@@ -14,6 +15,7 @@ import java.util.List;
 public class ChargingPoint {
     @Id
     private String id;
+    @Indexed(unique = true)
     private String cpId;
     private String name;
     private String address;

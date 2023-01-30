@@ -7,6 +7,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,6 +30,7 @@ public class TokenManager extends OncePerRequestFilter {
     private final CPOService cpoUserDetails;
     private final EmspDetailsService emspDetailsService;
     private final UserDetailsServiceImpl userDetailsService;
+    private final Logger logger = LoggerFactory.getLogger(TokenManager.class);
 
     @Autowired
     public TokenManager(CPOService cpoUserDetails, EmspDetailsService emspDetailsService, UserDetailsServiceImpl userDetailsService) {
@@ -53,14 +56,17 @@ public class TokenManager extends OncePerRequestFilter {
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                    logger.info("Authenticated cpo: " + usernamePasswordAuthenticationToken.getPrincipal());
+
+                    logger.info("Authenticated cpo: " + request.getUserPrincipal());
                 }
             }
-        }
-        if (authorizationHeader != null) {
+        } else if (authorizationHeader != null) {
             UserDetails emspDetails = this.userDetailsService.loadEmspByToken(authorizationHeader);
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(emspDetails, null, emspDetails.getAuthorities());
             usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+            logger.info("Authenticated emsp: " + usernamePasswordAuthenticationToken.getPrincipal());
         }
         chain.doFilter(request, response);
     }

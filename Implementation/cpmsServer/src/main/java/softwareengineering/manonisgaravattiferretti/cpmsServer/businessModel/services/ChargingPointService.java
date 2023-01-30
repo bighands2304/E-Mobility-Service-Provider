@@ -37,7 +37,7 @@ public class ChargingPointService {
 
     public Optional<ChargingPoint> findChargingPointByInternalId(String id, String cpoCode) {
         Optional<ChargingPoint> chargingPointOptional = chargingPointRepository.findById(id);
-        if (chargingPointOptional.isEmpty() ||
+        if (chargingPointOptional.isEmpty() || chargingPointOptional.get().getCpoCode() == null ||
                 !chargingPointOptional.get().getCpoCode().equals(cpoCode)) {
             return Optional.empty();
         }

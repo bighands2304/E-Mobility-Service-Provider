@@ -38,9 +38,10 @@ public class AuthorizationManager {
         http.cors();
         http
                 .authorizeHttpRequests()
-                .requestMatchers("/", "/api/CPO/register", "/api/CPO/login", "/ocpi/cpo/**", "/ws").permitAll()
-                //.requestMatchers("/ocpi/cpo/**").hasRole("EMSP")
-                .requestMatchers("/api/CPO/**").hasRole("CPO")
+                //.requestMatchers("/", "/api/CPO/**", "/ocpi/cpo/**", "/ws").permitAll()
+                .requestMatchers("/", "/api/CPO/login", "/api/CPO/register", "/ocpi/cpo/**", "/ws").permitAll()
+                //.requestMatchers("/ocpi/cpo/**").hasAuthority("EMSP")
+                .requestMatchers("/api/CPO/**").hasAuthority("CPO")
                 .anyRequest()
                 .authenticated()
                 .and()

@@ -1,6 +1,8 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.cpManager;
 
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
@@ -24,7 +26,7 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.socketStatusManag
 
 import java.util.Optional;
 
-@RestController("/api/CPO/chargingPoints")
+@RestController
 public class ChargingPointsManager {
     private final ChargingPointService chargingPointService;
     private final SocketService socketService;
@@ -33,6 +35,7 @@ public class ChargingPointsManager {
     private final DSOManager dsoManager;
     private final DSOOfferService dsoOfferService;
     private final PriceManager priceManager;
+    private final Logger logger = LoggerFactory.getLogger(ChargingPointsManager.class);
 
     @Autowired
     public ChargingPointsManager(ChargingPointService chargingPointService, SocketService socketService,
@@ -48,14 +51,14 @@ public class ChargingPointsManager {
         this.priceManager = priceManager;
     }
 
-    @GetMapping
+    @GetMapping("/api/CPO/chargingPoints")
     public ResponseEntity<Iterable<ChargingPoint>> getAllCps(@AuthenticationPrincipal CPO cpo,
                                                              @RequestParam(defaultValue = "0") int offset,
                                                              @RequestParam(defaultValue = "100") int limit) {
         return new ResponseEntity<>(chargingPointService.getChargingPointsOfCpo(cpo.getCpoCode(), offset, limit), HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/api/CPO/chargingPoints/{id}")
     public ResponseEntity<ChargingPoint> getCPById(@AuthenticationPrincipal CPO cpo, @PathVariable String id) {
         Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(id, cpo.getCpoCode());
         if (chargingPointOptional.isEmpty()) {
@@ -64,12 +67,12 @@ public class ChargingPointsManager {
         return new ResponseEntity<>(chargingPointOptional.get(), HttpStatus.OK);
     }
 
-    @PutMapping("/{externalCpId}")
+    @PutMapping("/api/CPO/chargingPoints/{externalCpId}")
     public void addChargingPoint(@PathVariable String externalCpId, @AuthenticationPrincipal CPO cpo) {
         //Todo
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/api/CPO/chargingPoints/{id}")
     public ResponseEntity<?> deleteChargingPoint(@AuthenticationPrincipal CPO cpo, @PathVariable String id) {
         Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(id, cpo.getCpoCode());
         if (chargingPointOptional.isEmpty()) {
@@ -79,7 +82,7 @@ public class ChargingPointsManager {
         return new ResponseEntity<>(chargingPointOptional.get(), HttpStatus.OK);
     }
 
-    @GetMapping("/{cpId}/sockets")
+    @GetMapping("/api/CPO/chargingPoints/{cpId}/sockets")
     public ResponseEntity<Iterable<Socket>> getSockets(@AuthenticationPrincipal CPO cpo, @PathVariable String cpId) {
         Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(cpId, cpo.getCpoCode());
         if (chargingPointOptional.isEmpty()) {
@@ -88,7 +91,7 @@ public class ChargingPointsManager {
         return ResponseEntity.ok(socketService.findCpSocketsByInternalId(cpId));
     }
 
-    @GetMapping("/{cpId}/sockets/{socketId}")
+    @GetMapping("/api/CPO/chargingPoints/{cpId}/sockets/{socketId}")
     public ResponseEntity<Socket> getSocketInfo(@AuthenticationPrincipal CPO cpo, @PathVariable String cpId,
                                                 @PathVariable Integer socketId) {
         Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(cpId, cpo.getCpoCode());
@@ -102,7 +105,7 @@ public class ChargingPointsManager {
         return ResponseEntity.ok(socketOptional.get());
     }
 
-    @GetMapping("/{cpId}/tariffs")
+    @GetMapping("/api/CPO/chargingPoints/{cpId}/tariffs")
     public ResponseEntity<Iterable<Tariff>> getTariffs(@AuthenticationPrincipal CPO cpo, @PathVariable String cpId) {
         Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(cpId, cpo.getCpoCode());
         if (chargingPointOptional.isEmpty()) {
@@ -111,7 +114,7 @@ public class ChargingPointsManager {
         return ResponseEntity.ok(chargingPointOptional.get().getTariffs());
     }
 
-    @GetMapping("/{id}/tariffs/{tariffId}")
+    @GetMapping("/api/CPO/chargingPoints/{id}/tariffs/{tariffId}")
     public ResponseEntity<Tariff> getTariff(@AuthenticationPrincipal CPO cpo, @PathVariable String id,
                                             @PathVariable String tariffId) {
         Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(id, cpo.getCpoCode());
@@ -126,7 +129,7 @@ public class ChargingPointsManager {
         return ResponseEntity.ok(tariffOptional.get());
     }
 
-    @PostMapping("/{id}/tariffs")
+    @PostMapping("/api/CPO/chargingPoints/{id}/tariffs")
     public ResponseEntity<Tariff> addNewTariff(@PathVariable String id, @AuthenticationPrincipal CPO cpo,
                                           @RequestBody AddTariffDTO addTariffDTO) {
         Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(id, cpo.getCpoCode());
@@ -136,7 +139,7 @@ public class ChargingPointsManager {
         return new ResponseEntity<>(priceManager.addTariff(addTariffDTO, id), HttpStatus.OK);
     }
 
-    @PutMapping("/{id}/tariffs/{tariffId}")
+    @PutMapping("/api/CPO/chargingPoints/{id}/tariffs/{tariffId}")
     public ResponseEntity<?> putTariff(@PathVariable String id, @PathVariable String tariffId,
                                        @RequestBody AddTariffDTO addTariffDTO, @AuthenticationPrincipal CPO cpo) {
         Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(id, cpo.getCpoCode());
@@ -146,14 +149,14 @@ public class ChargingPointsManager {
         return new ResponseEntity<>(priceManager.putTariff(addTariffDTO, id, tariffId), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}/tariffs/{tariffId}")
+    @DeleteMapping("/api/CPO/chargingPoints/{id}/tariffs/{tariffId}")
     public ResponseEntity<?> deleteTariff(@PathVariable String id, @PathVariable String tariffId,
                                           @AuthenticationPrincipal CPO cpo) {
         priceManager.removeTariff(id, tariffId);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{id}/optimizer/{type}")
+    @PostMapping("/api/CPO/chargingPoints/{id}/optimizer/{type}")
     public ResponseEntity<?> toggleOptimizer(@PathVariable String id, @PathVariable String type,
                                              @RequestParam boolean automatic) {
         switch (type) {
@@ -174,7 +177,7 @@ public class ChargingPointsManager {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/{id}/sockets/{socketId}")
+    @PutMapping("/api/CPO/chargingPoints/{id}/sockets/{socketId}")
     public ResponseEntity<?> updateSocketAvailability(@PathVariable String id, @PathVariable Integer socketId,
                                                       @RequestBody @Valid ChangeSocketAvailabilityDTO socketAvailabilityDTO,
                                                       @AuthenticationPrincipal CPO cpo) {
@@ -188,7 +191,7 @@ public class ChargingPointsManager {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/{id}/energySources/battery/{batteryId}")
+    @PutMapping("/api/CPO/chargingPoints/{id}/energySources/battery/{batteryId}")
     public ResponseEntity<?> includeBattery(@PathVariable String id, @PathVariable Integer batteryId,
                                             @RequestBody @Valid IncludeBatteryDTO includeBatteryDTO,
                                             @AuthenticationPrincipal CPO cpo) {
@@ -202,7 +205,7 @@ public class ChargingPointsManager {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/{id}/energySources/battery/{batteryId}/availability")
+    @PutMapping("/api/CPO/chargingPoints/{id}/energySources/battery/{batteryId}/availability")
     public ResponseEntity<?> changeBatteryAvailability(@PathVariable String id, @PathVariable Integer batteryId,
                                                        @RequestParam boolean available, @AuthenticationPrincipal CPO cpo) {
 
@@ -216,7 +219,7 @@ public class ChargingPointsManager {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{id}/dso/offers")
+    @GetMapping("/api/CPO/chargingPoints/{id}/dso/offers")
     public ResponseEntity<Iterable<DSOOffer>> getChargingPointDsoOffers(@PathVariable String id, @AuthenticationPrincipal CPO cpo) {
         Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointOfCpoById(id, cpo.getCpoCode());
         if (chargingPointOptional.isEmpty()) {
@@ -225,7 +228,7 @@ public class ChargingPointsManager {
         return new ResponseEntity<>(dsoOfferService.findOffersOfCp(chargingPointOptional.get().getId()), HttpStatus.OK);
     }
 
-    @PostMapping("/{id}/dso/offers/{offerId}")
+    @PostMapping("/api/CPO/chargingPoints/{id}/dso/offers/{offerId}")
     public ResponseEntity<?> changeDsoProvider(@PathVariable String id, @PathVariable String offerId,
                                                @RequestBody OfferTimeSlot offerTimeSlot, @AuthenticationPrincipal CPO cpo) {
         Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointOfCpoById(id, cpo.getCpoCode());

@@ -3,6 +3,7 @@ package softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.en
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,6 +18,7 @@ import java.util.List;
 public class EmspDetails implements UserDetails {
     @Id
     private String id;
+    @Indexed(unique = true)
     private String emspToken;
     private String url;
     private String cpoToken;
@@ -37,7 +39,7 @@ public class EmspDetails implements UserDetails {
         this.accountNonExpired = true;
         this.credentialNotExpired = true;
         this.accountNonLocked = true;
-        this.authorities = Collections.singletonList(new SimpleGrantedAuthority("EMSP"));
+        this.authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_EMSP"));
     }
 
     @Override
