@@ -1,7 +1,6 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSRequestSender;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.http.*;
@@ -13,11 +12,13 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointData
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.Socket;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.ChargingPointService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.SocketService;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.TariffService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.ChargingPointDTO;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.SocketDTO;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class LocationsSender {
@@ -25,11 +26,11 @@ public class LocationsSender {
     ChargingPointService cpService;
     @Autowired
     SocketService socketService;
-    @Value("${emsp.path}")
-    private String emspPath;
+    @Autowired
+    TariffService tariffService;
 
-    private String ocpiPath="/ocpi/cpo";
-    private RestTemplate restTemplate = new RestTemplate();
+    private final String ocpiPath="/ocpi/cpo";
+    private final RestTemplate restTemplate = new RestTemplate();
 
 
     public void getCps(ChargingPointOperator cpo){
@@ -40,7 +41,7 @@ public class LocationsSender {
 
         String urlTemplate = UriComponentsBuilder.fromHttpUrl(cpo.getCpmsUrl()+ocpiPath+"/locations").encode().toUriString();
 
-        ParameterizedTypeReference<Page<ChargingPointDTO>> typo = new ParameterizedTypeReference<Page<ChargingPointDTO>>() {};
+        ParameterizedTypeReference<Page<ChargingPointDTO>> typo = new ParameterizedTypeReference<>() {};
         ResponseEntity<Page<ChargingPointDTO>> response = restTemplate.exchange(
                 urlTemplate,
                 HttpMethod.GET,
@@ -49,7 +50,7 @@ public class LocationsSender {
         );
 
 
-        List<ChargingPointDTO> cps= response.getBody().getContent();
+        List<ChargingPointDTO> cps= Objects.requireNonNull(response.getBody()).getContent();
         for (ChargingPointDTO cp: cps) {
             ChargingPoint newCp = cpService.getCPById(cp.getCpId());
             if(newCp==null){
@@ -72,7 +73,6 @@ public class LocationsSender {
                 }
 
                 newSocket.setSocketId(s.getSocketId().toString());
-                newSocket.setChargingPoint(newCp);
                 newSocket.setAvailability(s.getAvailability());
                 newSocket.setStatus(s.getStatus());
                 newSocket.setType(s.getSocketType());
@@ -81,6 +81,9 @@ public class LocationsSender {
                 newCp.addSocket(newSocket);
             }
             newCp.setTariffsId(cp.getTariffIds());
+            for (String tid: cp.getTariffIds()) {
+                newCp.addTariff(tariffService.getTariffById(tid));
+            }
             cpService.save(newCp);
         }
     }
@@ -94,7 +97,7 @@ public class LocationsSender {
         //?date_from={DateTime}&date_to={DateTime}&offset=0&limit=10
         String urlTemplate = UriComponentsBuilder.fromHttpUrl(cp.getCpo().getCpmsUrl()+ocpiPath+"/locations/"+cp.getCpId()).encode().toUriString();
 
-        ParameterizedTypeReference<Page<ChargingPointDTO>> typo = new ParameterizedTypeReference<Page<ChargingPointDTO>>() {};
+        ParameterizedTypeReference<Page<ChargingPointDTO>> typo = new ParameterizedTypeReference<>() {};
         ResponseEntity<Page<ChargingPointDTO>> response = restTemplate.exchange(
                 urlTemplate,
                 HttpMethod.GET,
@@ -102,7 +105,7 @@ public class LocationsSender {
                 typo
         );
 
-        ChargingPointDTO cpResponse = response.getBody().getContent().get(0);
+        ChargingPointDTO cpResponse = Objects.requireNonNull(response.getBody()).getContent().get(0);
 
         ChargingPoint newCp = cpService.getCPById(cp.getCpId());
         if(newCp==null){
@@ -122,7 +125,6 @@ public class LocationsSender {
                 newSocket = new Socket();
             }
             newSocket.setSocketId(s.getSocketId().toString());
-            newSocket.setChargingPoint(newCp);
             newSocket.setAvailability(s.getAvailability());
             newSocket.setStatus(s.getStatus());
             newSocket.setType(s.getSocketType());
@@ -131,19 +133,22 @@ public class LocationsSender {
             newCp.addSocket(newSocket);
         }
         newCp.setTariffsId(cpResponse.getTariffIds());
+        for (String tid: cpResponse.getTariffIds()) {
+            newCp.addTariff(tariffService.getTariffById(tid));
+        }
         cpService.save(newCp);
     }
 
-    public void getSocket(Socket socket){
+    public void getSocket(Socket socket, ChargingPoint cp){
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
-        headers.set("Authorization", socket.getChargingPoint().getCpo().getTokenEmsp());
+        headers.set("Authorization", cp.getCpo().getTokenEmsp());
         HttpEntity<?> entity = new HttpEntity<>(headers);
 
         //?date_from={DateTime}&date_to={DateTime}&offset=0&limit=10
-        String urlTemplate = UriComponentsBuilder.fromHttpUrl(socket.getChargingPoint().getCpo().getCpmsUrl()+ocpiPath+"/locations/"+socket.getChargingPoint().getCpId() + "/" + socket.getSocketId()).encode().toUriString();
+        String urlTemplate = UriComponentsBuilder.fromHttpUrl(cp.getCpo().getCpmsUrl()+ocpiPath+"/locations/"+ cp.getCpId() + "/" + socket.getSocketId()).encode().toUriString();
 
-        ParameterizedTypeReference<Page<SocketDTO>> typo = new ParameterizedTypeReference<Page<SocketDTO>>() {};
+        ParameterizedTypeReference<Page<SocketDTO>> typo = new ParameterizedTypeReference<>() {};
         ResponseEntity<Page<SocketDTO>> response = restTemplate.exchange(
                 urlTemplate,
                 HttpMethod.GET,
@@ -151,14 +156,13 @@ public class LocationsSender {
                 typo
         );
 
-        SocketDTO socketResponse = response.getBody().getContent().get(0);
+        SocketDTO socketResponse = Objects.requireNonNull(response.getBody()).getContent().get(0);
 
         Socket newSocket = socketService.getSocketById(socketResponse.getSocketId().toString());
         if (newSocket==null){
             newSocket = new Socket();
         }
         newSocket.setSocketId(socketResponse.getSocketId().toString());
-        newSocket.setChargingPoint(socket.getChargingPoint());
         newSocket.setAvailability(socketResponse.getAvailability());
         newSocket.setStatus(socketResponse.getStatus());
         newSocket.setType(socketResponse.getSocketType());

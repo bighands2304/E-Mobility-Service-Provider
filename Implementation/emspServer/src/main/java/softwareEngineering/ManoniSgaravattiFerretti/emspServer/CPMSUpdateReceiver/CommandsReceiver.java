@@ -25,7 +25,7 @@ public class CommandsReceiver {
     //• STOP_SESSION
     //• UNLOCK_CONNECTOR
     @PostMapping("/{command}/{uid}")
-    public ResponseEntity<?> cancelReservation(@PathVariable String command, String uid, @RequestBody Map<String,String> commandResult){
+    public ResponseEntity<?> cancelReservation(@PathVariable String command, @PathVariable String uid, @RequestBody Map<String,String> commandResult){
         if (command.equals("CANCEL_RESERVATION")){
             if(commandResult.get("result").equals("ACCEPTED")) {
                 Reservation reservation = reservationService.getReservationById(Long.parseLong(uid));

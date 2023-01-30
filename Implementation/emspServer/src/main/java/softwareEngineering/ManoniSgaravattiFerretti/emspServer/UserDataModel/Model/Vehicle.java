@@ -24,8 +24,4 @@ public class Vehicle {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private List<UserVehicle> usersList = new ArrayList<>();
-
-    public void addUser(UserVehicle user){
-        this.usersList.add(user);
-    }
 }

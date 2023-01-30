@@ -1,10 +1,15 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.time.LocalTime;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
+@Document
 public class SpecialOffer extends Tariff{
     public SpecialOffer(){
         super.setIsSpecialOffer(true);

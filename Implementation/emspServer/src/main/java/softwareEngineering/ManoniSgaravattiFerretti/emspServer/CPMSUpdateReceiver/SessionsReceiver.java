@@ -21,7 +21,7 @@ public class SessionsReceiver {
 
         reservation.setStartTime(session.getStartDateTime());
         reservation.setId(session.getReservationId());
-        reservation.setSessionId(Long.parseLong(session.getSessionId()));
+        reservation.setSessionId(Long.parseLong(session_id));
         reservation.setSocketId(session.getSocketId());
 
         reservationService.save(reservation);
@@ -36,7 +36,7 @@ public class SessionsReceiver {
 
             reservation.setStartTime(session.getStartDateTime());
             reservation.setId(session.getReservationId());
-            reservation.setSessionId(Long.parseLong(session.getSessionId()));
+            reservation.setSessionId(Long.parseLong(session_id));
             reservation.setSocketId(session.getSocketId());
 
             reservationService.save(reservation);
@@ -53,7 +53,7 @@ public class SessionsReceiver {
             reservationService.save(reservation);
         }
 
-        if (session.getStatus().equals("ENDED")) {
+        if (session.getStatus().equals("COMPLETED")) {
             EndedReservation reservation = (EndedReservation) reservationService.getReservationById(session.getReservationId());
 
             reservation.setStartTime(session.getStartDateTime());

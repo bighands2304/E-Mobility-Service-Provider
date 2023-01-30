@@ -10,9 +10,6 @@ public class ChargingPointOperatorService {
     @Autowired
     ChargingPointOperatorRepository cpoRepository;
 
-    public ChargingPointOperator saveCPO(ChargingPointOperator cpo){return cpoRepository.save(cpo);}
-
-    public ChargingPointOperator getCPOById(String cpoId){return cpoRepository.findChargingPointOperatorByCpoId(cpoId);}
-
+    public void saveCPO(ChargingPointOperator cpo){cpoRepository.save(cpo);}
     public ChargingPointOperator searchCPOByToken(String token){return cpoRepository.findChargingPointOperatorByToken(token);}
 }

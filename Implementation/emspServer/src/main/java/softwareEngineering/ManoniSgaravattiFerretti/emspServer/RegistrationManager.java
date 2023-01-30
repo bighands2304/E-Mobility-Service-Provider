@@ -3,7 +3,6 @@ package softwareEngineering.ManoniSgaravattiFerretti.emspServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,7 +34,6 @@ public class RegistrationManager {
             userService.saveUser(user);
             return ResponseEntity.ok(user);
         }catch (Exception e){
-            System.out.println(e);
             return ResponseEntity.badRequest().body(e);
         }
     }

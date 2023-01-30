@@ -40,8 +40,6 @@ public class LocationsReceiver {
             newSocket.setStatus(s.getStatus());
             newSocket.setLastUpdate(s.getLastUpdate());
             newSocket.setAvailability(s.getAvailability());
-            newSocket.setChargingPoint(newCp);
-
             newCp.addSocket(newSocket);
 
             socketService.save(newSocket);
@@ -60,7 +58,6 @@ public class LocationsReceiver {
         newSocket.setStatus(socket.getStatus());
         newSocket.setLastUpdate(socket.getLastUpdate());
         newSocket.setAvailability(socket.getAvailability());
-        newSocket.setChargingPoint(chargingPoint);
 
         chargingPoint.addSocket(newSocket);
 
@@ -86,7 +83,7 @@ public class LocationsReceiver {
     }
 
     @PatchMapping("/{cp_id}/{socket_id}")
-    public ResponseEntity<?> patchSocket(@PathVariable String cp_id, String socket_id, @RequestBody SocketDTO updatedSocket){
+    public ResponseEntity<?> patchSocket(@PathVariable String cp_id, @PathVariable String socket_id, @RequestBody SocketDTO updatedSocket){
         ChargingPoint chargingPoint = cpService.getCPById(cp_id);
         Socket socket = chargingPoint.getSockets().stream().filter(socket1 -> socket1.getSocketId().equals(socket_id)).toList().get(0);
 

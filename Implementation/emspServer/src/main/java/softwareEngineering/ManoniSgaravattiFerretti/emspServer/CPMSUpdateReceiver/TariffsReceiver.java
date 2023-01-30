@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.TariffDTO;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.SpecialOffer;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.Tariff;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.ChargingPointService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.TariffService;
 
 @RestController
@@ -14,11 +13,9 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointData
 public class TariffsReceiver {
     @Autowired
     TariffService tariffService;
-    @Autowired
-    ChargingPointService cpService;
 
     @PutMapping ("/{tariff_id}")
-    public ResponseEntity<?> putTariff(@PathVariable String tariff_id, @RequestBody TariffDTO tariff, @RequestHeader("Authorization") String auth){
+    public ResponseEntity<?> putTariff(@PathVariable String tariff_id, @RequestBody TariffDTO tariff){
         Tariff newTariff = new Tariff();
         newTariff.setTariffId(tariff_id);
         newTariff.setPrice(tariff.getPrice());
@@ -26,7 +23,6 @@ public class TariffsReceiver {
         newTariff.setSocketType(tariff.getSocketType());
         newTariff.setStartDate(tariff.getStartDate());
         newTariff.setStepSize(tariff.getStepSize());
-        newTariff.setChargingPoint(cpService.getCPById(tariff.getCpId()));
 
         if(tariff.isSpecialOffer()){
             SpecialOffer newSpecialOffer = (SpecialOffer) newTariff;

@@ -2,9 +2,7 @@ package softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs;
 
 import lombok.Data;
 
-import java.nio.DoubleBuffer;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -30,10 +28,6 @@ public class TariffDTO {
     private List<String> daysOfTheWeek;
 
     public Boolean isSpecialOffer(){
-        if (startTime==null && endTime==null && minKWh==null && maxKWh==null && minCurrent==null && maxCurrent==null && minDuration==null && maxDuration==null && daysOfTheWeek==null){
-            return false;
-        }else {
-            return true;
-        }
+        return startTime != null || endTime != null || minKWh != null || maxKWh != null || minCurrent != null || maxCurrent != null || minDuration != null || maxDuration != null || daysOfTheWeek != null;
     }
 }

@@ -1,6 +1,5 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data

@@ -10,6 +10,7 @@ public class SessionDTO {
     private Long reservationId;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
+    private LocalDateTime expiryDate;
     private Double kwh;
     private String chargingPointId;
     private String socketId;

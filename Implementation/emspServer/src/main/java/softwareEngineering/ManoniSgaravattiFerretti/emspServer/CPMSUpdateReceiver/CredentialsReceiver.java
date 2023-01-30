@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.AuthManager.TokenManager;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSRequestSender.LocationsSender;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.CredentialDTO;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.ChargingPointOperator;
@@ -23,8 +22,6 @@ public class CredentialsReceiver {
     LocationsSender locations;
     @Autowired
     ChargingPointOperatorService cpoService;
-    @Autowired
-    TokenManager tokenManager;
     @Value("${emsp.path}")
     private String emspPath;
 

@@ -14,7 +14,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.ChargingPointOperator;
 
 import java.io.IOException;
 import java.util.Date;
@@ -31,8 +30,8 @@ public class TokenManager extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException{
         final String authorizationHeader = request.getHeader("Authorization");
-        String username=null;
-        String jwt=null;
+        String username;
+        String jwt;
 
         if(authorizationHeader!=null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);

@@ -2,7 +2,6 @@ package softwareEngineering.ManoniSgaravattiFerretti.emspServer.AuthManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -46,11 +45,11 @@ public class LoginManager implements UserDetailsService {
         if (cpo == null){
             throw new UsernameNotFoundException("Invalid token");
         }
-        return new ChargingPointOperator(cpo);
+        return new ChargingPointOperator();
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> payload) throws Exception {
+    public ResponseEntity<?> login(@RequestBody Map<String, String> payload){
         String username = payload.get("username");
         String password = payload.get("password");
         try{
@@ -61,7 +60,7 @@ public class LoginManager implements UserDetailsService {
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e);
         }
-        //Load the userdetails
+        //Load the userDetails
         final User userDetails = loadUserByUsername(username);
         //Generate a jwt based on the user
         final String jwt = tokenManager.generateToken(userDetails);

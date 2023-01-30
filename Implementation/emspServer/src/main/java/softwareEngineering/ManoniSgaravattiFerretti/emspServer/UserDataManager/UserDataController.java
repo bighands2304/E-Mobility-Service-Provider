@@ -3,7 +3,6 @@ package softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.AuthManager.TokenManager;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.Reservation;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.User;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.UserVehicle;
@@ -21,8 +20,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/user")
 public class UserDataController {
 
-    @Autowired
-    TokenManager tokenManager;
     @Autowired
     UserService userService;
     @Autowired
@@ -73,7 +70,7 @@ public class UserDataController {
     @GetMapping("/getUserVehicles")
     public ResponseEntity<?> getUserVehicles(@RequestBody Map<String, String> payload){
         List<UserVehicle> uv = userVehicleService.getUserVehicles(Long.parseLong(payload.get("userId")));
-        List<Vehicle> vehicles = uv.stream().map(u -> u.getVehicle()).collect(Collectors.toList());
+        List<Vehicle> vehicles = uv.stream().map(UserVehicle::getVehicle).collect(Collectors.toList());
         return ResponseEntity.ok(vehicles);
     }
 

@@ -4,6 +4,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,29 +14,20 @@ import java.util.Collection;
 import java.util.List;
 
 @Data
+@Document
 public class ChargingPointOperator implements UserDetails{
     public ChargingPointOperator(){
-        this.authorities.add(new SimpleGrantedAuthority("ROLE_CPMS"));
-    }
-    public ChargingPointOperator(ChargingPointOperator cpo){
-        this.cpoId=cpo.cpoId;
-        this.token=cpo.token;
-        this.tokenEmsp=cpo.tokenEmsp;
-        this.iban=cpo.iban;
-        this.cpmsUrl=cpo.cpmsUrl;
-        this.chargingPoints=cpo.chargingPoints;
         this.authorities.add(new SimpleGrantedAuthority("ROLE_CPMS"));
     }
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
+    private String id;
     private String cpoId;
     private String token;
     private String tokenEmsp;
     private String iban;
     private String cpmsUrl;
-    private List<ChargingPoint> chargingPoints = new ArrayList<>();
-
     private List<GrantedAuthority> authorities = new ArrayList<>();
 
     @Override
