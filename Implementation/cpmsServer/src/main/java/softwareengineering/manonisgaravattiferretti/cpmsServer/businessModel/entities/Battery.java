@@ -1,13 +1,11 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 @Data
 public class Battery {
-    @Id
+    @Indexed
     private Integer batteryId;
     private String status;
     private Double maxCapacity;

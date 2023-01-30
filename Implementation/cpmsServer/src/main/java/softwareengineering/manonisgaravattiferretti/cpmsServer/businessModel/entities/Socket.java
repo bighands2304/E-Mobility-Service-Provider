@@ -13,7 +13,7 @@ import java.util.List;
 @Document(collection = "sockets")
 public class Socket {
     @Id
-    private int id;
+    private String id;
     @Indexed
     private Integer socketId; // the id visible to the emsp
     @JsonIgnore
