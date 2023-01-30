@@ -1,5 +1,6 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSUpdateReceiver;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.ChargingPointDTO;
@@ -13,8 +14,11 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointData
 @RestController
 @RequestMapping("/ocpi/emsp/locations")
 public class LocationsReceiver {
+    @Autowired
     ChargingPointService cpService;
+    @Autowired
     SocketService socketService;
+    @Autowired
     ChargingPointOperatorService cpoService;
 
     @PutMapping("/{cp_id}")

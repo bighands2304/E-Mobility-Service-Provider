@@ -1,5 +1,6 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSUpdateReceiver;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.SessionDTO;
@@ -11,6 +12,7 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Ser
 @RestController
 @RequestMapping("/ocpi/emsp/sessions")
 public class SessionsReceiver {
+    @Autowired
     ReservationService reservationService;
 
     @PutMapping("/{session_id}")

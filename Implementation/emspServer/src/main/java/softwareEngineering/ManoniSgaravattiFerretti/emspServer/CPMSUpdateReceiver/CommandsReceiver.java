@@ -1,5 +1,6 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSUpdateReceiver;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.ActiveReservation;
@@ -14,6 +15,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/ocpi/emsp/commands")
 public class CommandsReceiver {
+    @Autowired
     ReservationService reservationService;
 
     //List of commands:

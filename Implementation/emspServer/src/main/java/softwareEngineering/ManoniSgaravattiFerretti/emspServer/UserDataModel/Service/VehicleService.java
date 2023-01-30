@@ -7,6 +7,7 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Rep
 
 @Service
 public class VehicleService {
+    @Autowired
     VehicleRepository vehicleRepository;
 
     public void saveVehicle(Vehicle vehicle){vehicleRepository.save(vehicle);}

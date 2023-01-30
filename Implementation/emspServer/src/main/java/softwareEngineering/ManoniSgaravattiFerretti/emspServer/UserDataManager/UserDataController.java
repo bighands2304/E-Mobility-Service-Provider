@@ -1,5 +1,6 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataManager;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.Reservation;
@@ -19,9 +20,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/user")
 public class UserDataController {
 
+    @Autowired
     UserService userService;
+    @Autowired
     VehicleService vehicleService;
+    @Autowired
     UserVehicleService userVehicleService;
+    @Autowired
     ReservationService reservationService;
 
     @PostMapping("/addVehicle")
