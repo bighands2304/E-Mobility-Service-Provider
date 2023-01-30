@@ -2,6 +2,7 @@ package softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.en
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.List;
 @Data
 public class ChargingProfile {
     @Id
+    @Indexed
     private int id;
     private String recurrencyKind;
     private LocalDateTime validFrom;

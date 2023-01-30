@@ -5,15 +5,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.CPOLoginDTO;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.ChangePasswordDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.CPO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.CPOService;
 
@@ -59,5 +63,16 @@ public class LoginManager {
         response.put("jwt", jwt);
         response.put("user", cpoService.getCPOData(loginDTO.getCpoCode()));
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/api/CPO/changePassword")
+    public ResponseEntity<CPO> changePassword(@AuthenticationPrincipal CPO cpo,
+                                            @RequestBody @Valid ChangePasswordDTO changePasswordDTO) {
+        if (!changePasswordDTO.getOldPassword().equals(cpo.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Old password not correct");
+        }
+        cpo.setPassword(changePasswordDTO.getNewPassword());
+        cpoService.insertCPO(cpo);
+        return new ResponseEntity<>(cpo, HttpStatus.OK);
     }
 }

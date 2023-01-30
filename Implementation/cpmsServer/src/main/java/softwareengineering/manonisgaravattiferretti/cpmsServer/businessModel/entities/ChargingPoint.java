@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
@@ -18,6 +19,7 @@ public class ChargingPoint {
     @Indexed(unique = true)
     private String cpId;
     private String name;
+    @TextIndexed
     private String address;
     private Double latitude;
     private Double longitude;
