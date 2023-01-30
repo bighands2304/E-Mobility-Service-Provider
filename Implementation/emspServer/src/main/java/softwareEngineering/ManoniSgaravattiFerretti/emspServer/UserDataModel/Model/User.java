@@ -12,7 +12,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Data
 @Entity
@@ -34,6 +33,8 @@ public class User implements UserDetails {
         this.surname = user.surname;
         this.email = user.email;
         this.password = user.password;
+        this.vehicleList=user.vehicleList;
+        this.reservations=user.reservations;
         this.enable = true;
         this.accountNonExpired = true;
         this.credentialExpired = true;
@@ -90,9 +91,5 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return enable;
-    }
-
-    public void addVehicle(UserVehicle vehicle){
-        this.vehicleList.add(vehicle);
     }
 }

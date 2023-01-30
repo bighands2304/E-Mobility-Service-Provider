@@ -2,10 +2,14 @@ package softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDat
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalTime;
+import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
+@Document
 public class SpecialOffer extends Tariff{
     public SpecialOffer(){
         super.setIsSpecialOffer(true);
@@ -16,7 +20,7 @@ public class SpecialOffer extends Tariff{
     private Double maxKWh;
     private Double minCurrent;
     private Double maxCurrent;
-    private Double minDuration;
-    private Double maxDuration;
-    private String daysOfTheWeek;
+    private Integer minDuration;
+    private Integer maxDuration;
+    private List<String> daysOfTheWeek;
 }

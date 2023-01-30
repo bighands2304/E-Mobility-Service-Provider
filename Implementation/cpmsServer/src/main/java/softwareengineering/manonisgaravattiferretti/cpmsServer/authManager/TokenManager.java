@@ -14,7 +14,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.EmspDetails;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.CPOService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.EmspDetailsService;
 
@@ -22,18 +21,19 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 
 @Service
 public class TokenManager extends OncePerRequestFilter {
     private final CPOService cpoUserDetails;
     private final EmspDetailsService emspDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
 
     @Autowired
-    public TokenManager(CPOService cpoUserDetails, EmspDetailsService emspDetailsService) {
+    public TokenManager(CPOService cpoUserDetails, EmspDetailsService emspDetailsService, UserDetailsServiceImpl userDetailsService) {
         this.cpoUserDetails = cpoUserDetails;
         this.emspDetailsService = emspDetailsService;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -48,7 +48,7 @@ public class TokenManager extends OncePerRequestFilter {
             username = extractUsername(jwt);
 
             if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
-                UserDetails userDetails = this.cpoUserDetails.loadUserByUsername(username);
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
                 if(validateToken(jwt,userDetails)){
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -57,7 +57,7 @@ public class TokenManager extends OncePerRequestFilter {
             }
         }
         if (authorizationHeader != null) {
-            UserDetails emspDetails = this.emspDetailsService.loadUserByUsername(authorizationHeader);
+            UserDetails emspDetails = this.userDetailsService.loadEmspByToken(authorizationHeader);
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(emspDetails, null, emspDetails.getAuthorities());
             usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);

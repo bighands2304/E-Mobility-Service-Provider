@@ -1,6 +1,5 @@
-package softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSUpdateReceiver.OcpiDTOs;
+package softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
@@ -10,5 +9,4 @@ public class CredentialDTO {
     private String iban;
     private String cpmsToken;
     private String emspToken;
-
 }

@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -18,11 +17,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class AuthorizationManager {
 
     @Autowired
@@ -34,8 +32,7 @@ public class AuthorizationManager {
         http.cors();
         http
                 .authorizeHttpRequests()
-                .requestMatchers("/").permitAll()
-                .requestMatchers("/register", "/login", "/ocpi/emsp/2.2/credentials").permitAll()
+                .requestMatchers("/**", "/ocpi/emsp/credentials").permitAll()
                 .requestMatchers("/ocpi/**").hasRole("CPMS")
                 .requestMatchers("/user/**").hasRole("USER")
                 .anyRequest()
@@ -72,7 +69,7 @@ public class AuthorizationManager {
 
 
         CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
-        corsConfiguration.setAllowedMethods(Arrays.asList("*"));
+        corsConfiguration.setAllowedMethods(List.of("*"));
         source.registerCorsConfiguration("/**", corsConfiguration);
 
         return source;

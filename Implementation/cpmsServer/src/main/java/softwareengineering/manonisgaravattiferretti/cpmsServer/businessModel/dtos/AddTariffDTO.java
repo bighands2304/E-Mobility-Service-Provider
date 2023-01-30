@@ -1,5 +1,6 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -24,6 +25,7 @@ public class AddTariffDTO {
     @NotNull
     private Integer stepSize;
 
+    @JsonIgnore
     private Boolean isSpecialOffer;
 
     // Optional parameters (only for add special offer)

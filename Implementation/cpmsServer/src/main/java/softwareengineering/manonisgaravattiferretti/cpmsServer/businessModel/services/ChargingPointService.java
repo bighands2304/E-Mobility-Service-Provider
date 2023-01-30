@@ -44,6 +44,10 @@ public class ChargingPointService {
         return chargingPointOptional;
     }
 
+    public Optional<ChargingPoint> findChargingPointByInternalId(String id) {
+        return chargingPointRepository.findById(id);
+    }
+
     public Optional<ChargingPoint> findChargingPointOfCpoById(String id, String cpoCode) {
         return chargingPointRepository.findChargingPointByCpIdAndCpoCode(id, cpoCode);
     }
@@ -97,10 +101,6 @@ public class ChargingPointService {
 
     public Optional<ChargingPoint> findChargingPointByAuthKey(String authKey) {
         return chargingPointRepository.findChargingPointByAuthenticationKey(authKey);
-    }
-
-    public void removeCpById(String id) {
-        chargingPointRepository.deleteById(id);
     }
 
     public List<ChargingPoint> findAll() {

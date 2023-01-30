@@ -3,10 +3,12 @@ package softwareengineering.manonisgaravattiferretti.cpmsServer.socketStatusMana
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.EMSPUpdateSender;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.Reservation;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.ReservationService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.SocketService;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.utils.EntityFromDTOConverter;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.cpManager.PriceManager;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.emspUpdateSender.OcpiSessionSender;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.socketStatusManager.events.SessionStoppedEvent;
 
 import java.util.Optional;
@@ -14,14 +16,22 @@ import java.util.Optional;
 @Component
 public class SessionStoppedListener implements ApplicationListener<SessionStoppedEvent> {
     private final SocketService socketService;
-    private final EMSPUpdateSender emspUpdateSender;
+    private final OcpiSessionSender ocpiSessionSender;
     private final ReservationService reservationService;
+    private final SocketStatusListener socketStatusListener;
+    private final PriceManager priceManager;
 
     @Autowired
-    public SessionStoppedListener(SocketService socketService, EMSPUpdateSender emspUpdateSender, ReservationService reservationService) {
+    public SessionStoppedListener(SocketService socketService,
+                                  OcpiSessionSender ocpiSessionSender,
+                                  ReservationService reservationService,
+                                  SocketStatusListener socketStatusListener,
+                                  PriceManager priceManager) {
         this.socketService = socketService;
-        this.emspUpdateSender = emspUpdateSender;
+        this.ocpiSessionSender = ocpiSessionSender;
         this.reservationService = reservationService;
+        this.socketStatusListener = socketStatusListener;
+        this.priceManager = priceManager;
     }
 
     @Override
@@ -35,6 +45,12 @@ public class SessionStoppedListener implements ApplicationListener<SessionStoppe
         String cpId = reservationOptional.get().getSocket().getCpId();
         Integer socketId = reservationOptional.get().getSocket().getSocketId();
         socketService.updateSocketStatus(cpId, socketId, "AVAILABLE");
-        //todo: send update to emsp
+        Reservation reservation = reservationOptional.get();
+        reservation.setStatus("ENDED");
+        reservation.setLastUpdated(event.getTime());
+        reservation.setTotalCost(priceManager.applyTariff(event.getSessionId(), reservation.getSocket().getCpId()));
+        ocpiSessionSender.patchSession(EntityFromDTOConverter.chargingSessionDTOFromReservation(reservation),
+                reservation.getEmspDetails());
+        socketStatusListener.onSocketUpdate(cpId, socketId);
     }
 }

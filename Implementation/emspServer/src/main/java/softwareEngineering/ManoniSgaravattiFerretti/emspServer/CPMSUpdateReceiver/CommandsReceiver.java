@@ -1,6 +1,5 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSUpdateReceiver;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.ActiveReservation;
@@ -13,9 +12,8 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/ocpi/emsp/2.2/commands")
-public class Commands {
-    @Autowired
+@RequestMapping("/ocpi/emsp/commands")
+public class CommandsReceiver {
     ReservationService reservationService;
 
     //List of commands:
@@ -25,7 +23,7 @@ public class Commands {
     //• STOP_SESSION
     //• UNLOCK_CONNECTOR
     @PostMapping("/{command}/{uid}")
-    public ResponseEntity<?> cancelReservation(@PathVariable String command, String uid, @RequestBody Map<String,String> commandResult){
+    public ResponseEntity<?> cancelReservation(@PathVariable String command, @PathVariable String uid, @RequestBody Map<String,String> commandResult){
         if (command.equals("CANCEL_RESERVATION")){
             if(commandResult.get("result").equals("ACCEPTED")) {
                 Reservation reservation = reservationService.getReservationById(Long.parseLong(uid));
@@ -71,14 +69,6 @@ public class Commands {
                 reservationService.delete(reservation);
             }
         }
-
-        if (command.equals("UNLOCK_CONNECTOR")){
-            if(commandResult.get("result").equals("ACCEPTED")){
-                //TODO insert some action
-            }
-        }
-
-
 
         return ResponseEntity.noContent().build();
     }

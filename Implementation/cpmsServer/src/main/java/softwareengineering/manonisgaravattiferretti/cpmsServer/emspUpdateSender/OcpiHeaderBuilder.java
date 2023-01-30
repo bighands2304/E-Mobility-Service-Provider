@@ -11,7 +11,7 @@ public class OcpiHeaderBuilder {
         return WebClient.create()
                 .method(method)
                 .uri(emspDetails.getUrl() + "/ocpi/emsp/" + endPoint)
-                .header("Authorization", emspDetails.getEmspToken())
+                .header("Authorization", emspDetails.getCpoToken())
                 .contentType(MediaType.APPLICATION_JSON);
     }
 }

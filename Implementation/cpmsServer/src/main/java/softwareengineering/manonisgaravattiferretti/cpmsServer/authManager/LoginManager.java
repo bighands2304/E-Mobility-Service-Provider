@@ -22,14 +22,16 @@ import java.util.Map;
 
 @RestController
 public class LoginManager {
+    private final UserDetailsServiceImpl userDetailsService;
     private final CPOService cpoService;
     private final AuthenticationManager authenticationManager;
     private final TokenManager tokenManager;
     private final Logger logger = LoggerFactory.getLogger(LoginManager.class);
 
     @Autowired
-    public LoginManager(CPOService cpoService, @Lazy AuthenticationManager authenticationManager,
-                        TokenManager tokenManager) {
+    public LoginManager(UserDetailsServiceImpl userDetailsService, CPOService cpoService,
+                        @Lazy AuthenticationManager authenticationManager, TokenManager tokenManager) {
+        this.userDetailsService = userDetailsService;
         this.cpoService = cpoService;
         this.authenticationManager = authenticationManager;
         this.tokenManager = tokenManager;
@@ -47,7 +49,7 @@ public class LoginManager {
             throw new AccessDeniedException("Bad credentials");
         }
         //Cerco l'esistenza dell'utente nel db
-        final CPO userDetails = cpoService.loadUserByUsername(loginDTO.getCpoCode());
+        final CPO userDetails = userDetailsService.loadUserByUsername(loginDTO.getCpoCode());
         //Genero la stringa jwt relativa a quell'utente
         final String jwt = tokenManager.generateToken(userDetails);
 

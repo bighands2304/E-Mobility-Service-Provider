@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.ChargingSessionDTO;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.EmspChargingPointDTO;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.EmspChargingPointDTOWithId;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.EmspSocketDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.*;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.ChargingPointService;
@@ -32,23 +32,23 @@ public class SocketStatusController {
     }
 
     @GetMapping("/ocpi/cpo/locations")
-    public ResponseEntity<Iterable<EmspChargingPointDTO>> getCps(@RequestParam(required = false) LocalDateTime dateFrom,
+    public ResponseEntity<Iterable<EmspChargingPointDTOWithId>> getCps(@RequestParam(required = false) LocalDateTime dateFrom,
                                                                  @RequestParam(required = false) LocalDateTime dateTo,
                                                                  @RequestParam(defaultValue = "0") Integer offset,
                                                                  @RequestParam(defaultValue = "100") Integer limit) {
         Page<ChargingPoint> chargingPoints = (dateFrom == null) ? chargingPointService.findAllPaginated(offset, limit) :
                 chargingPointService.findAllLastUpdatePaginated(dateFrom, dateTo, offset, limit);
-        Page<EmspChargingPointDTO> chargingPointDTOS = chargingPoints.map(
-                EntityFromDTOConverter::emspChargingPointDTOFromChargingPoint);
+        Page<EmspChargingPointDTOWithId> chargingPointDTOS = chargingPoints.map(
+                EntityFromDTOConverter::emspChargingPointDTOWithIdFromChargingPoint);
         return new ResponseEntity<>(chargingPointDTOS, HttpStatus.OK);
     }
 
     @GetMapping("/ocpi/cpo/locations/{cpId}")
-    public ResponseEntity<EmspChargingPointDTO> getCp(@PathVariable String cpId) {
+    public ResponseEntity<EmspChargingPointDTOWithId> getCp(@PathVariable String cpId) {
         Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointById(cpId);
         ChargingPoint chargingPoint = chargingPointOptional.orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Charging point not found"));
-        return new ResponseEntity<>(EntityFromDTOConverter.emspChargingPointDTOFromChargingPoint(chargingPoint), HttpStatus.OK);
+        return new ResponseEntity<>(EntityFromDTOConverter.emspChargingPointDTOWithIdFromChargingPoint(chargingPoint), HttpStatus.OK);
     }
 
     @GetMapping("/ocpi/cpo/locations/{cpId}/{socketId}")

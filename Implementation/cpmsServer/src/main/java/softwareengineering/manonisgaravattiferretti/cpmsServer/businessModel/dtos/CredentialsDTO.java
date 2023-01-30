@@ -1,12 +1,12 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class EmspCredentialsDTO {
-    @NotBlank
+public class CredentialsDTO {
     private String emspToken;
-    @NotBlank
-    private String url;
+    private String emspUrl;
+    private String cpmsUrl;
+    private String cpmsToken;
+    private String iban;
 }
