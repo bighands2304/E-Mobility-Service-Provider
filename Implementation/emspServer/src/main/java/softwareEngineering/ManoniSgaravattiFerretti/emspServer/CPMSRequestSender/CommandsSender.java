@@ -19,6 +19,7 @@ public class CommandsSender {
         headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
         headers.set("Authorization", cp.getCpo().getTokenEmsp());
 
+        //setting the session parameters
         SessionDTO session = new SessionDTO();
         session.setReservationId(reservation.getId());
         session.setChargingPointId(cp.getCpId());
