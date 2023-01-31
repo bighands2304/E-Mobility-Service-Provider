@@ -57,8 +57,6 @@ public class TokenManager extends OncePerRequestFilter {
                     usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
                     logger.info("Authenticated cpo: " + usernamePasswordAuthenticationToken.getPrincipal());
-
-                    logger.info("Authenticated cpo: " + request.getUserPrincipal());
                 }
             }
         } else if (authorizationHeader != null) {

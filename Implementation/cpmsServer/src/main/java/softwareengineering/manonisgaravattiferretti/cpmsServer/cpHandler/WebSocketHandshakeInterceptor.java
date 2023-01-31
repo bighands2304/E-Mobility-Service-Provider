@@ -24,7 +24,7 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
         logger.info("Starting connection handshake form url " + request.getRemoteAddress().getHostString());
-        if (request instanceof ServletServerHttpRequest servletRequest) {
+        /*if (request instanceof ServletServerHttpRequest servletRequest) {
             HttpServletRequest httpServletRequest = servletRequest.getServletRequest();
             String token = httpServletRequest.getParameter("token");
             HttpSession session = servletRequest.getServletRequest().getSession();
@@ -34,7 +34,8 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
             }
         }
         response.setStatusCode(HttpStatus.UNAUTHORIZED);
-        return false;
+        return false;*/
+        return true;
     }
 
     @Override

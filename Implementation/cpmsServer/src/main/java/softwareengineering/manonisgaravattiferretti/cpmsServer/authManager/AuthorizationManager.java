@@ -20,6 +20,7 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.ser
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.EmspDetailsService;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -35,7 +36,7 @@ public class AuthorizationManager {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable();
-        http.cors();
+        http.cors().configurationSource(corsConfigurationSource());
         http
                 .authorizeHttpRequests()
                 //.requestMatchers("/", "/api/CPO/**", "/ocpi/cpo/**", "/ws").permitAll()
@@ -68,7 +69,9 @@ public class AuthorizationManager {
     CorsConfigurationSource corsConfigurationSource() {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
-        corsConfiguration.setAllowedMethods(Arrays.asList("*"));
+        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
+        corsConfiguration.setAllowCredentials(true);
+        corsConfiguration.addAllowedOriginPattern("*");
         source.registerCorsConfiguration("/**", corsConfiguration);
         return source;
     }
