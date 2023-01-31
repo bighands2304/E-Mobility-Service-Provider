@@ -50,7 +50,7 @@ public class DSOOfferService {
     }
 
     public Optional<DSOOffer> findDSOOfferFromCpAndTimeSlot(String cpId, OfferTimeSlot offerTimeSlot, boolean inUse) {
-        return dsoOfferRepository.findDSOOfferByChargingPointInternalIdAndAvailableTimeSlotAndInUse(cpId, offerTimeSlot, inUse);
+        return dsoOfferRepository.findDSOOfferByChargingPointIdAndAvailableTimeSlotAndInUse(cpId, offerTimeSlot, inUse);
     }
 
     public void registerDso(String dsoId, String cpId, String dsoToken, String dsoUrl, String companyName, String cpoToken) {

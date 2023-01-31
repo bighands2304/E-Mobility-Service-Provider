@@ -10,7 +10,5 @@ import java.util.Optional;
 @Repository
 public interface SocketRepository extends MongoRepository<Socket, String>, SocketCustomUpdate {
     Optional<Socket> findSocketByCpIdAndSocketId(String cpId, Integer socketId);
-    Optional<Socket> findSocketByInternalCpIdAndSocketId(String cpId, Integer socketId);
     List<Socket> findSocketsByCpId(String cpId);
-    List<Socket> findSocketsByInternalCpId(String cpInternalId);
 }

@@ -30,14 +30,14 @@ public class EnergyMixManager implements ApplicationListener<ToggleEnergyMixOpti
         energyMixOptimizer.switchOptimizer(event.getCpId(), event.isAutomatic());
     }
 
-    public boolean includeBattery(IncludeBatteryDTO includeBatteryDTO, String cpId, Integer batteryId) {
+    public boolean includeBattery(IncludeBatteryDTO includeBatteryDTO, String cpInternalId, Integer batteryId) {
         if (includeBatteryDTO.getMinLevel() > includeBatteryDTO.getMaxLevel()) {
             return false;
         }
-        chargingPointService.updateIncludeBattery(includeBatteryDTO, cpId, batteryId);
-        chargingPointService.updateToggleOptimizer(cpId, "EnergyMix", false);
-        energyMixOptimizer.switchOptimizer(cpId, false);
-        EnergyChangeEvent energyChangeEvent = new EnergyChangeEvent(this, cpId);
+        chargingPointService.updateIncludeBattery(includeBatteryDTO, cpInternalId, batteryId);
+        chargingPointService.updateToggleOptimizer(cpInternalId, "EnergyMix", false);
+        energyMixOptimizer.switchOptimizer(cpInternalId, false);
+        EnergyChangeEvent energyChangeEvent = new EnergyChangeEvent(this, cpInternalId);
         applicationEventPublisher.publishEvent(energyChangeEvent);
         return true;
     }

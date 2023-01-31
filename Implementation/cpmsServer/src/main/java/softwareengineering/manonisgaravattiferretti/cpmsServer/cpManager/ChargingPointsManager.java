@@ -24,6 +24,7 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.eve
 import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.events.ToggleEnergyMixOptimizerEvent;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.socketStatusManager.events.SocketAvailabilityEvent;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -88,7 +89,7 @@ public class ChargingPointsManager {
         if (chargingPointOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Charging point not found");
         }
-        return ResponseEntity.ok(socketService.findCpSocketsByInternalId(cpId));
+        return ResponseEntity.ok(chargingPointOptional.get().getSockets());
     }
 
     @GetMapping("/api/CPO/chargingPoints/{cpId}/sockets/{socketId}")
@@ -98,7 +99,8 @@ public class ChargingPointsManager {
         if (chargingPointOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Charging point not found");
         }
-        Optional<Socket> socketOptional = socketService.findSocketByCpInternalIdAndSocketId(cpId, socketId);
+        Optional<Socket> socketOptional = chargingPointOptional.get().getSockets().stream()
+                .filter(socket -> Objects.equals(socket.getSocketId(), socketId)).findFirst();
         if (socketOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Socket not found");
         }
@@ -131,7 +133,7 @@ public class ChargingPointsManager {
 
     @PostMapping("/api/CPO/chargingPoints/{id}/tariffs")
     public ResponseEntity<Tariff> addNewTariff(@PathVariable String id, @AuthenticationPrincipal CPO cpo,
-                                          @RequestBody AddTariffDTO addTariffDTO) {
+                                               @RequestBody AddTariffDTO addTariffDTO) {
         Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(id, cpo.getCpoCode());
         if (chargingPointOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Charging point not found");
@@ -234,7 +236,7 @@ public class ChargingPointsManager {
         if (chargingPointOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "charging point not found");
         }
-        if(!dsoManager.changeDsoProviderManual(id, offerId, offerTimeSlot)) {
+        if(!dsoManager.changeDsoProviderManual(id, chargingPointOptional.get().getCpId(), offerId, offerTimeSlot)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "parameters not correct");
         }
         return ResponseEntity.status(HttpStatus.OK).build();

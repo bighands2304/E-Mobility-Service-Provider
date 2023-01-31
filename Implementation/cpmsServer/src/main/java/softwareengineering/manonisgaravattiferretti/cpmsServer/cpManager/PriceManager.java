@@ -55,7 +55,9 @@ public class PriceManager implements ApplicationListener<TogglePriceOptimizerEve
         chargingPointService.addTariff(cpId, tariff);
         List<EmspDetails> emspDetailsList = emspDetailsService.findAll();
         for (EmspDetails emspDetails: emspDetailsList) {
-            ocpiTariffSender.putTariff(addTariffDTO, id, emspDetails);
+            if (emspDetails.getUrl() != null) {
+                ocpiTariffSender.putTariff(addTariffDTO, id, emspDetails);
+            }
         }
         return tariff;
     }

@@ -35,12 +35,12 @@ public class DSOManager implements ApplicationListener<ToggleDsoSelectionOptimiz
         dsoSelectionOptimizer.switchOptimizer(event.getCpId(), event.isAutomatic());
     }
 
-    public boolean changeDsoProviderManual(String cpId, String offerId, OfferTimeSlot offerTimeSlot) {
+    public boolean changeDsoProviderManual(String cpInternalId, String cpId, String offerId, OfferTimeSlot offerTimeSlot) {
         Optional<DSOOffer> dsoOfferOptional = dsoOfferService.findOfferById(offerId);
         if (dsoOfferOptional.isEmpty() || !dsoOfferOptional.get().getChargingPointId().equals(cpId)) {
             return false;
         }
-        dsoSelectionOptimizer.switchOptimizer(cpId, false);
+        dsoSelectionOptimizer.switchOptimizer(cpInternalId, false);
         DSOOffer dsoOffer = dsoOfferOptional.get();
         if (dsoOffer.isInUse()) {
             return true;
