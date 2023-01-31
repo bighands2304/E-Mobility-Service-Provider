@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.socket.WebSocketSession;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.ReservationService;
@@ -34,23 +36,30 @@ public class OcppReceiver {
         this.applicationEventPublisher = applicationEventPublisher;
     }
 
+    @MessageMapping("/ocpp")
+    public void handleMessage(String messageJson) {
+        logger.info("message " + messageJson);
+    }
+
     @MessageMapping("/ocpp/BootNotification")
-    public @ResponseBody BootNotificationConf handleBootNotification(BootNotificationReq request, WebSocketSession socketSession) {
-        sessionsManager.registerSession(socketSession.getId(), socketSession);
-        return new BootNotificationConf();
+    public @ResponseBody BootNotificationConf handleBootNotification(@RequestBody BootNotificationReq request,
+                                                                     SimpMessageHeaderAccessor headerAccessor) {
+        logger.info("arrived boot notification message from session: " + headerAccessor.getSessionId());
+        return new BootNotificationConf(headerAccessor.getSessionId());
     }
 
     @MessageMapping("/ocpp/StatusNotification")
-    public @ResponseBody StatusNotificationConf handleStatusNotification(StatusNotificationReq request, WebSocketSession socketSession) {
+    public @ResponseBody StatusNotificationConf handleStatusNotification(@RequestBody StatusNotificationReq request,
+                                                                         SimpMessageHeaderAccessor headerAccessor) {
         SocketStatusChangeEvent socketStatusChangeEvent = new SocketStatusChangeEvent(this,
-                sessionsManager.getChargingPointFromSession(socketSession.getId()), request.getConnectorId(),
+                sessionsManager.getChargingPointFromSession(headerAccessor.getSessionId()), request.getConnectorId(),
                 request.getStatus(), request.getTimestamp());
         applicationEventPublisher.publishEvent(socketStatusChangeEvent);
         return new StatusNotificationConf();
     }
 
     @MessageMapping("/ocpp/MeterValues")
-    public @ResponseBody MeterValueConf handleMeterValues(MeterValueReq request) {
+    public @ResponseBody MeterValueConf handleMeterValues(@RequestBody MeterValueReq request) {
         MeterValueEvent meterValueEvent = new MeterValueEvent(this, request.getTransactionId(),
                 request.getConnectorId(), request.getMeterValue());
         applicationEventPublisher.publishEvent(meterValueEvent);
@@ -58,9 +67,10 @@ public class OcppReceiver {
     }
 
     @MessageMapping("/ocpp/StartTransaction")
-    public @ResponseBody StartTransactionConf handleStartTransaction(StartTransactionReq request, WebSocketSession socketSession) {
+    public @ResponseBody StartTransactionConf handleStartTransaction(@RequestBody StartTransactionReq request,
+                                                                     SimpMessageHeaderAccessor headerAccessor) {
         Long sessionId = reservationService.maxSessionId() + 1;
-        String cpId = sessionsManager.getChargingPointFromSession(socketSession.getId());
+        String cpId = sessionsManager.getChargingPointFromSession(headerAccessor.getSessionId());
         SessionStartedEvent sessionStartedEvent = new SessionStartedEvent(this, request.getReservationId(),
                 sessionId, request.getTimestamp(), cpId, request.getConnectorId());
         applicationEventPublisher.publishEvent(sessionStartedEvent);
@@ -68,7 +78,7 @@ public class OcppReceiver {
     }
 
     @MessageMapping("/ocpp/StopTransaction")
-    public @ResponseBody StopTransactionConf handleStopTransaction(StopTransactionReq request) {
+    public @ResponseBody StopTransactionConf handleStopTransaction(@RequestBody StopTransactionReq request) {
         SessionStoppedEvent sessionStoppedEvent = new SessionStoppedEvent(this, request.getTransactionId(),
                 request.getTimestamp(), request.getTransactionData());
         applicationEventPublisher.publishEvent(sessionStoppedEvent);
@@ -76,37 +86,37 @@ public class OcppReceiver {
     }
 
     @MessageMapping("/ocpp/ChangeAvailabilityConf")
-    public void handleChangeAvailabilityConf(ChangeAvailabilityConf changeAvailabilityConf, @Header("requestId") String reqId) {
-        ocppSender.completeRequest(changeAvailabilityConf, reqId);
+    public void handleChangeAvailabilityConf(@RequestBody ChangeAvailabilityConf changeAvailabilityConf) {
+        ocppSender.completeRequest(changeAvailabilityConf, changeAvailabilityConf.getRequestId());
     }
 
     @MessageMapping("/ocpp/ClearChargingProfileConf")
-    public void handleClearChargingProfileConf(ClearChargingProfileConf clearChargingProfileConf, @Header("requestId") String reqId) {
-        ocppSender.completeRequest(clearChargingProfileConf, reqId);
+    public void handleClearChargingProfileConf(@RequestBody ClearChargingProfileConf clearChargingProfileConf) {
+        ocppSender.completeRequest(clearChargingProfileConf, clearChargingProfileConf.getRequestId());
     }
 
     @MessageMapping("/ocpp/CancelReservationConf")
-    public void handleCancelReservationConf(CancelReservationConf cancelReservationConf, @Header("requestId") String reqId) {
-        ocppSender.completeRequest(cancelReservationConf, reqId);
+    public void handleCancelReservationConf(@RequestBody CancelReservationConf cancelReservationConf) {
+        ocppSender.completeRequest(cancelReservationConf, cancelReservationConf.getRequestId());
     }
 
     @MessageMapping("/ocpp/RemoteStartTransactionConf")
-    public void handleRemoteStartTransactionConf(RemoteStartTransactionConf remoteStartTransactionConf, @Header("requestId") String reqId) {
-        ocppSender.completeRequest(remoteStartTransactionConf, reqId);
+    public void handleRemoteStartTransactionConf(@RequestBody RemoteStartTransactionConf remoteStartTransactionConf) {
+        ocppSender.completeRequest(remoteStartTransactionConf, remoteStartTransactionConf.getRequestId());
     }
 
     @MessageMapping("/ocpp/RemoteStopTransactionConf")
-    public void handleRemoteStopTransactionConf(RemoteStopTransactionConf remoteStopTransactionConf, @Header("requestId") String reqId) {
-        ocppSender.completeRequest(remoteStopTransactionConf, reqId);
+    public void handleRemoteStopTransactionConf(@RequestBody RemoteStopTransactionConf remoteStopTransactionConf) {
+        ocppSender.completeRequest(remoteStopTransactionConf, remoteStopTransactionConf.getRequestId());
     }
 
     @MessageMapping("/ocpp/ReserveNowConf")
-    public void handleReserveNowConf(ReserveNowConf reserveNowConf, @Header("requestId") String reqId) {
-        ocppSender.completeRequest(reserveNowConf, reqId);
+    public void handleReserveNowConf(@RequestBody ReserveNowConf reserveNowConf) {
+        ocppSender.completeRequest(reserveNowConf, reserveNowConf.getRequestId());
     }
 
     @MessageMapping("/ocpp/SetChargingProfileConf")
-    public void handleSetChargingProfileConf(SetChargingProfileConf setChargingProfileConf, @Header("requestId") String reqId) {
-        ocppSender.completeRequest(setChargingProfileConf, reqId);
+    public void handleSetChargingProfileConf(@RequestBody SetChargingProfileConf setChargingProfileConf) {
+        ocppSender.completeRequest(setChargingProfileConf, setChargingProfileConf.getRequestId());
     }
 }

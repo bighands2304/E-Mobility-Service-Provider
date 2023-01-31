@@ -81,8 +81,8 @@ public class ChargingSessionController {
     void sendStartSessionResponse(CompletableFuture<ConfMessage> futureCpResponse, EmspDetails emspDetails, Long reservationId) {
         CommandResultType commandResultType;
         try {
-            RemoteStopTransactionConf response = (RemoteStopTransactionConf) futureCpResponse.get();
-            commandResultType = CommandResultType.getFromCpCommandResult(response.getStatus());
+            RemoteStartTransactionConf response = (RemoteStartTransactionConf) futureCpResponse.get();
+            commandResultType = CommandResultType.getFromCpCommandResult(response.getCommandResult());
         } catch (InterruptedException | ExecutionException e) {
             commandResultType = CommandResultType.TIMEOUT;
         }
@@ -94,7 +94,7 @@ public class ChargingSessionController {
         CommandResultType commandResultType;
         try {
             RemoteStopTransactionConf response = (RemoteStopTransactionConf) futureCpResponse.get();
-            commandResultType = CommandResultType.getFromCpCommandResult(response.getStatus());
+            commandResultType = CommandResultType.getFromCpCommandResult(response.getCommandResult());
         } catch (InterruptedException | ExecutionException e) {
             commandResultType = CommandResultType.TIMEOUT;
         }

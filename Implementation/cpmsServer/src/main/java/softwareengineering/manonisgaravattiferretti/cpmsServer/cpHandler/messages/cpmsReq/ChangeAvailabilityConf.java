@@ -6,4 +6,5 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.message
 @Data
 public class ChangeAvailabilityConf implements ConfMessage {
     private CommandResult commandResult;
+    private String requestId;
 }

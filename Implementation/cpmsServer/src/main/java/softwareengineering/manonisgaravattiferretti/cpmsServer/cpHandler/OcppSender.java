@@ -28,7 +28,7 @@ public class OcppSender {
     public CompletableFuture<ConfMessage> sendChangeAvailability(String cpId, Integer socketId, Boolean available) {
         ChangeAvailabilityReq changeAvailabilityReq = new ChangeAvailabilityReq(
                 socketId, AvailabilityType.getFromBoolean(available));
-        return send(changeAvailabilityReq, cpId, "ChangeAvailabilityConf");
+        return send(changeAvailabilityReq, cpId, "ChangeAvailability");
     }
 
     public CompletableFuture<ConfMessage> sendClearChargingProfile(String cpId) {
@@ -37,35 +37,35 @@ public class OcppSender {
 
     public CompletableFuture<ConfMessage> sendClearChargingProfile(String cpId, Integer socketId) {
         ClearChargingProfileReq request = new ClearChargingProfileReq(null, socketId);
-        return send(request, cpId, "ClearChargingProfileConf");
+        return send(request, cpId, "ClearChargingProfile");
     }
 
     public CompletableFuture<ConfMessage> sendCancelReservation(String cpId, Long reservationId) {
         CancelReservationReq request = new CancelReservationReq(reservationId);
-        return send(request, cpId, "CancelReservationConf");
+        return send(request, cpId, "CancelReservation");
     }
 
     public CompletableFuture<ConfMessage> sendRemoteStartTransaction(String cpId, Integer socketId,
                                                                                     ChargingProfile chargingProfile) {
         RemoteStartTransactionReq request = new RemoteStartTransactionReq(socketId, chargingProfile);
-        return send(request, cpId, "RemoteStartTransactionConf");
+        return send(request, cpId, "RemoteStartTransaction");
     }
 
     public CompletableFuture<ConfMessage> sendRemoteStopTransaction(String cpId, Long transactionId) {
         RemoteStopTransactionReq request = new RemoteStopTransactionReq(transactionId);
-        return send(request, cpId, "RemoteStopTransactionConf");
+        return send(request, cpId, "RemoteStopTransaction");
     }
 
     public CompletableFuture<ConfMessage> sendReserveNow(String cpId, Long reservationId,
                                                          LocalDateTime expiryDate, Integer socketId) {
         ReserveNowReq request = new ReserveNowReq(socketId, expiryDate, reservationId);
-        return send(request, cpId, "RemoteStopTransactionConf");
+        return send(request, cpId, "ReserveNow");
     }
 
     public CompletableFuture<ConfMessage> sendSetChargingProfile(String cpId, Integer socketId,
                                                                             ChargingProfile chargingProfile) {
         SetChargingProfileReq request = new SetChargingProfileReq(socketId, chargingProfile);
-        return send(request, cpId, "RemoteStopTransactionConf");
+        return send(request, cpId, "SetChargingProfile");
     }
 
     public void completeRequest(ConfMessage confMessage, String requestId) {
@@ -80,9 +80,13 @@ public class OcppSender {
         String requestId = UUID.randomUUID().toString();
         String sessionId = sessionsManager.getSessionIdFromChargingPointId(cpId);
         Map<String, Object> headers = Map.of("requestId", requestId);
-        template.convertAndSendToUser(sessionId, "/ocpp/" + messageName, message, headers);
+        template.convertAndSendToUser(sessionId, "topic/ocpp/" + messageName, message, headers);
         CompletableFuture<ConfMessage> futureResponse = new CompletableFuture<>();
         pendingResponses.put(requestId, futureResponse);
         return futureResponse;
+    }
+
+    public void sendConnectionTrigger() {
+
     }
 }
