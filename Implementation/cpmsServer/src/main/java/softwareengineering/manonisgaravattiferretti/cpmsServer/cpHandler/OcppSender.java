@@ -46,8 +46,9 @@ public class OcppSender {
     }
 
     public CompletableFuture<ConfMessage> sendRemoteStartTransaction(String cpId, Integer socketId,
-                                                                                    ChargingProfile chargingProfile) {
-        RemoteStartTransactionReq request = new RemoteStartTransactionReq(socketId, chargingProfile);
+                                                                     ChargingProfile chargingProfile,
+                                                                     Long reservationId) {
+        RemoteStartTransactionReq request = new RemoteStartTransactionReq(socketId, reservationId, chargingProfile);
         return send(request, cpId, "RemoteStartTransaction");
     }
 
@@ -63,7 +64,7 @@ public class OcppSender {
     }
 
     public CompletableFuture<ConfMessage> sendSetChargingProfile(String cpId, Integer socketId,
-                                                                            ChargingProfile chargingProfile) {
+                                                                 ChargingProfile chargingProfile) {
         SetChargingProfileReq request = new SetChargingProfileReq(socketId, chargingProfile);
         return send(request, cpId, "SetChargingProfile");
     }

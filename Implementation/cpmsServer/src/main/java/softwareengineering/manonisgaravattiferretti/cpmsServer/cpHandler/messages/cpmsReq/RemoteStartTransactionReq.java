@@ -10,5 +10,6 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.ent
 @AllArgsConstructor
 public class RemoteStartTransactionReq {
     private Integer connectorId;
+    private Long reservationId;
     private ChargingProfile chargingProfile;
 }

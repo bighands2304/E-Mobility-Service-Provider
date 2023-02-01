@@ -9,9 +9,8 @@ import java.util.List;
 
 @Data
 public class ChargingProfile {
-    @Id
     @Indexed
-    private int id;
+    private Integer chargingProfileId;
     private String recurrencyKind;
     private LocalDateTime validFrom;
     private LocalDateTime validTo;

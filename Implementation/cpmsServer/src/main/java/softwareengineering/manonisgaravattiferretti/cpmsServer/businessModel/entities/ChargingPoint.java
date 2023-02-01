@@ -31,10 +31,6 @@ public class ChargingPoint {
     private List<Socket> sockets;
     private List<Battery> batteries;
     private LocalDateTime lastUpdated;
-    //TODO: check if it is ok to leave just the code
-    // (since the performance is better like this, because no lookups are needed)
-    //@DocumentReference(lazy = true)
-    //private CPO cpo;
     @JsonIgnore
     private String cpoCode;
     @JsonIgnore

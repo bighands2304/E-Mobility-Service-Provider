@@ -30,8 +30,8 @@ public class EmspDetailsService {
         return emspRepository.findByEmspToken(emspToken);
     }
 
-    public void insertEmsp(EmspDetails emspDetails) {
-        emspRepository.save(emspDetails);
+    public EmspDetails insertEmsp(EmspDetails emspDetails) {
+        return emspRepository.save(emspDetails);
     }
 
     public void updateEmspAddCpoToken(String emspToken, String cpoToken) {

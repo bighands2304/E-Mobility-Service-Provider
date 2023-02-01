@@ -83,9 +83,9 @@ public class PriceManager implements ApplicationListener<TogglePriceOptimizerEve
         }
     }
 
-    public Double applyTariff(Long sessionId, String cpInternalId) {
+    public Double applyTariff(Long reservationId, String cpInternalId) {
         Optional<ChargingPoint> chargingPoint = chargingPointService.findChargingPointByInternalId(cpInternalId);
-        Optional<Reservation> reservation = reservationService.findReservationBySessionId(sessionId);
+        Optional<Reservation> reservation = reservationService.findReservationByInternalId(reservationId);
         if (chargingPoint.isEmpty() || reservation.isEmpty()) {
             return 0.0;
         }

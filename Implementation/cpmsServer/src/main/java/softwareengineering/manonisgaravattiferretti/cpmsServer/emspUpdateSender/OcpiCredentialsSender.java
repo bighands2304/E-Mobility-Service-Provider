@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.CpmsRegistrationDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.CredentialsDTO;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.EmspDetails;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.exceptions.EmspErrorException;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.exceptions.EmspResponseTimeoutException;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.EmspDetailsService;
@@ -35,7 +36,15 @@ public class OcpiCredentialsSender {
         // header is different since from the standard ocpi since this is the registration
         // of the cpms in the emsp platform
         String emspToken = UUID.randomUUID().toString();
-        Optional<CredentialsDTO> credentialsDTOOptional = Optional.empty();
+
+        // build temporary emsp credentials to store in db
+        /*EmspDetails emspDetails = new EmspDetails();
+        emspDetails.setEmspToken(emspToken);
+        emspDetails.setUrl(emspUrl);
+        emspDetails = emspDetailsService.insertEmsp(emspDetails);
+        logger.info("Inserted temporary credentials for emsp: " + emspDetails);*/
+
+        Optional<CredentialsDTO> credentialsDTOOptional;
         try {
             credentialsDTOOptional = WebClient
                     .create()

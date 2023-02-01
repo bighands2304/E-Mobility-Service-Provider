@@ -12,9 +12,7 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.rep
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.repositories.aggregationResults.TariffUnwind;
 
 import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -52,7 +50,7 @@ public class ChargingPointService {
         return chargingPointRepository.findChargingPointByCpIdAndCpoCode(id, cpoCode);
     }
 
-    public Optional<ChargingPoint> findChargingPointById(String id) {
+    public Optional<ChargingPoint> findChargingPointByExternalId(String id) {
         return chargingPointRepository.findChargingPointByCpId(id);
     }
 
@@ -121,6 +119,4 @@ public class ChargingPointService {
         List<Tariff> tariffs = tariffsAggregation.getMappedResults().stream().map(TariffUnwind::getTariff).toList();
         return new PageImpl<>(tariffs, pageable, tariffs.size());
     }
-
-    // Todo: add cp
 }

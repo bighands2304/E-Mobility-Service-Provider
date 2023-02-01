@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.Reservation;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.ReservationService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.utils.EntityFromDTOConverter;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.chargingPointReq.dtos.MeterValue;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.emspUpdateSender.OcpiSessionSender;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.socketStatusManager.events.MeterValueEvent;
 
@@ -30,7 +31,7 @@ public class MeterValueListener implements ApplicationListener<MeterValueEvent> 
             return;
         }
         Double energyConsumed = event.getMeterValues().stream()
-                .map(meterValue -> Double.parseDouble(meterValue.getSampledValue()))
+                .map(MeterValue::getSampledValue)
                 .reduce(0.0, Double::sum);
         reservationService.updateSessionEnergyConsumption(energyConsumed, event.getSessionId(), LocalDateTime.now());
         Reservation reservation = reservationOptional.get();
