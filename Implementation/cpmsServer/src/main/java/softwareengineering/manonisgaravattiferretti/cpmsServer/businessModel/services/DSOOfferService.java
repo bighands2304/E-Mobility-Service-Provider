@@ -65,4 +65,8 @@ public class DSOOfferService {
         dsoOffer.setAvailableTimeSlot(new OfferTimeSlot(LocalTime.MIN, LocalTime.MAX));
         insertOffer(dsoOffer);
     }
+
+    public Optional<DSOOffer> findCurrentCpOffer(String cpId, boolean inUse) {
+        return dsoOfferRepository.findDSOOfferByChargingPointIdAndInUse(cpId, inUse);
+    }
 }

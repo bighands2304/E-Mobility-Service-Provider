@@ -9,6 +9,9 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.ser
 import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.events.EnergyChangeEvent;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.events.ToggleEnergyMixOptimizerEvent;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
 @Service
 public class EnergyMixManager implements ApplicationListener<ToggleEnergyMixOptimizerEvent> {
     private final ChargingPointService chargingPointService;
@@ -22,7 +25,6 @@ public class EnergyMixManager implements ApplicationListener<ToggleEnergyMixOpti
         this.energyMixOptimizer = energyMixOptimizer;
         this.applicationEventPublisher = applicationEventPublisher;
     }
-
 
     @Override
     public void onApplicationEvent(ToggleEnergyMixOptimizerEvent event) {
@@ -44,7 +46,8 @@ public class EnergyMixManager implements ApplicationListener<ToggleEnergyMixOpti
 
     public boolean changeBatteryAvailability(String cpId, Integer batteryId, boolean available) {
         chargingPointService.updateBatteryAvailability(cpId, batteryId, available);
-        energyMixOptimizer.optimizeCp(cpId);
+        LocalDateTime now = LocalDateTime.now();
+        energyMixOptimizer.optimizeCp(cpId, now.minus(1, ChronoUnit.WEEKS), now);
         EnergyChangeEvent energyChangeEvent = new EnergyChangeEvent(this, cpId);
         applicationEventPublisher.publishEvent(energyChangeEvent);
         return true;
