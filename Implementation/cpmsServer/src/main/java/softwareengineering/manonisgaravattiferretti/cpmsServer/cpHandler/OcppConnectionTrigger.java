@@ -25,6 +25,8 @@ public class OcppConnectionTrigger {
     private final Logger logger = LoggerFactory.getLogger(OcppConnectionTrigger.class);
     @Value("${ocpp-tester.path}")
     String cpTestingPath;
+    @Value("${enable-testing-enviroment}")
+    boolean enableTesting;
 
     @Autowired
     public OcppConnectionTrigger(ChargingPointService chargingPointService) {
@@ -33,6 +35,7 @@ public class OcppConnectionTrigger {
 
     @EventListener(ApplicationReadyEvent.class)
     public void connectToAllCp() {
+        if (!enableTesting) return;
         logger.info("trying to open websocket connections with the charging points");
         List<ChargingPoint> cps = chargingPointService.findAll();
         try {

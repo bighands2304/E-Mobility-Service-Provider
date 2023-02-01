@@ -40,7 +40,7 @@ public class AuthorizationManager {
         http
                 .authorizeHttpRequests()
                 //.requestMatchers("/", "/api/CPO/**", "/ocpi/cpo/**", "/ws").permitAll()
-                .requestMatchers("/", "/api/CPO/login", "/api/CPO/register", "/ocpi/cpo/**", "/ocpp").permitAll()
+                .requestMatchers("/", "/api/CPO/login", "/api/CPO/register", "/ocpi/cpo/**", "/oscp/fp/**", "/ocpp").permitAll()
                 .requestMatchers("/ocpi/cpo/**").hasAuthority("EMSP")
                 .requestMatchers("/api/CPO/**").hasAuthority("CPO")
                 .anyRequest()
