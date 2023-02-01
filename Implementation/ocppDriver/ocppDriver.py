@@ -12,6 +12,8 @@ TOPICS = ["BootNotification", "StatusNotification", "MeterValues", "StartTransac
 
 MESSAGES_TO_SEND = ["StatusNotification", "MeterValues", "StartTransaction", "StopTransaction"]
 
+CONTENT_TYPE = "application/json"
+
 
 class CpConnection:
 
@@ -34,14 +36,16 @@ class CpConnection:
         self.websock.send(sub_msg)
         self.websock.send(stomper.send("/app/ocpp/BootNotification",
                                        json.dumps({"message": "Hi"}),
-                                       content_type='application/json'))
+                                       content_type=CONTENT_TYPE))
 
     def on_message(self, ws, message):
         message_unpacked = stomper.unpack_frame(message)
-        print("")
-        print("==========================================================================================")
-        print(f"message from cp: {self.cp_id} at destination {message_unpacked['headers']['destination']}")
-        print(f"the message is: {message_unpacked['body']}")
+        print(f"""
+        ==========================================================================================
+        message from cp: {self.cp_id} at destination {message_unpacked['headers']['destination']}
+        the message is: 
+        {message}
+        """)
         destination = message_unpacked["headers"]["destination"]
         if destination == "/topic/ocpp/BootNotification":
             self.on_boot_notification_conf(message_unpacked)
@@ -56,15 +60,13 @@ class CpConnection:
         elif destination == "/topic/ocpp/RemoteStopTransaction":
             request_id = message_unpacked["headers"]["requestId"]
             self.on_remote_stop_transaction(message_unpacked, request_id)
-        print("==========================================================================================")
-        print()
 
     def on_close(self, ws, a, b):
-        print()
-        print("==========================================================================================")
-        print(f"Connection with {self.cp_id} closed")
-        print("==========================================================================================")
-        print()
+        print(f'''
+        ==========================================================================================
+        Connection with {self.cp_id} closed
+        ==========================================================================================
+        ''')
 
     def close_connection(self):
         self.websock.close()
@@ -78,17 +80,48 @@ class CpConnection:
     def on_message_to_accept(self, topic, request_id):
         print("sending ACCEPTED as a response")
         res_message = {"commandResult": "ACCEPTED", "requestId": request_id}
-        #headers = {"requestId": request_id}
-        stomp_message = stomper.send(topic, res_message, content_type="application/json")
+        stomp_message = stomper.send(topic, json.dumps(res_message), content_type=CONTENT_TYPE)
         self.websock.send(stomp_message)
 
     def on_remote_start_transaction(self, message, request_id):
         self.on_message_to_accept("/app/ocpp/RemoteStartTransactionConf", request_id)
-        # todo: send some meter values, after some time send also stop transaction
+        time.sleep(5)
+        connector_id = message['body']['connectorId']
+        reservation_id = message['body']['reservationId']
+        start_tr_msg = {
+            "connectorId": connector_id,
+            "reservationId": reservation_id,
+            "timestamp": datetime.datetime.now().isoformat()
+        }
+        print(f"sending StartTransaction to cp: {self.cp_id}")
+        stomp_msg = stomper.send("/app/ocpp/StartTransaction", json.dumps(start_tr_msg), content_type=CONTENT_TYPE)
+        self.websock.send(stomp_msg)
+        meter_value_msg = {
+            "connectorId": connector_id,
+            "meterValue": [{"timestamp": datetime.datetime.now().isoformat(), "sampledValue": 5.0}]
+        }
+        for _ in range(3):
+            time.sleep(10)
+            stomp_msg = stomper.send("/app/ocpp/MeterValue", json.dumps(meter_value_msg), content_type=CONTENT_TYPE)
+            print(f"Sending meter value to cp: {self.cp_id}")
+            self.websock.send(stomp_msg)
+        time.sleep(10)
+        stop_tr_msg = {
+            "transactionId": reservation_id,
+            "timestamp": datetime.datetime.now().isoformat()
+        }
+        stomp_msg = stomper.send("/app/ocpp/StopTransaction", json.dumps(stop_tr_msg), content_type=CONTENT_TYPE)
+        self.websock.send(stomp_msg)
 
     def on_remote_stop_transaction(self, message, request_id):
         self.on_message_to_accept("/app/ocpp/RemoteStartTransactionConf", request_id)
-        # todo: after some time send stop transaction
+        time.sleep(10)
+        stop_tr_msg = {
+            "transactionId": message['body']['transactionId'],
+            "timestamp": datetime.datetime.now().isoformat()
+        }
+        stomp_msg = stomper.send("/app/ocpp/StopTransaction", json.dumps(stop_tr_msg), content_type=CONTENT_TYPE)
+        self.websock.send(stomp_msg)
 
     def send_msg(self, topic, message):
         stomp_message = stomper.send(topic, message, content_type="application/json")
