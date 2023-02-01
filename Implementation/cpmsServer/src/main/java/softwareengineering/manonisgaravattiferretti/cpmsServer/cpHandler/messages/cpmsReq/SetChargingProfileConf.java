@@ -6,4 +6,5 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.message
 @Data
 public class SetChargingProfileConf implements ConfMessage {
     private CommandResult commandResult;
+    private String requestId;
 }

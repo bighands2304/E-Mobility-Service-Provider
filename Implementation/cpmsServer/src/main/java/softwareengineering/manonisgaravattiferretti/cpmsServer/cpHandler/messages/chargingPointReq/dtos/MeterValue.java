@@ -10,5 +10,5 @@ public class MeterValue {
     @NotNull
     private LocalDateTime timestamp;
     @NotNull
-    private String sampledValue;
+    private Double sampledValue;
 }

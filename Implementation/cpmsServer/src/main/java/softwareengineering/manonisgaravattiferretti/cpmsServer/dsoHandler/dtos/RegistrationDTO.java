@@ -8,5 +8,5 @@ public class RegistrationDTO {
     private String dsoId;
     private String companyName;
     private String cpId;
-    private VersionUrlDTO versionUrl;
+    private String url;
 }

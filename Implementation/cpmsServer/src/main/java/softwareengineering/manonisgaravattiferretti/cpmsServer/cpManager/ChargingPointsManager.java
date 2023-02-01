@@ -10,45 +10,58 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.AddChargingPointDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.AddTariffDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.ChangeSocketAvailabilityDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.IncludeBatteryDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.*;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.ChargingPointService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.DSOOfferService;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.SocketService;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.EmspDetailsService;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.utils.EntityFromDTOConverter;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.OcppConnectionTrigger;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.cpManager.events.TogglePriceOptimizerEvent;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.emspUpdateSender.OcpiLocationsSender;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.DSOManager;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.EnergyMixManager;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.events.ToggleDsoSelectionOptimizerEvent;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.events.ToggleEnergyMixOptimizerEvent;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.socketStatusManager.events.SocketAvailabilityEvent;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
 public class ChargingPointsManager {
     private final ChargingPointService chargingPointService;
-    private final SocketService socketService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final EnergyMixManager energyMixManager;
     private final DSOManager dsoManager;
     private final DSOOfferService dsoOfferService;
     private final PriceManager priceManager;
+    private final OcppConnectionTrigger ocppConnectionTrigger;
+    private final OcpiLocationsSender ocpiLocationsSender;
+    private final EmspDetailsService emspDetailsService;
     private final Logger logger = LoggerFactory.getLogger(ChargingPointsManager.class);
 
     @Autowired
-    public ChargingPointsManager(ChargingPointService chargingPointService, SocketService socketService,
+    public ChargingPointsManager(ChargingPointService chargingPointService,
                                  ApplicationEventPublisher applicationEventPublisher,
                                  EnergyMixManager energyMixManager, DSOManager dsoManager,
-                                 DSOOfferService dsoOfferService, PriceManager priceManager) {
+                                 DSOOfferService dsoOfferService, PriceManager priceManager,
+                                 OcppConnectionTrigger ocppConnectionTrigger,
+                                 OcpiLocationsSender ocpiLocationsSender,
+                                 EmspDetailsService emspDetailsService) {
         this.chargingPointService = chargingPointService;
-        this.socketService = socketService;
         this.applicationEventPublisher = applicationEventPublisher;
         this.energyMixManager = energyMixManager;
         this.dsoManager = dsoManager;
         this.dsoOfferService = dsoOfferService;
         this.priceManager = priceManager;
+        this.ocppConnectionTrigger = ocppConnectionTrigger;
+        this.ocpiLocationsSender = ocpiLocationsSender;
+        this.emspDetailsService = emspDetailsService;
     }
 
     @GetMapping("/api/CPO/chargingPoints")
@@ -67,9 +80,25 @@ public class ChargingPointsManager {
         return new ResponseEntity<>(chargingPointOptional.get(), HttpStatus.OK);
     }
 
-    @PutMapping("/api/CPO/chargingPoints/{externalCpId}")
-    public void addChargingPoint(@PathVariable String externalCpId, @AuthenticationPrincipal CPO cpo) {
-        //Todo
+    @PostMapping("/api/CPO/chargingPoints")
+    public ResponseEntity<?> addChargingPoint(@RequestBody AddChargingPointDTO addChargingPointDTO, @AuthenticationPrincipal CPO cpo) {
+        Optional<ChargingPoint> chargingPointOptional = chargingPointService
+                .findChargingPointByExternalId(addChargingPointDTO.getCpId());
+        if (chargingPointOptional.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Charging point with that id already exists");
+        }
+        ChargingPoint chargingPoint = EntityFromDTOConverter.fromAddCpDTOToCp(addChargingPointDTO, cpo.getCpoCode());
+        ResponseEntity<Void> response = ocppConnectionTrigger.triggerConnection(chargingPoint);
+        if (response == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Wasn't able to connect to the charging point");
+        }
+        chargingPointService.addChargingPoint(chargingPoint);
+        List<EmspDetails> emspDetailsList = emspDetailsService.findAll();
+        for (EmspDetails emspDetails: emspDetailsList) {
+            ocpiLocationsSender.putChargingPoint(emspDetails, chargingPoint.getCpId(),
+                    EntityFromDTOConverter.emspChargingPointDTOFromChargingPoint(chargingPoint), true);
+        }
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/api/CPO/chargingPoints/{id}")
@@ -88,7 +117,7 @@ public class ChargingPointsManager {
         if (chargingPointOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Charging point not found");
         }
-        return ResponseEntity.ok(socketService.findCpSocketsByInternalId(cpId));
+        return ResponseEntity.ok(chargingPointOptional.get().getSockets());
     }
 
     @GetMapping("/api/CPO/chargingPoints/{cpId}/sockets/{socketId}")
@@ -98,7 +127,8 @@ public class ChargingPointsManager {
         if (chargingPointOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Charging point not found");
         }
-        Optional<Socket> socketOptional = socketService.findSocketByCpInternalIdAndSocketId(cpId, socketId);
+        Optional<Socket> socketOptional = chargingPointOptional.get().getSockets().stream()
+                .filter(socket -> Objects.equals(socket.getSocketId(), socketId)).findFirst();
         if (socketOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Socket not found");
         }
@@ -131,7 +161,7 @@ public class ChargingPointsManager {
 
     @PostMapping("/api/CPO/chargingPoints/{id}/tariffs")
     public ResponseEntity<Tariff> addNewTariff(@PathVariable String id, @AuthenticationPrincipal CPO cpo,
-                                          @RequestBody AddTariffDTO addTariffDTO) {
+                                               @RequestBody AddTariffDTO addTariffDTO) {
         Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(id, cpo.getCpoCode());
         if (chargingPointOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Charging point not found");
@@ -234,7 +264,7 @@ public class ChargingPointsManager {
         if (chargingPointOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "charging point not found");
         }
-        if(!dsoManager.changeDsoProviderManual(id, offerId, offerTimeSlot)) {
+        if(!dsoManager.changeDsoProviderManual(id, chargingPointOptional.get().getCpId(), offerId, offerTimeSlot)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "parameters not correct");
         }
         return ResponseEntity.status(HttpStatus.OK).build();

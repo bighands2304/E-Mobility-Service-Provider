@@ -8,4 +8,5 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.message
 public class CancelReservationConf implements ConfMessage {
     @NotNull
     private CommandResult commandResult;
+    private String requestId;
 }

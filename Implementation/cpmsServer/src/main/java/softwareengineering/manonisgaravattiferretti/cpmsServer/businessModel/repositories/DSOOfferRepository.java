@@ -11,8 +11,8 @@ import java.util.Optional;
 @Repository
 public interface DSOOfferRepository extends MongoRepository<DSOOffer, String>, DSOOfferCustomUpdate {
     List<DSOOffer> findDSOOffersByChargingPointId(String chargingPointId);
-    Optional<DSOOffer> findDSOOfferByChargingPointInternalIdAndAvailableTimeSlotAndInUse(String cpId,
-                                                                                         OfferTimeSlot availableTimeSlot,
-                                                                                         boolean inUse);
-    List<DSOOffer> findDSOOffersByChargingPointInternalId(String chargingPointInternalId);
+    Optional<DSOOffer> findDSOOfferByChargingPointIdAndAvailableTimeSlotAndInUse(String cpId,
+                                                                                 OfferTimeSlot availableTimeSlot,
+                                                                                 boolean inUse);
+    Optional<DSOOffer> findDSOOfferByChargingPointIdAndInUse(String cpId, boolean inUse);
 }

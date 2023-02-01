@@ -1,3 +1,10 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.chargingPointReq;
 
-public class BootNotificationReq {}
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+public class BootNotificationReq {
+    private String message;
+}

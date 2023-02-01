@@ -56,8 +56,8 @@ public class DSOOfferCustomUpdateImpl implements DSOOfferCustomUpdate {
         Query query = new Query();
         query.addCriteria(Criteria.where("dsoToken").is(dsoToken));
         query.addCriteria(Criteria.where("chargingPointId").is(cpId));
-        query.addCriteria(Criteria.where("startTime").is(startTime));
-        query.addCriteria(Criteria.where("endTime").is(endTime));
+        query.addCriteria(Criteria.where("availableTimeSlot.startTime").is(startTime));
+        query.addCriteria(Criteria.where("availableTimeSlot.endTime").is(endTime));
         Update update = new Update();
         update.set(fieldName, value);
         update.set("valid", true);

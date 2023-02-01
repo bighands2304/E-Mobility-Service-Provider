@@ -59,7 +59,7 @@ public class DSOSelectionOptimizer {
         List<DSOOffer> bestDsoOffers = new ArrayList<>();
         for (String dsoId: dsoIds) {
             Optional<DSOOffer> bestOffer = dsoOffers.stream()
-                    .filter(dsoOffer -> dsoOffer.getCapacity() > meanConsumption)
+                    .filter(dsoOffer -> dsoOffer.getCapacity() > meanConsumption && dsoOffer.getDsoId().equals(dsoId))
                     .reduce((a, b) -> (a.getPrice() > b.getPrice()) ? b : a);
             bestOffer.ifPresent(bestDsoOffers::add);
         }

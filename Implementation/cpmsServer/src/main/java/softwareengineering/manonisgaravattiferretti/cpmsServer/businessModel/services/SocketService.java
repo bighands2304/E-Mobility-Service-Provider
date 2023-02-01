@@ -22,14 +22,6 @@ public class SocketService {
         return socketRepository.findSocketByCpIdAndSocketId(cpId, socketId);
     }
 
-    public Optional<Socket> findSocketByCpInternalIdAndSocketId(String cpInternalId, Integer socketId) {
-        return socketRepository.findSocketByInternalCpIdAndSocketId(cpInternalId, socketId);
-    }
-
-    public List<Socket> findCpSocketsByInternalId(String cpId) {
-        return socketRepository.findSocketsByInternalCpId(cpId);
-    }
-
     public List<Socket> findCpSocketsById(String cpId) {
         return socketRepository.findSocketsByCpId(cpId);
     }

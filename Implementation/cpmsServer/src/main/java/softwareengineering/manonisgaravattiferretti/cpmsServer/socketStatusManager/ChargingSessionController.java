@@ -55,7 +55,8 @@ public class ChargingSessionController {
         }
         // Todo: select a charging profile?
         CompletableFuture<ConfMessage> responseFuture = ocppSender.sendRemoteStartTransaction(
-                startSessionDTO.getChargingPointId(), startSessionDTO.getSocketId(), null);
+                startSessionDTO.getChargingPointId(), startSessionDTO.getSocketId(),
+                null, startSessionDTO.getReservationId());
         sendStartSessionResponse(responseFuture, emspDetails, reservationOptional.get().getReservationIdEmsp());
         return ResponseEntity.ok().build();
     }
@@ -72,7 +73,7 @@ public class ChargingSessionController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "session is already finished");
         }
         CompletableFuture<ConfMessage> responseFuture = ocppSender.sendRemoteStopTransaction(
-                reservationOptional.get().getSocket().getCpId(), sessionId);
+                reservationOptional.get().getSocket().getCpId(), reservationOptional.get().getInternalReservationId());
         sendStopSessionResponse(responseFuture, emspDetails, reservationOptional.get().getReservationIdEmsp());
         return ResponseEntity.ok().build();
     }
@@ -81,8 +82,8 @@ public class ChargingSessionController {
     void sendStartSessionResponse(CompletableFuture<ConfMessage> futureCpResponse, EmspDetails emspDetails, Long reservationId) {
         CommandResultType commandResultType;
         try {
-            RemoteStopTransactionConf response = (RemoteStopTransactionConf) futureCpResponse.get();
-            commandResultType = CommandResultType.getFromCpCommandResult(response.getStatus());
+            RemoteStartTransactionConf response = (RemoteStartTransactionConf) futureCpResponse.get();
+            commandResultType = CommandResultType.getFromCpCommandResult(response.getCommandResult());
         } catch (InterruptedException | ExecutionException e) {
             commandResultType = CommandResultType.TIMEOUT;
         }
@@ -94,7 +95,7 @@ public class ChargingSessionController {
         CommandResultType commandResultType;
         try {
             RemoteStopTransactionConf response = (RemoteStopTransactionConf) futureCpResponse.get();
-            commandResultType = CommandResultType.getFromCpCommandResult(response.getStatus());
+            commandResultType = CommandResultType.getFromCpCommandResult(response.getCommandResult());
         } catch (InterruptedException | ExecutionException e) {
             commandResultType = CommandResultType.TIMEOUT;
         }

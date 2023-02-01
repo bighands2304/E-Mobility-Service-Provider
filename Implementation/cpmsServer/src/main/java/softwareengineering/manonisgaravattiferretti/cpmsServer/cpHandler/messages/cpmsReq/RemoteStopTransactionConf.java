@@ -5,5 +5,6 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.message
 
 @Data
 public class RemoteStopTransactionConf implements ConfMessage {
-    private CommandResult status;
+    private CommandResult commandResult;
+    private String requestId;
 }

@@ -7,19 +7,19 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class SessionStoppedEvent extends ApplicationEvent {
-    private final Long sessionId;
+    private final Long reservationId;
     private final LocalDateTime time;
     private final List<MeterValue> meterValues;
 
-    public SessionStoppedEvent(Object source, Long sessionId, LocalDateTime time, List<MeterValue> meterValues) {
+    public SessionStoppedEvent(Object source, Long reservationId, LocalDateTime time, List<MeterValue> meterValues) {
         super(source);
-        this.sessionId = sessionId;
+        this.reservationId = reservationId;
         this.time = time;
         this.meterValues = meterValues;
     }
 
-    public Long getSessionId() {
-        return sessionId;
+    public Long getReservationId() {
+        return reservationId;
     }
 
     public LocalDateTime getTime() {

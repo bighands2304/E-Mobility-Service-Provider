@@ -9,6 +9,9 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.ser
 import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.events.EnergyChangeEvent;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.events.ToggleEnergyMixOptimizerEvent;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
 @Service
 public class EnergyMixManager implements ApplicationListener<ToggleEnergyMixOptimizerEvent> {
     private final ChargingPointService chargingPointService;
@@ -23,28 +26,28 @@ public class EnergyMixManager implements ApplicationListener<ToggleEnergyMixOpti
         this.applicationEventPublisher = applicationEventPublisher;
     }
 
-
     @Override
     public void onApplicationEvent(ToggleEnergyMixOptimizerEvent event) {
         chargingPointService.updateToggleOptimizer(event.getCpId(), "EnergyMix", event.isAutomatic());
         energyMixOptimizer.switchOptimizer(event.getCpId(), event.isAutomatic());
     }
 
-    public boolean includeBattery(IncludeBatteryDTO includeBatteryDTO, String cpId, Integer batteryId) {
+    public boolean includeBattery(IncludeBatteryDTO includeBatteryDTO, String cpInternalId, Integer batteryId) {
         if (includeBatteryDTO.getMinLevel() > includeBatteryDTO.getMaxLevel()) {
             return false;
         }
-        chargingPointService.updateIncludeBattery(includeBatteryDTO, cpId, batteryId);
-        chargingPointService.updateToggleOptimizer(cpId, "EnergyMix", false);
-        energyMixOptimizer.switchOptimizer(cpId, false);
-        EnergyChangeEvent energyChangeEvent = new EnergyChangeEvent(this, cpId);
+        chargingPointService.updateIncludeBattery(includeBatteryDTO, cpInternalId, batteryId);
+        chargingPointService.updateToggleOptimizer(cpInternalId, "EnergyMix", false);
+        energyMixOptimizer.switchOptimizer(cpInternalId, false);
+        EnergyChangeEvent energyChangeEvent = new EnergyChangeEvent(this, cpInternalId);
         applicationEventPublisher.publishEvent(energyChangeEvent);
         return true;
     }
 
     public boolean changeBatteryAvailability(String cpId, Integer batteryId, boolean available) {
         chargingPointService.updateBatteryAvailability(cpId, batteryId, available);
-        energyMixOptimizer.optimizeCp(cpId);
+        LocalDateTime now = LocalDateTime.now();
+        energyMixOptimizer.optimizeCp(cpId, now.minus(1, ChronoUnit.WEEKS), now);
         EnergyChangeEvent energyChangeEvent = new EnergyChangeEvent(this, cpId);
         applicationEventPublisher.publishEvent(energyChangeEvent);
         return true;

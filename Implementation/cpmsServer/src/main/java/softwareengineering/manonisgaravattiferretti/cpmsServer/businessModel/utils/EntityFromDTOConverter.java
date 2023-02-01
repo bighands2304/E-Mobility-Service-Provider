@@ -4,6 +4,9 @@ import org.springframework.beans.BeanUtils;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.*;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.*;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 public class EntityFromDTOConverter {
     public static CPO cpoFromRegistrationDTO(CPORegistrationDTO cpoRegistrationDTO) {
         CPO cpo = new CPO();
@@ -67,5 +70,29 @@ public class EntityFromDTOConverter {
         BeanUtils.copyProperties(addTariffDTO, tariff);
         tariff.setTariffId(id);
         return tariff;
+    }
+
+    public static ChargingPoint fromAddCpDTOToCp(AddChargingPointDTO addChargingPointDTO, String cpoCode) {
+        ChargingPoint chargingPoint = new ChargingPoint();
+        BeanUtils.copyProperties(addChargingPointDTO, chargingPoint);
+        List<Socket> sockets = addChargingPointDTO.getCpSockets().stream()
+                .map(socketDto -> {
+                    Socket socket = new Socket();
+                    BeanUtils.copyProperties(socketDto, socket);
+                    socket.setAvailability("AVAILABLE");
+                    socket.setStatus("AVAILABLE");
+                    socket.setLastUpdated(LocalDateTime.now());
+                    socket.setCpoCode(cpoCode);
+                    socket.setCpId(addChargingPointDTO.getCpId());
+                    socket.setChargingProfiles(List.of());
+                    return socket;
+                }).toList();
+        chargingPoint.setSockets(sockets);
+        chargingPoint.setCpoCode(cpoCode);
+        chargingPoint.setLastUpdated(LocalDateTime.now());
+        chargingPoint.setToggleDSOSelectionOptimizer(true);
+        chargingPoint.setToggleEnergyMixOptimizer(true);
+        chargingPoint.setToggleDSOSelectionOptimizer(true);
+        return chargingPoint;
     }
 }

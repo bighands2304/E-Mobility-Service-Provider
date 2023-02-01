@@ -1,6 +1,7 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -12,7 +13,7 @@ import java.util.List;
 
 @Data
 public class AddTariffDTO {
-    @NotBlank
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String cpId;
     @NotBlank
     private String socketType;
@@ -24,8 +25,6 @@ public class AddTariffDTO {
     private Double price;
     @NotNull
     private Integer stepSize;
-
-    @JsonIgnore
     private Boolean isSpecialOffer;
 
     // Optional parameters (only for add special offer)

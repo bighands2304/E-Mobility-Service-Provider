@@ -45,7 +45,7 @@ public class SocketStatusController {
 
     @GetMapping("/ocpi/cpo/locations/{cpId}")
     public ResponseEntity<EmspChargingPointDTOWithId> getCp(@PathVariable String cpId) {
-        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointById(cpId);
+        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByExternalId(cpId);
         ChargingPoint chargingPoint = chargingPointOptional.orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Charging point not found"));
         return new ResponseEntity<>(EntityFromDTOConverter.emspChargingPointDTOWithIdFromChargingPoint(chargingPoint), HttpStatus.OK);

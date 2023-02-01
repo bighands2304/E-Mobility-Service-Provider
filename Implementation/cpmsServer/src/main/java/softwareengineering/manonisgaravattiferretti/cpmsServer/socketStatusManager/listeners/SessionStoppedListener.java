@@ -36,7 +36,7 @@ public class SessionStoppedListener implements ApplicationListener<SessionStoppe
 
     @Override
     public void onApplicationEvent(SessionStoppedEvent event) {
-        Optional<Reservation> reservationOptional = reservationService.findReservationBySessionId(event.getSessionId());
+        Optional<Reservation> reservationOptional = reservationService.findReservationByInternalId(event.getReservationId());
         if (reservationOptional.isEmpty()) {
             return;
         }
@@ -48,7 +48,7 @@ public class SessionStoppedListener implements ApplicationListener<SessionStoppe
         Reservation reservation = reservationOptional.get();
         reservation.setStatus("ENDED");
         reservation.setLastUpdated(event.getTime());
-        reservation.setTotalCost(priceManager.applyTariff(event.getSessionId(), reservation.getSocket().getCpId()));
+        reservation.setTotalCost(priceManager.applyTariff(event.getReservationId(), reservation.getSocket().getCpId()));
         ocpiSessionSender.patchSession(EntityFromDTOConverter.chargingSessionDTOFromReservation(reservation),
                 reservation.getEmspDetails());
         socketStatusListener.onSocketUpdate(cpId, socketId);

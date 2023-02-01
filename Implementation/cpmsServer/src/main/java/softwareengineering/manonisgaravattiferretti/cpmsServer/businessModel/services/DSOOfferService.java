@@ -50,7 +50,7 @@ public class DSOOfferService {
     }
 
     public Optional<DSOOffer> findDSOOfferFromCpAndTimeSlot(String cpId, OfferTimeSlot offerTimeSlot, boolean inUse) {
-        return dsoOfferRepository.findDSOOfferByChargingPointInternalIdAndAvailableTimeSlotAndInUse(cpId, offerTimeSlot, inUse);
+        return dsoOfferRepository.findDSOOfferByChargingPointIdAndAvailableTimeSlotAndInUse(cpId, offerTimeSlot, inUse);
     }
 
     public void registerDso(String dsoId, String cpId, String dsoToken, String dsoUrl, String companyName, String cpoToken) {
@@ -64,5 +64,9 @@ public class DSOOfferService {
         dsoOffer.setValid(false);
         dsoOffer.setAvailableTimeSlot(new OfferTimeSlot(LocalTime.MIN, LocalTime.MAX));
         insertOffer(dsoOffer);
+    }
+
+    public Optional<DSOOffer> findCurrentCpOffer(String cpId, boolean inUse) {
+        return dsoOfferRepository.findDSOOfferByChargingPointIdAndInUse(cpId, inUse);
     }
 }
