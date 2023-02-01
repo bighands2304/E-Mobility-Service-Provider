@@ -5,6 +5,7 @@ import websocket
 import stomper
 import json
 import threading
+import oscpDriver
 
 TOPICS = ["BootNotification", "StatusNotification", "MeterValues", "StartTransaction", "StopTransaction",
           "ChangeAvailability", "ClearChargingProfile", "CancelReservation", "RemoteStartTransaction",
@@ -143,7 +144,7 @@ class InteractiveConnection:
         thread.start()
 
     def close_connection(self, cp_id):
-        self.connections[cp_id].close()
+        self.connections[cp_id].close_connection()
 
     def close_all(self):
         for cp_id in self.connections.keys():
@@ -151,7 +152,7 @@ class InteractiveConnection:
 
     def loop(self):
         while True:
-            print(len((self.connections.keys())))
+            time.sleep(60)
             if len(self.connections.keys()) > 0:
                 print(f"select a cp to send message: {self.connections.keys()}, or quit to end the driver")
                 input_ = input("> ")
@@ -191,13 +192,14 @@ def open_connection():
     cp_id = request.args.get("cp_id")
     cp = request.json
     print(f"trying to connect to {cp_id}")
-    interactive_connections.add_connection(cp_id, auth_key, cp)
+    #interactive_connections.add_connection(cp_id, auth_key, cp)
+    threading.Thread(target=oscpDriver.OscpConnection, args=(cp_id,)).start()
     print(f"connection with charging point {cp_id} opened")
     return make_response("200 OK", 200)
 
 
 if __name__ == "__main__":
-    t = threading.Thread(target=interactive_connections.loop)
-    t.start()
-    app.run(port=3000)
-    t.join()
+    #t = threading.Thread(target=interactive_connections.loop)
+    #t.start()
+    app.run(host="0.0.0.0", port=5000)
+    #t.join()
