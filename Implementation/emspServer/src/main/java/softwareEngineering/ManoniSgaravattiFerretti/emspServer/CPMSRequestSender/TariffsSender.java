@@ -4,10 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.ChargingPoint;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.ChargingPointOperator;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.Tariff;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.TariffService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.TariffDTO;
@@ -22,15 +23,19 @@ public class TariffsSender {
     TariffService tariffService;
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public void getTariffs(ChargingPoint cp) {
-        List<Tariff> allTariffs = new ArrayList<>();
+    @Async
+    public void getTariffs(ChargingPointOperator cpo) {
+        try {
+            Thread.sleep(1000*60);
+        }catch (Exception e){}
+
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
-        headers.set("Authorization", cp.getCpo().getTokenEmsp());
+        headers.set("Authorization", cpo.getTokenEmsp());
         HttpEntity<?> entity = new HttpEntity<>(headers);
 
         String ocpiPath = "/ocpi/cpo";
-        String urlTemplate = UriComponentsBuilder.fromHttpUrl(cp.getCpo().getCpmsUrl() + ocpiPath + "/tariffs").encode().toUriString();
+        String urlTemplate = UriComponentsBuilder.fromHttpUrl(cpo.getCpmsUrl() + ocpiPath + "/tariffs").encode().toUriString();
 
         ParameterizedTypeReference<Page<TariffDTO>> typo = new ParameterizedTypeReference<>() {};
         ResponseEntity<Page<TariffDTO>> response = restTemplate.exchange(

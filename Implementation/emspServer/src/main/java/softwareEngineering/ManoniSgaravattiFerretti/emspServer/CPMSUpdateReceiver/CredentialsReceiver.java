@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSRequestSender.LocationsSender;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSRequestSender.TariffsSender;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.CredentialDTO;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.ChargingPointOperator;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.ChargingPointOperatorService;
@@ -20,6 +21,8 @@ import java.util.UUID;
 public class CredentialsReceiver {
     @Autowired
     LocationsSender locations;
+    @Autowired
+    TariffsSender tariffs;
     @Autowired
     ChargingPointOperatorService cpoService;
     @Value("${emsp.path}")
@@ -41,6 +44,7 @@ public class CredentialsReceiver {
         cpoService.saveCPO(cpo);
 
         locations.getCps(cpo);
+        tariffs.getTariffs(cpo);
 
         return ResponseEntity.ok(credentials);
     }

@@ -10,7 +10,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.ChargingPoint;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.ChargingPointOperator;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.Socket;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.Tariff;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.ChargingPointService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.TariffService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.ChargingPointDTO;
@@ -40,7 +39,6 @@ public class LocationsSender {
         try {
             Thread.sleep(1000*60);
         }catch (Exception e){}
-        System.out.println("Creating getCPs request...");
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
@@ -56,8 +54,6 @@ public class LocationsSender {
                 entity,
                 typo
         );
-        System.out.println("Response of getCPs request: " + response.getBody());
-
 
         List<ChargingPointDTO> cps= Objects.requireNonNull(response.getBody()).getContent();
         for (ChargingPointDTO cp: cps) {
