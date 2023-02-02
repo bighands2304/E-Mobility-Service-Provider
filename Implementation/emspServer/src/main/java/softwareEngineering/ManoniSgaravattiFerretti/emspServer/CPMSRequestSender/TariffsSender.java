@@ -2,7 +2,6 @@ package softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSRequestSende
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.domain.Page;
 import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -11,6 +10,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.ChargingPointOperator;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.Tariff;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.TariffService;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.RestResponsePage;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.TariffDTO;
 
 import java.util.List;
@@ -36,8 +36,8 @@ public class TariffsSender {
         String ocpiPath = "/ocpi/cpo";
         String urlTemplate = UriComponentsBuilder.fromHttpUrl(cpo.getCpmsUrl() + ocpiPath + "/tariffs").encode().toUriString();
 
-        ParameterizedTypeReference<Page<TariffDTO>> typo = new ParameterizedTypeReference<>() {};
-        ResponseEntity<Page<TariffDTO>> response = restTemplate.exchange(
+        ParameterizedTypeReference<RestResponsePage<TariffDTO>> typo = new ParameterizedTypeReference<>() {};
+        ResponseEntity<RestResponsePage<TariffDTO>> response = restTemplate.exchange(
                 urlTemplate,
                 HttpMethod.GET,
                 entity,
