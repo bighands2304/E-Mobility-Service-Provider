@@ -50,6 +50,7 @@ public class SocketAvailabilityListener implements ApplicationListener<SocketAva
     public void onApplicationEvent(SocketAvailabilityEvent event) {
         CompletableFuture<ConfMessage> futureResponse = ocppSender.sendChangeAvailability(event.getCpId(),
                 event.getSocketId(), event.getChangeSocketAvailabilityDTO().getAvailable());
+        socketService.updateSocketAvailability(event.getChangeSocketAvailabilityDTO(), event.getCpId(), event.getSocketId());
         ChangeAvailabilityConf changeAvailabilityConf;
         try {
             changeAvailabilityConf = (ChangeAvailabilityConf) futureResponse.orTimeout(120, TimeUnit.SECONDS).get();
@@ -60,7 +61,6 @@ public class SocketAvailabilityListener implements ApplicationListener<SocketAva
             logger.warn("Response from charging point has not arrived");
             return;
         }
-        socketService.updateSocketAvailability(event.getChangeSocketAvailabilityDTO(), event.getCpId(), event.getSocketId());
         socketStatusListener.onSocketUpdate(event.getCpId(), event.getSocketId());
     }
 }

@@ -16,7 +16,9 @@ public class EntityFromDTOConverter {
 
     public static EmspDetails emspDetailsFromCredentialsDTO(CredentialsDTO credentialsDTO) {
         EmspDetails emspDetails = new EmspDetails();
-        BeanUtils.copyProperties(credentialsDTO, emspDetails);
+        emspDetails.setEmspToken(credentialsDTO.getEmspToken());
+        emspDetails.setUrl(credentialsDTO.getEmspUrl());
+        emspDetails.setCpoToken(credentialsDTO.getCpmsToken());
         return emspDetails;
     }
 
