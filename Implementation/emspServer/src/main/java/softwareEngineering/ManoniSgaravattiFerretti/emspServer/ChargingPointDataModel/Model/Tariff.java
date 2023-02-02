@@ -1,9 +1,9 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model;
 
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,6 +14,8 @@ import java.util.List;
 @Data
 @Document
 public class Tariff {
+    @Id
+    private String id;
     @Indexed(unique=true)
     private String tariffId;
     private String socketType;

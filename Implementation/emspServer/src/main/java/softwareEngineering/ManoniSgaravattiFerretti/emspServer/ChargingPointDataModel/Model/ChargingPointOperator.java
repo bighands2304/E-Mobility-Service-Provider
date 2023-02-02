@@ -1,9 +1,9 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model;
 
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,6 +19,8 @@ public class ChargingPointOperator implements UserDetails{
     public ChargingPointOperator(){
         this.authorities.add(new SimpleGrantedAuthority("ROLE_CPMS"));
     }
+    @Id
+    private String id;
     private String token;
     private String tokenEmsp;
     private String iban;

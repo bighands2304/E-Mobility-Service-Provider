@@ -2,9 +2,9 @@ package softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDat
 
 
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
@@ -16,6 +16,8 @@ import java.util.List;
 @Data
 @Document
 public class ChargingPoint {
+    @Id
+    private String id;
     @Indexed(unique = true)
     private String cpId;
     private String name;

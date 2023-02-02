@@ -52,6 +52,7 @@ public class TariffsSender {
             newTariff.setStepSize(t.getStepSize());
             newTariff.setStartDate(t.getStartDate());
             newTariff.setEndDate(t.getEndDate());
+            newTariff.setIsSpecialOffer(t.isSpecialOffer());
 
             newTariff.setStartTime(t.getStartTime());
             newTariff.setEndTime(t.getEndTime());
