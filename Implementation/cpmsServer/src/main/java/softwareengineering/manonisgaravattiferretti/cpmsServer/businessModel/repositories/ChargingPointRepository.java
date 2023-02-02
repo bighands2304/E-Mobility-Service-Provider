@@ -81,11 +81,11 @@ public interface ChargingPointRepository extends MongoRepository<ChargingPoint, 
             }
             """, """
             {
-                $skip: ?2
+                $skip: ?0
             }
             """, """
             {
-                $limit: ?3
+                $limit: ?1
             }
             """
     })
