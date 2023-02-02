@@ -17,9 +17,13 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointData
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.ChargingPointDTO;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.SocketDTO;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static java.time.temporal.ChronoUnit.MINUTES;
 
 @Service
 public class LocationsSender {
@@ -38,8 +42,15 @@ public class LocationsSender {
     @Async
     public void getCps(ChargingPointOperator cpo){
         try {
+            LocalTime a= LocalTime.now();
+            System.out.println("starting sleep: " + a);
             Thread.sleep(5000);
-        }catch (Exception e){}
+            LocalTime b= LocalTime.now();
+            System.out.println("ending sleep: " + b);
+            System.out.println("seconds: " + a.until(b, MINUTES));
+        }catch (Exception e){
+            System.out.println("Exception: " + e);
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
