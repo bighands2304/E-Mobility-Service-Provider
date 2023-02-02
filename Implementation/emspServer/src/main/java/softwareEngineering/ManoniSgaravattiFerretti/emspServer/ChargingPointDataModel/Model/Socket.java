@@ -11,10 +11,6 @@ import java.time.LocalDateTime;
 
 @Data
 public class Socket {
-    @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
-    private String id;
     @Indexed(unique = true)
     private String socketId;
     private String availability;

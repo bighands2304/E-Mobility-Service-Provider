@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.TariffDTO;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.SpecialOffer;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.Tariff;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.TariffService;
 
@@ -24,22 +23,18 @@ public class TariffsReceiver {
         newTariff.setStartDate(tariff.getStartDate());
         newTariff.setStepSize(tariff.getStepSize());
 
-        if(tariff.isSpecialOffer()){
-            SpecialOffer newSpecialOffer = (SpecialOffer) newTariff;
-            newSpecialOffer.setStartTime(tariff.getStartTime());
-            newSpecialOffer.setEndTime(tariff.getEndTime());
-            newSpecialOffer.setMinKWh(tariff.getMinKWh());
-            newSpecialOffer.setMaxKWh(tariff.getMaxKWh());
-            newSpecialOffer.setMinCurrent(tariff.getMinCurrent());
-            newSpecialOffer.setMaxCurrent(tariff.getMaxCurrent());
-            newSpecialOffer.setMinDuration(tariff.getMinDuration());
-            newSpecialOffer.setMaxDuration(tariff.getMaxDuration());
-            newSpecialOffer.setDaysOfTheWeek(tariff.getDaysOfTheWeek());
+        newTariff.setStartTime(tariff.getStartTime());
+        newTariff.setEndTime(tariff.getEndTime());
+        newTariff.setMinKWh(tariff.getMinKWh());
+        newTariff.setMaxKWh(tariff.getMaxKWh());
+        newTariff.setMinCurrent(tariff.getMinCurrent());
+        newTariff.setMaxCurrent(tariff.getMaxCurrent());
+        newTariff.setMinDuration(tariff.getMinDuration());
+        newTariff.setMaxDuration(tariff.getMaxDuration());
+        newTariff.setDaysOfTheWeek(tariff.getDaysOfTheWeek());
 
-            tariffService.save(newSpecialOffer);
-        }else {
-            tariffService.save(newTariff);
-        }
+        tariffService.save(newTariff);
+
         return ResponseEntity.noContent().build();
     }
 

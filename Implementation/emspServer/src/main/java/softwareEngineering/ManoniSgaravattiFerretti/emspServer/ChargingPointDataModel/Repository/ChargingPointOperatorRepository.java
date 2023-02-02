@@ -6,6 +6,5 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointData
 
 @Repository
 public interface ChargingPointOperatorRepository extends MongoRepository<ChargingPointOperator, String> {
-    ChargingPointOperator findChargingPointOperatorByCpoId(String cpoId);
     ChargingPointOperator findChargingPointOperatorByToken(String token);
 }
