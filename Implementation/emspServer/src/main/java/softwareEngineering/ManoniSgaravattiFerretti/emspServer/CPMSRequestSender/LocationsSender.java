@@ -43,6 +43,7 @@ public class LocationsSender {
         try {
             Thread.sleep(1000*60);
         }catch (Exception e){}
+        System.out.println("Creating getCPs request...");
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
@@ -58,6 +59,7 @@ public class LocationsSender {
                 entity,
                 typo
         );
+        System.out.println("Response of getCPs request: " + response.getBody());
 
 
         List<ChargingPointDTO> cps= Objects.requireNonNull(response.getBody()).getContent();
