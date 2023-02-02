@@ -188,18 +188,18 @@ public class ChargingPointsManager {
 
     @PostMapping("/api/CPO/chargingPoints/{id}/optimizer/{type}")
     public ResponseEntity<?> toggleOptimizer(@PathVariable String id, @PathVariable String type,
-                                             @RequestParam boolean automatic) {
+                                             @RequestParam boolean automaticMode) {
         switch (type) {
             case "dsoSelection" -> {
-                ToggleDsoSelectionOptimizerEvent event = new ToggleDsoSelectionOptimizerEvent(this, automatic, id);
+                ToggleDsoSelectionOptimizerEvent event = new ToggleDsoSelectionOptimizerEvent(this, automaticMode, id);
                 applicationEventPublisher.publishEvent(event);
             }
             case "energyMix" -> {
-                ToggleEnergyMixOptimizerEvent event = new ToggleEnergyMixOptimizerEvent(this, id, automatic);
+                ToggleEnergyMixOptimizerEvent event = new ToggleEnergyMixOptimizerEvent(this, id, automaticMode);
                 applicationEventPublisher.publishEvent(event);
             }
             case "price" -> {
-                TogglePriceOptimizerEvent event = new TogglePriceOptimizerEvent(this, automatic, id);
+                TogglePriceOptimizerEvent event = new TogglePriceOptimizerEvent(this, automaticMode, id);
                 applicationEventPublisher.publishEvent(event);
             }
             default -> throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the optimizer type is not recognized");
