@@ -7,6 +7,7 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,10 +16,6 @@ import java.util.List;
 @Data
 @Document
 public class ChargingPoint {
-    @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
-    private String id;
     @Indexed(unique = true)
     private String cpId;
     private String name;
@@ -26,14 +23,12 @@ public class ChargingPoint {
     private Double latitude;
     private Double longitude;
     private LocalDateTime lastUpdate;
+    @DocumentReference
     private ChargingPointOperator cpo;
     private List<Socket> sockets = new ArrayList<>();
-    private List<Tariff> tariffs = new ArrayList<>();
     private List<String> tariffsId = new ArrayList<>();
 
-    public void addTariff(Tariff newTariff){
-        tariffs.add(newTariff);
-    }
-
     public void addSocket(Socket newSocket){ sockets.add(newSocket);}
+
+    public void removeSocket(Socket removedSocket){ sockets.remove(removedSocket);}
 }

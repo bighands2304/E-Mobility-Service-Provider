@@ -13,6 +13,7 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointData
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.TariffService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.TariffDTO;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,7 +23,8 @@ public class TariffsSender {
     TariffService tariffService;
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public void getTariffs(ChargingPoint cp) {
+    public List<Tariff> getTariffs(ChargingPoint cp) {
+        List<Tariff> allTariffs = new ArrayList<>();
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
         headers.set("Authorization", cp.getCpo().getTokenEmsp());
@@ -62,10 +64,11 @@ public class TariffsSender {
                 newSpecialOffer.setMinDuration(t.getMinDuration());
                 newSpecialOffer.setMaxDuration(t.getMaxDuration());
                 newSpecialOffer.setDaysOfTheWeek(t.getDaysOfTheWeek());
-                tariffService.save(newSpecialOffer);
+                allTariffs.add(newSpecialOffer);
             }else {
-                tariffService.save(newTariff);
+                allTariffs.add(newTariff);
             }
         }
+        return allTariffs;
     }
 }

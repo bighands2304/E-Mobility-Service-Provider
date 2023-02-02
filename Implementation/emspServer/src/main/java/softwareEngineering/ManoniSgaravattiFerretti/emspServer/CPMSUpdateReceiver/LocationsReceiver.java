@@ -9,7 +9,6 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointData
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.Socket;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.ChargingPointOperatorService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.ChargingPointService;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.SocketService;
 
 @RestController
 @RequestMapping("/ocpi/emsp/locations")
@@ -17,10 +16,7 @@ public class LocationsReceiver {
     @Autowired
     ChargingPointService cpService;
     @Autowired
-    SocketService socketService;
-    @Autowired
     ChargingPointOperatorService cpoService;
-
     @PutMapping("/{cp_id}")
     public ResponseEntity<?> putCP(@PathVariable String cp_id, @RequestBody ChargingPointDTO cp, @RequestHeader("Authorization") String auth){
         ChargingPoint newCp = new ChargingPoint();
@@ -41,8 +37,6 @@ public class LocationsReceiver {
             newSocket.setLastUpdate(s.getLastUpdate());
             newSocket.setAvailability(s.getAvailability());
             newCp.addSocket(newSocket);
-
-            socketService.save(newSocket);
         }
         cpService.save(newCp);
         return ResponseEntity.noContent().build();
@@ -61,7 +55,6 @@ public class LocationsReceiver {
 
         chargingPoint.addSocket(newSocket);
 
-        socketService.save(newSocket);
         cpService.save(chargingPoint);
 
         return ResponseEntity.noContent().build();
@@ -86,13 +79,15 @@ public class LocationsReceiver {
     public ResponseEntity<?> patchSocket(@PathVariable String cp_id, @PathVariable String socket_id, @RequestBody SocketDTO updatedSocket){
         ChargingPoint chargingPoint = cpService.getCPById(cp_id);
         Socket socket = chargingPoint.getSockets().stream().filter(socket1 -> socket1.getSocketId().equals(socket_id)).toList().get(0);
+        chargingPoint.removeSocket(socket);
 
         socket.setType(updatedSocket.getSocketType());
         socket.setStatus(updatedSocket.getStatus());
         socket.setLastUpdate(updatedSocket.getLastUpdate());
         socket.setAvailability(updatedSocket.getAvailability());
 
-        socketService.save(socket);
+        chargingPoint.addSocket(socket);
+        cpService.save(chargingPoint);
 
         return ResponseEntity.noContent().build();
     }

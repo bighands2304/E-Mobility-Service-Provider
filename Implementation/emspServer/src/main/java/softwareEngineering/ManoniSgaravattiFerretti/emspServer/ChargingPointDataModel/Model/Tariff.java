@@ -10,11 +10,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDate;
 
 @Data
+@Document
 public class Tariff {
-    @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
-    private String id;
     @Indexed(unique=true)
     private String tariffId;
     private String socketType;

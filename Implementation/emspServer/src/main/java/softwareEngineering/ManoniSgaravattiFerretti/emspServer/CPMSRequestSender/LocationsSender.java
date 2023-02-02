@@ -2,7 +2,6 @@ package softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSRequestSende
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.domain.Page;
 import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -11,8 +10,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.ChargingPoint;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.ChargingPointOperator;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.Socket;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.Tariff;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.ChargingPointService;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.SocketService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.TariffService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.ChargingPointDTO;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.RestResponsePage;
@@ -22,14 +21,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static java.time.temporal.ChronoUnit.MINUTES;
-
 @Service
 public class LocationsSender {
     @Autowired
     ChargingPointService cpService;
     @Autowired
-    SocketService socketService;
+    TariffsSender tariffsSender;
     @Autowired
     TariffService tariffService;
 
@@ -79,27 +76,16 @@ public class LocationsSender {
 
             newCp.setSockets(new ArrayList<>());
             for (SocketDTO s: cp.getSockets()) {
-                Socket newSocket = socketService.getSocketById(s.getSocketId().toString());
-                if (newSocket==null){
-                    newSocket = new Socket();
-                }
+                Socket newSocket = new Socket();
 
                 newSocket.setSocketId(s.getSocketId().toString());
                 newSocket.setAvailability(s.getAvailability());
                 newSocket.setStatus(s.getStatus());
                 newSocket.setType(s.getSocketType());
                 newSocket.setLastUpdate(s.getLastUpdate());
-                socketService.save(newSocket);
                 newCp.addSocket(newSocket);
             }
             newCp.setTariffsId(cp.getTariffIds());
-            for (String tid: cp.getTariffIds()) {
-                try {
-                    newCp.addTariff(tariffService.getTariffById(tid));
-                }catch (Exception e){
-                    System.out.println("EXCEPTION: "+e);
-                }
-            }
             cpService.save(newCp);
         }
     }
@@ -113,8 +99,8 @@ public class LocationsSender {
         //?date_from={DateTime}&date_to={DateTime}&offset=0&limit=10
         String urlTemplate = UriComponentsBuilder.fromHttpUrl(cp.getCpo().getCpmsUrl()+ocpiPath+"/locations/"+cp.getCpId()).encode().toUriString();
 
-        ParameterizedTypeReference<Page<ChargingPointDTO>> typo = new ParameterizedTypeReference<>() {};
-        ResponseEntity<Page<ChargingPointDTO>> response = restTemplate.exchange(
+        ParameterizedTypeReference<RestResponsePage<ChargingPointDTO>> typo = new ParameterizedTypeReference<>() {};
+        ResponseEntity<RestResponsePage<ChargingPointDTO>> response = restTemplate.exchange(
                 urlTemplate,
                 HttpMethod.GET,
                 entity,
@@ -136,22 +122,16 @@ public class LocationsSender {
         newCp.setLastUpdate(cpResponse.getLastUpdated());
         newCp.setCpo(cp.getCpo());
         for (SocketDTO s: cpResponse.getSockets()) {
-            Socket newSocket = socketService.getSocketById(s.getSocketId().toString());
-            if (newSocket==null){
-                newSocket = new Socket();
-            }
+            Socket newSocket = new Socket();
+
             newSocket.setSocketId(s.getSocketId().toString());
             newSocket.setAvailability(s.getAvailability());
             newSocket.setStatus(s.getStatus());
             newSocket.setType(s.getSocketType());
             newSocket.setLastUpdate(s.getLastUpdate());
-            socketService.save(newSocket);
             newCp.addSocket(newSocket);
         }
-        newCp.setTariffsId(cpResponse.getTariffIds());
-        for (String tid: cpResponse.getTariffIds()) {
-            newCp.addTariff(tariffService.getTariffById(tid));
-        }
+        newCp.setTariffsId(cp.getTariffsId());
         cpService.save(newCp);
     }
 
@@ -164,8 +144,8 @@ public class LocationsSender {
         //?date_from={DateTime}&date_to={DateTime}&offset=0&limit=10
         String urlTemplate = UriComponentsBuilder.fromHttpUrl(cp.getCpo().getCpmsUrl()+ocpiPath+"/locations/"+ cp.getCpId() + "/" + socket.getSocketId()).encode().toUriString();
 
-        ParameterizedTypeReference<Page<SocketDTO>> typo = new ParameterizedTypeReference<>() {};
-        ResponseEntity<Page<SocketDTO>> response = restTemplate.exchange(
+        ParameterizedTypeReference<RestResponsePage<SocketDTO>> typo = new ParameterizedTypeReference<>() {};
+        ResponseEntity<RestResponsePage<SocketDTO>> response = restTemplate.exchange(
                 urlTemplate,
                 HttpMethod.GET,
                 entity,
@@ -173,16 +153,17 @@ public class LocationsSender {
         );
 
         SocketDTO socketResponse = Objects.requireNonNull(response.getBody()).getContent().get(0);
+        cp.removeSocket(socket);
+        if(socketResponse!=null) {
+            Socket newSocket = new Socket();
 
-        Socket newSocket = socketService.getSocketById(socketResponse.getSocketId().toString());
-        if (newSocket==null){
-            newSocket = new Socket();
+            newSocket.setSocketId(socketResponse.getSocketId().toString());
+            newSocket.setAvailability(socketResponse.getAvailability());
+            newSocket.setStatus(socketResponse.getStatus());
+            newSocket.setType(socketResponse.getSocketType());
+            newSocket.setLastUpdate(socketResponse.getLastUpdate());
+            cp.addSocket(newSocket);
+            cpService.save(cp);
         }
-        newSocket.setSocketId(socketResponse.getSocketId().toString());
-        newSocket.setAvailability(socketResponse.getAvailability());
-        newSocket.setStatus(socketResponse.getStatus());
-        newSocket.setType(socketResponse.getSocketType());
-        newSocket.setLastUpdate(socketResponse.getLastUpdate());
-        socketService.save(newSocket);
     }
 }
