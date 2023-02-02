@@ -15,9 +15,9 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointData
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.SocketService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.TariffService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.ChargingPointDTO;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.RestResponsePage;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.SocketDTO;
 
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -52,8 +52,8 @@ public class LocationsSender {
 
         String urlTemplate = UriComponentsBuilder.fromHttpUrl(cpo.getCpmsUrl()+ocpiPath+"/locations").encode().toUriString();
 
-        ParameterizedTypeReference<Page<ChargingPointDTO>> typo = new ParameterizedTypeReference<>() {};
-        ResponseEntity<Page<ChargingPointDTO>> response = restTemplate.exchange(
+        ParameterizedTypeReference<RestResponsePage<ChargingPointDTO>> typo = new ParameterizedTypeReference<>() {};
+        ResponseEntity<RestResponsePage<ChargingPointDTO>> response = restTemplate.exchange(
                 urlTemplate,
                 HttpMethod.GET,
                 entity,
