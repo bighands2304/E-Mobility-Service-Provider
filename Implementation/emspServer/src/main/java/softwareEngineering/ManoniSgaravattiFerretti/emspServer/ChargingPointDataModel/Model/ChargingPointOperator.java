@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.List;
 
 @Data
-@Document
 public class ChargingPointOperator implements UserDetails{
     public ChargingPointOperator(){
         this.authorities.add(new SimpleGrantedAuthority("ROLE_CPMS"));

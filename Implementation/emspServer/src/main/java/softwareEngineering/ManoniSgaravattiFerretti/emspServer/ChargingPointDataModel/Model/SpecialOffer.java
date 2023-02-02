@@ -9,7 +9,6 @@ import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Document
 public class SpecialOffer extends Tariff{
     public SpecialOffer(){
         super.setIsSpecialOffer(true);

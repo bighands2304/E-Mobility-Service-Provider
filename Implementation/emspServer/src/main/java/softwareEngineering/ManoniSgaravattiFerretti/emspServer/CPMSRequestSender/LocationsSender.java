@@ -17,7 +17,6 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointData
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.ChargingPointDTO;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.SocketDTO;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,15 +41,8 @@ public class LocationsSender {
     @Async
     public void getCps(ChargingPointOperator cpo){
         try {
-            LocalTime a= LocalTime.now();
-            System.out.println("starting sleep: " + a);
-            Thread.sleep(5000);
-            LocalTime b= LocalTime.now();
-            System.out.println("ending sleep: " + b);
-            System.out.println("seconds: " + a.until(b, MINUTES));
-        }catch (Exception e){
-            System.out.println("Exception: " + e);
-        }
+            Thread.sleep(1000*60);
+        }catch (Exception e){}
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
@@ -100,7 +92,11 @@ public class LocationsSender {
             }
             newCp.setTariffsId(cp.getTariffIds());
             for (String tid: cp.getTariffIds()) {
-                newCp.addTariff(tariffService.getTariffById(tid));
+                try {
+                    newCp.addTariff(tariffService.getTariffById(tid));
+                }catch (Exception e){
+                    System.out.println("EXCEPTION: "+e);
+                }
             }
             cpService.save(newCp);
         }
