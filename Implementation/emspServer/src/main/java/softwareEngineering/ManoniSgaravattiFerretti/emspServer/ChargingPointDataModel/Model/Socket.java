@@ -10,8 +10,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 
 @Data
-
-@Document
 public class Socket {
     @Id
     @GeneratedValue(generator = "uuid")
