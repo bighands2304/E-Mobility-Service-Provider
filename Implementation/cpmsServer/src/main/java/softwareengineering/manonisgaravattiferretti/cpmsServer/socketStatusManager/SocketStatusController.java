@@ -1,5 +1,7 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.socketStatusManager;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,7 @@ public class SocketStatusController {
     private final SocketService socketService;
     private final ChargingPointService chargingPointService;
     private final ReservationService reservationService;
+    private final Logger logger = LoggerFactory.getLogger(SocketStatusController.class);
 
     @Autowired
     public SocketStatusController(SocketService socketService, ChargingPointService chargingPointService, ReservationService reservationService) {
@@ -36,6 +39,7 @@ public class SocketStatusController {
                                                                  @RequestParam(required = false) LocalDateTime dateTo,
                                                                  @RequestParam(defaultValue = "0") Integer offset,
                                                                  @RequestParam(defaultValue = "100") Integer limit) {
+        logger.info("Received a get cp request from the emsp");
         Page<ChargingPoint> chargingPoints = (dateFrom == null) ? chargingPointService.findAllPaginated(offset, limit) :
                 chargingPointService.findAllLastUpdatePaginated(dateFrom, dateTo, offset, limit);
         Page<EmspChargingPointDTOWithId> chargingPointDTOS = chargingPoints.map(

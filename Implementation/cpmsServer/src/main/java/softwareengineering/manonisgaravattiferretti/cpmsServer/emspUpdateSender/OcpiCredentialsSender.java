@@ -45,6 +45,7 @@ public class OcpiCredentialsSender {
         logger.info("Inserted temporary credentials for emsp: " + emspDetails);*/
 
         Optional<CredentialsDTO> credentialsDTOOptional;
+        logger.info("Sending credentials to the emsp at the url " + emspUrl + " with token = " + emspToken);
         try {
             credentialsDTOOptional = WebClient
                     .create()
@@ -56,8 +57,10 @@ public class OcpiCredentialsSender {
                     .bodyToMono(CredentialsDTO.class)
                     .blockOptional(Duration.ofSeconds(10));
         } catch (RuntimeException e) {
+            logger.info("Emsp is not responding");
             throw new EmspResponseTimeoutException("Request timeout: emsp is not reachable");
         }
+        logger.info("Received response from emsp " + credentialsDTOOptional);
         CredentialsDTO credentialsDTO = credentialsDTOOptional.orElseThrow(() -> new EmspErrorException("Bad request"));
         emspDetailsService.insertEmsp(EntityFromDTOConverter.emspDetailsFromCredentialsDTO(credentialsDTO));
     }

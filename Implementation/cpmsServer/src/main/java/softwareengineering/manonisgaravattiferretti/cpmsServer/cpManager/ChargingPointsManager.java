@@ -207,7 +207,7 @@ public class ChargingPointsManager {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/api/CPO/chargingPoints/{id}/sockets/{socketId}")
+    @PatchMapping("/api/CPO/chargingPoints/{id}/sockets/{socketId}")
     public ResponseEntity<?> updateSocketAvailability(@PathVariable String id, @PathVariable Integer socketId,
                                                       @RequestBody @Valid ChangeSocketAvailabilityDTO socketAvailabilityDTO,
                                                       @AuthenticationPrincipal CPO cpo) {
