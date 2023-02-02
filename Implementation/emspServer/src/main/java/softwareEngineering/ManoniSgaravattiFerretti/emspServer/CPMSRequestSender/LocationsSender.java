@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -33,7 +34,13 @@ public class LocationsSender {
     private final RestTemplate restTemplate = new RestTemplate();
 
 
+
+    @Async
     public void getCps(ChargingPointOperator cpo){
+        try {
+            Thread.sleep(5000);
+        }catch (Exception e){}
+
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
         headers.set("Authorization", cpo.getTokenEmsp());
