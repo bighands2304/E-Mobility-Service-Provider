@@ -54,6 +54,7 @@ public class ChargingPointCustomUpdateImpl implements ChargingPointCustomUpdate 
     public void updateBatteryAvailability(String id, int batteryId, Boolean available) {
         Query query = new Query();
         query.addCriteria(Criteria.where("_id").is(id));
+        query.addCriteria(Criteria.where("batteries.batteryId").is(batteryId));
         Update update = new Update();
         update.set("batteries.$.status", (available) ? "IDLE" : "UNAVAILABLE");
         mongoOperations.updateFirst(query, update, ChargingPoint.class);

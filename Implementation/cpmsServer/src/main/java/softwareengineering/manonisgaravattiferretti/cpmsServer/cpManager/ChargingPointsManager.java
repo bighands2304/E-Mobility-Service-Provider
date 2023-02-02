@@ -211,7 +211,7 @@ public class ChargingPointsManager {
     public ResponseEntity<?> updateSocketAvailability(@PathVariable String id, @PathVariable Integer socketId,
                                                       @RequestBody @Valid ChangeSocketAvailabilityDTO socketAvailabilityDTO,
                                                       @AuthenticationPrincipal CPO cpo) {
-        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointOfCpoById(id, cpo.getCpoCode());
+        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(id, cpo.getCpoCode());
         if (chargingPointOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "socket not found");
         }
@@ -225,7 +225,7 @@ public class ChargingPointsManager {
     public ResponseEntity<?> includeBattery(@PathVariable String id, @PathVariable Integer batteryId,
                                             @RequestBody @Valid IncludeBatteryDTO includeBatteryDTO,
                                             @AuthenticationPrincipal CPO cpo) {
-        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointOfCpoById(id, cpo.getCpoCode());
+        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(id, cpo.getCpoCode());
         if (chargingPointOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "battery not found");
         }
@@ -238,7 +238,7 @@ public class ChargingPointsManager {
     @PatchMapping("/api/CPO/chargingPoints/{id}/energySources/battery/{batteryId}/availability")
     public ResponseEntity<?> changeBatteryAvailability(@PathVariable String id, @PathVariable Integer batteryId,
                                                        @RequestParam boolean available, @AuthenticationPrincipal CPO cpo) {
-        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointOfCpoById(id, cpo.getCpoCode());
+        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(id, cpo.getCpoCode());
         if (chargingPointOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "battery not found");
         }
@@ -250,7 +250,7 @@ public class ChargingPointsManager {
 
     @GetMapping("/api/CPO/chargingPoints/{id}/dso/offers")
     public ResponseEntity<Iterable<DSOOffer>> getChargingPointDsoOffers(@PathVariable String id, @AuthenticationPrincipal CPO cpo) {
-        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointOfCpoById(id, cpo.getCpoCode());
+        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(id, cpo.getCpoCode());
         if (chargingPointOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "charging point not found");
         }
@@ -260,7 +260,7 @@ public class ChargingPointsManager {
     @PatchMapping("/api/CPO/chargingPoints/{id}/dso/offers/{offerId}")
     public ResponseEntity<?> changeDsoProvider(@PathVariable String id, @PathVariable String offerId,
                                                @RequestBody OfferTimeSlot offerTimeSlot, @AuthenticationPrincipal CPO cpo) {
-        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointOfCpoById(id, cpo.getCpoCode());
+        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(id, cpo.getCpoCode());
         if (chargingPointOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "charging point not found");
         }
