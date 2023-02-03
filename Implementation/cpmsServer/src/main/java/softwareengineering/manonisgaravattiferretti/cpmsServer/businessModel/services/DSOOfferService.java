@@ -49,8 +49,20 @@ public class DSOOfferService {
         dsoOfferRepository.save(dsoOffer);
     }
 
+    public void removeOffer(List<DSOOffer> offers) {
+        dsoOfferRepository.deleteAll(offers);
+    }
+
+    public List<DSOOffer> findDsoOffersFromCpAndDso(String dsoToken, String cpId) {
+        return dsoOfferRepository.findDSOOffersByChargingPointIdAndDsoToken(cpId, dsoToken);
+    }
+
     public Optional<DSOOffer> findDSOOfferFromCpAndTimeSlot(String cpId, OfferTimeSlot offerTimeSlot, boolean inUse) {
         return dsoOfferRepository.findDSOOfferByChargingPointIdAndAvailableTimeSlotAndInUse(cpId, offerTimeSlot, inUse);
+    }
+
+    public void insertAll(List<DSOOffer> offers) {
+        dsoOfferRepository.insert(offers);
     }
 
     public void registerDso(String dsoId, String cpId, String dsoToken, String dsoUrl, String companyName, String cpoToken) {

@@ -50,6 +50,7 @@ public class DSOSelectionOptimizer {
 
     @Async
     void optimizeCp(String cpId, LocalDateTime now, LocalDateTime oneWeekAgo) {
+        // todo: change
         double meanConsumption = energyConsumptionService.findMeanConsumption(cpId, oneWeekAgo, now);
         List<DSOOffer> dsoOffers = dsoOfferService.findOffersOfCp(cpId);
         if (dsoOffers.size() <= 1) {

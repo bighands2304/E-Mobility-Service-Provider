@@ -97,4 +97,11 @@ public class EntityFromDTOConverter {
         chargingPoint.setToggleDSOSelectionOptimizer(true);
         return chargingPoint;
     }
+
+    public static DSOOfferDTO fromOfferToDto(DSOOffer dsoOffer) {
+        DSOOfferDTO dsoOfferDTO = new DSOOfferDTO();
+        BeanUtils.copyProperties(dsoOffer, dsoOfferDTO);
+        dsoOfferDTO.setOfferId(dsoOffer.getId());
+        return dsoOfferDTO;
+    }
 }

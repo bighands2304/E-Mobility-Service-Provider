@@ -15,4 +15,5 @@ public interface DSOOfferRepository extends MongoRepository<DSOOffer, String>, D
                                                                                  OfferTimeSlot availableTimeSlot,
                                                                                  boolean inUse);
     Optional<DSOOffer> findDSOOfferByChargingPointIdAndInUse(String cpId, boolean inUse);
+    List<DSOOffer> findDSOOffersByChargingPointIdAndDsoToken(String cpId, String dsoToken);
 }
