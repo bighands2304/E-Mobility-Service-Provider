@@ -22,9 +22,9 @@ public class CommandsReceiver {
     @Autowired
     NotificationSender notificationSender;
 
-    //List of commands invokable by the CPMS:
-    //• CANCEL_RESERVATION: Delete the reservation
-    //• RESERVE_NOW:
+    //List of commands invokable by the CPMS to confirm:
+    //• CANCEL_RESERVATION: the deletion of the reservation
+    //• RESERVE_NOW: the creation of the reservation
     //• START_SESSION:
     //• STOP_SESSION:
     //• UNLOCK_CONNECTOR:
@@ -57,7 +57,6 @@ public class CommandsReceiver {
         if (command.equals("START_SESSION")){
             if(commandResult.get("result").equals("ACCEPTED")){
                 ActiveReservation reservation = (ActiveReservation) reservationService.getReservationById(Long.parseLong(uid));
-                //TODO insert real session id
                 reservation.setSessionId(Long.parseLong(uid));
 
                 reservationService.save(reservation);
@@ -77,13 +76,7 @@ public class CommandsReceiver {
                 //Send the notification to the user
                 notificationSender.sendToSpecificUser(notification);
 
-                //TODO insert real values
-                endedReservation.setEnergyAmount(1.0);
-                endedReservation.setEndTime(LocalDateTime.now());
-                endedReservation.setPrice(1.0);
-
                 reservationService.save(endedReservation);
-                reservationService.delete(reservation);
             }
         }
 

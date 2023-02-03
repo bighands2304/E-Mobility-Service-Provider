@@ -96,7 +96,7 @@ public class UserDataController {
     @DeleteMapping("/deleteVehicle/{vin}")
     public ResponseEntity<?> deleteVehicle(@PathVariable String vin){
         vehicleService.deleteVehicleByVin(vin);
-        return ResponseEntity.ok("Delted");
+        return ResponseEntity.ok("Deleted");
     }
 
     @PostMapping("/setFavouriteVehicle")
