@@ -25,14 +25,16 @@ class CpConnection:
         self.auth_key = auth_key
 
     def create_connection(self):
-        self.websock = websocket.WebSocketApp(f"ws://cpmsserver.up.railway.app/ocpp?token={self.auth_key}",
+        self.websock = websocket.WebSocketApp(f"wss://cpmsserver.up.railway.app/ocpp?token={self.auth_key}",
                                               on_open=self.on_open,
                                               on_message=self.on_message,
-                                              on_close=self.on_close)
+                                              on_close=self.on_close,
+                                              on_error=self.on_error)
         #self.websock = websocket.WebSocketApp(f"ws://localhost:8080/ocpp?token={self.auth_key}",
         #                                      on_open=self.on_open,
         #                                      on_message=self.on_message,
-        #                                      on_close=self.on_close)
+        #                                      on_close=self.on_close,
+        #                                      on_error=self.on_error)
         self.websock.run_forever()
 
     def on_open(self, ws: websocket.WebSocketApp):
@@ -46,14 +48,18 @@ class CpConnection:
     def on_message(self, ws, message):
         message_unpacked = stomper.unpack_frame(message)
         print(f"""
-        ==========================================================================================
-        message from cp: {self.cp_id} at destination {message_unpacked['headers']['destination']}
-        the message is: 
-        {message}
+==========================================================================================
+current time: {datetime.datetime.now().isoformat()}
+message from cp: {self.cp_id} at destination {message_unpacked['headers']['destination']}
+the message is: 
+{message}
+The message parsed is 
+{message_unpacked}
         """)
         destination = message_unpacked["headers"]["destination"]
+        body = json.loads(message_unpacked["body"])
         if destination == "/topic/ocpp/BootNotification":
-            self.on_boot_notification_conf(message_unpacked)
+            self.on_boot_notification_conf(body)
         elif destination in ["/topic/ocpp/ChangeAvailability", "/topic/ocpp/CancelReservation",
                              "/topic/ocpp/ReserveNow", "/topic/ocpp/SetChargingProfile",
                              "/topic/ocpp/ClearChargingProfile"]:
@@ -61,23 +67,29 @@ class CpConnection:
             self.on_message_to_accept("/app/" + destination[7:] + "Conf", request_id)
         elif destination == "/topic/ocpp/RemoteStartTransaction":
             request_id = message_unpacked["headers"]["requestId"]
-            self.on_remote_start_transaction(message_unpacked, request_id)
+            self.on_remote_start_transaction(body, request_id)
         elif destination == "/topic/ocpp/RemoteStopTransaction":
             request_id = message_unpacked["headers"]["requestId"]
-            self.on_remote_stop_transaction(message_unpacked, request_id)
+            self.on_remote_stop_transaction(body, request_id)
 
     def on_close(self, ws, a, b):
         print(f'''
-        ==========================================================================================
-        Connection with {self.cp_id} closed
-        ==========================================================================================
+==========================================================================================
+Connection with {self.cp_id} closed
+Trying to reconnect
+==========================================================================================
         ''')
+        time.sleep(600)
+        self.create_connection()
+
+    def on_error(self, ws, message):
+        print(f"error {message}: current time = {datetime.datetime.now().isoformat()}")
 
     def close_connection(self):
         self.websock.close()
 
     def on_boot_notification_conf(self, message):
-        self.session_id = message["body"]["sessionId"]
+        self.session_id = message["sessionId"]
         for topic in TOPICS:
             sub_msg = stomper.subscribe(f"/topic/ocpp/{topic}", self.session_id)
             self.websock.send(sub_msg)
@@ -91,8 +103,8 @@ class CpConnection:
     def on_remote_start_transaction(self, message, request_id):
         self.on_message_to_accept("/app/ocpp/RemoteStartTransactionConf", request_id)
         time.sleep(5)
-        connector_id = message['body']['connectorId']
-        reservation_id = message['body']['reservationId']
+        connector_id = message['connectorId']
+        reservation_id = message['reservationId']
         start_tr_msg = {
             "connectorId": connector_id,
             "reservationId": reservation_id,
@@ -122,7 +134,7 @@ class CpConnection:
         self.on_message_to_accept("/app/ocpp/RemoteStartTransactionConf", request_id)
         time.sleep(10)
         stop_tr_msg = {
-            "transactionId": message['body']['transactionId'],
+            "transactionId": message['transactionId'],
             "timestamp": datetime.datetime.now().isoformat()
         }
         stomp_msg = stomper.send("/app/ocpp/StopTransaction", json.dumps(stop_tr_msg), content_type=CONTENT_TYPE)
