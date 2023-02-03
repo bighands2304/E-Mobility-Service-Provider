@@ -20,6 +20,9 @@ public class Vehicle {
     private String VINCode;
     private String socketType;
     private String model;
+    private Integer batteryPercentage;
+    private Integer kmRange;
+
     @OneToMany(mappedBy = "vehicle")
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore

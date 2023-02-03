@@ -52,6 +52,8 @@ public class UserDataController {
         //Set non required fields
         //Randomly select a Model simulating the VIN API
         vehicle.setModel(models[new Random().nextInt(socketTypes.length)]);
+        vehicle.setBatteryPercentage(new Random().nextInt(100));
+        vehicle.setKmRange(new Random().nextInt(600));
 
         try {
             //Save the vehicle in the DB
@@ -113,9 +115,9 @@ public class UserDataController {
         //Collect the vehicle user connection by the id of the user
         List<UserVehicle> uv = userVehicleService.getUserVehicles(Long.parseLong(payload.get("userId")));
         //Get just the vehicles from the list
-        List<Vehicle> vehicles = uv.stream().map(UserVehicle::getVehicle).collect(Collectors.toList());
+        //List<Vehicle> vehicles = uv.stream().map(UserVehicle::getVehicle).collect(Collectors.toList());
         //Return the list of vehicles in the response
-        return ResponseEntity.ok(vehicles);
+        return ResponseEntity.ok(uv);
     }
 
     @GetMapping("/getReservationsOfUser")
