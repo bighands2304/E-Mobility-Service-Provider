@@ -20,21 +20,24 @@ public class RegistrationManager {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Map<String, String> payload) {
-        //Required fields
+        //Collect required fields
         User user = new User();
         user.setUsername(payload.get("username"));
         user.setEmail(payload.get("email"));
         user.setPassword(passwordEncoder.encode(payload.get("password")));
 
-        //Not required fields
+        //Collect not required fields
         user.setName(payload.get("name"));
         user.setSurname(payload.get("surname"));
 
         try {
+            //Save the user in the DB
             userService.saveUser(user);
+            //Return the user in the response
             return ResponseEntity.ok(user);
         }catch (Exception e){
-            return ResponseEntity.badRequest().body(e);
+            //Return error message in the response if occurs
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }

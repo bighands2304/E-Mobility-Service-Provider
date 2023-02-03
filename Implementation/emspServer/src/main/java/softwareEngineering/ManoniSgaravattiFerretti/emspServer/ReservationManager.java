@@ -44,14 +44,14 @@ public class ReservationManager {
         reservation.setUser(user);
         reservation.setSocketId(socketId);
         reservation.setStartTime(LocalDateTime.now());
-        reservationService.save(reservation);
-
-        //send the reservation to the cpms
-        commandsSender.reserveNow(cp, reservation);
-
 
         //Save the reservation in the DB
         reservationService.save(reservation);
+
+        //Send the reservation to the cpms
+        commandsSender.reserveNow(cp, reservation);
+
+        //Send reservation response
         return ResponseEntity.ok(reservation);
     }
 }

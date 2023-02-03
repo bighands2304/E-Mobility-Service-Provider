@@ -11,9 +11,12 @@ import java.util.List;
 public class UserVehicleService {
     @Autowired
     UserVehicleRepository userVehicleRepository;
+
     public void saveUserVehicle(UserVehicle userVehicle) {userVehicleRepository.save(userVehicle);}
 
     public List<UserVehicle> getUserVehicles(Long userId) {return userVehicleRepository.findAllByUserId(userId);}
 
     public UserVehicle findFavouriteOfUser(Long userId){return userVehicleRepository.findByUserIdAndFavouriteIsTrue(userId);}
+
+    public UserVehicle findVehcileByIds(Long userId, Long vehicleVin){return userVehicleRepository.findByUserIdAndVehicleVINCode(userId,vehicleVin);}
 }
