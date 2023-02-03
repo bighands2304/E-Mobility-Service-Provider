@@ -1,6 +1,8 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.socketStatusManager;
 
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,15 +38,16 @@ public class ReservationController {
     private final ReservationService reservationService;
     private final SocketService socketService;
     private final OcppSender ocppSender;
-    private final OcpiCommandSender ocpiCommandSender;
+    private final ChargingPointCommandResponseDispatcher chargingPointResponseDispatcher;
+    private final Logger logger = LoggerFactory.getLogger(ReservationController.class);
 
     @Autowired
-    public ReservationController(ReservationService reservationService, SocketService socketService,
-                                 OcppSender ocppSender, OcpiCommandSender ocpiCommandSender) {
+    public ReservationController(ReservationService reservationService, SocketService socketService, OcppSender ocppSender,
+                                 ChargingPointCommandResponseDispatcher chargingPointResponseDispatcher) {
         this.reservationService = reservationService;
         this.socketService = socketService;
         this.ocppSender = ocppSender;
-        this.ocpiCommandSender = ocpiCommandSender;
+        this.chargingPointResponseDispatcher = chargingPointResponseDispatcher;
     }
 
     @PostMapping("/ocpi/cpo/commands/RESERVE_NOW")
@@ -58,10 +61,15 @@ public class ReservationController {
         if (!socketOptional.get().getAvailability().equals("AVAILABLE")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "socket not available");
         }
+        logger.info("Received RESERVE_NOW command, all parameters are ok");
         long id = reservationService.getReservationsCount() + 1;
+        logger.info("Assigned an  internalId = {} to the reservation", id);
+        logger.info("Sending an asynchronous message to the charging point");
         CompletableFuture<ConfMessage> responseFuture = ocppSender.sendReserveNow(reserveNowDTO.getChargingPointId(), id,
                 reserveNowDTO.getExpiryDate(), reserveNowDTO.getSocketId());
-        sendReserveNowResponse(responseFuture, socketOptional.get(), id, reserveNowDTO, emspDetails);
+        chargingPointResponseDispatcher.sendReserveNowResponse(responseFuture, socketOptional.get(),
+                id, reserveNowDTO, emspDetails);
+        logger.info("Sending response to the emsp");
         return ResponseEntity.ok().build();
     }
 
@@ -69,47 +77,17 @@ public class ReservationController {
     public ResponseEntity<?> cancelReservation(@PathVariable Long id, @AuthenticationPrincipal EmspDetails emspDetails) {
         Optional<Reservation> reservationOptional = reservationService.findReservationByEmspId(id, emspDetails);
         if (reservationOptional.isEmpty()) {
+            logger.info("Received CANCEL_RESERVATION command, the reservation was not found");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "reservation not found");
         }
+        logger.info("Received CANCEL_RESERVATION command, all parameters are ok");
         String cpId = reservationOptional.get().getSocket().getCpId();
         Long reservationId = reservationOptional.get().getInternalReservationId();
         CompletableFuture<ConfMessage> responseFuture = ocppSender.sendCancelReservation(cpId, reservationId);
-        sendCancelReservationResponse(responseFuture, cpId, id, reservationOptional.get().getSocket().getSocketId(),
+        chargingPointResponseDispatcher.sendCancelReservationResponse(responseFuture, cpId, id,
+                reservationOptional.get().getSocket().getSocketId(),
                 reservationOptional.get().getInternalReservationId(), emspDetails);
+        logger.info("Sending response to the emsp");
         return ResponseEntity.ok().build();
-    }
-
-    @Async
-    void sendReserveNowResponse(CompletableFuture<ConfMessage> futureCpResponse, Socket socket, Long internalReservationId,
-                                ReserveNowDTO reserveNowDTO, EmspDetails emspDetails) {
-        CommandResultType commandResultType;
-        try {
-            ReserveNowConf response = (ReserveNowConf) futureCpResponse.orTimeout(5, TimeUnit.SECONDS).get();
-            commandResultType = CommandResultType.getFromReservationStatus(response.getReservationStatus());
-            if (response.getReservationStatus() == ReservationStatus.ACCEPTED) {
-                socketService.updateSocketStatus(reserveNowDTO.getChargingPointId(), reserveNowDTO.getSocketId(), "RESERVED");
-                reservationService.insertReservation(reserveNowDTO, internalReservationId, socket, emspDetails);
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            commandResultType = CommandResultType.TIMEOUT;
-        }
-        ocpiCommandSender.sendCommandResult(emspDetails, reserveNowDTO.getReservationId(), commandResultType, "RESERVE_NOW");
-    }
-
-    @Async
-    void sendCancelReservationResponse(CompletableFuture<ConfMessage> futureCpResponse, String cpId, Long emspReservationId,
-                                       Integer socketId, Long internalReservationId, EmspDetails emspDetails) {
-        CommandResultType commandResultType;
-        try {
-            CancelReservationConf response = (CancelReservationConf) futureCpResponse.get();
-            commandResultType = CommandResultType.getFromCpCommandResult(response.getCommandResult());
-            if (commandResultType == CommandResultType.ACCEPTED) {
-                socketService.updateSocketStatus(cpId, socketId, "AVAILABLE");
-                reservationService.updateReservationStatus(internalReservationId, "DELETED", LocalDateTime.now());
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            commandResultType = CommandResultType.TIMEOUT;
-        }
-        ocpiCommandSender.sendCommandResult(emspDetails, emspReservationId, commandResultType, "CANCEL_RESERVATION");
     }
 }

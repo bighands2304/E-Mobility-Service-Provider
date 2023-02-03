@@ -9,7 +9,6 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.ent
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.DSOOffer;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.ChargingPointService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.DSOOfferService;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.dataWarehouse.groupByDtos.MeanConsumption;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.dataWarehouse.service.EnergyConsumptionService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.events.DSOOptimizerEvent;
 

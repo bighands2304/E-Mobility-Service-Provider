@@ -80,14 +80,13 @@ public class OcppSender {
     private CompletableFuture<ConfMessage> send(Object message, String cpId, String messageName) {
         String requestId = UUID.randomUUID().toString();
         String sessionId = sessionsManager.getSessionIdFromChargingPointId(cpId);
+        if (sessionId == null) {
+            return CompletableFuture.completedFuture(null);
+        }
         Map<String, Object> headers = Map.of("requestId", requestId);
         template.convertAndSendToUser(sessionId, "topic/ocpp/" + messageName, message, headers);
         CompletableFuture<ConfMessage> futureResponse = new CompletableFuture<>();
         pendingResponses.put(requestId, futureResponse);
         return futureResponse;
-    }
-
-    public void sendConnectionTrigger() {
-
     }
 }
