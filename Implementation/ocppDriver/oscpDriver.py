@@ -7,7 +7,7 @@ import random
 import string
 import requests
 
-CPMS_URL = "https://cpmsserver.up.railway.app/oscp/fp"
+CPMS_URL = "https://cpmsserver.up.railway.app"
 # CPMS_URL = "http://localhost:8080"
 letters = string.ascii_lowercase
 COMPANIES = ["Shell", "Enel", "Pure Power", "Green Power", "InnovaPower", "Airnergy", "AlternEnergy",
