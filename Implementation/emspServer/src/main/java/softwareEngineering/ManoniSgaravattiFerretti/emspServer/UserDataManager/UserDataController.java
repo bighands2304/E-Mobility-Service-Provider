@@ -40,29 +40,35 @@ public class UserDataController {
         }catch (Exception e) {
             return ResponseEntity.badRequest().body(e.toString());
         }
+        //Values for the simulation of the VIN API
         String[] socketTypes = {"MEDIUM","FAST","RAPID"};
         String[] models = {"Tesla Model Y", "Citroen AMI", "BMW i3", "Hyundai Ioniq Electric", "Volkswagen ID.4", "Subaru Solterra", "MINI Cooper Electric"};
-        //Create a new vehicle
-        Vehicle vehicle = new Vehicle();
-        //Set required fields
-        vehicle.setVINCode(payload.get("vin"));
-        //Randomly select a SocketType simulating the VIN API
-        vehicle.setSocketType(socketTypes[new Random().nextInt(socketTypes.length)]);
 
-        //Set non required fields
-        //Randomly select a Model simulating the VIN API
-        vehicle.setModel(models[new Random().nextInt(socketTypes.length)]);
-        vehicle.setBatteryPercentage(new Random().nextInt(100));
-        vehicle.setKmRange(new Random().nextInt(600));
+        //Search if the vehicle already exist
+        Vehicle vehicle = vehicleService.getVehicleByVin(payload.get("vin"));
+        if (vehicle==null) {
+            //Create a new vehicle if it doesn't exist
+            vehicle = new Vehicle();
+            //Set required fields
+            vehicle.setVINCode(payload.get("vin"));
+            //Randomly select a SocketType simulating the VIN API
+            vehicle.setSocketType(socketTypes[new Random().nextInt(socketTypes.length)]);
 
-        try {
-            //Save the vehicle in the DB
-            vehicleService.saveVehicle(vehicle);
-        }catch (Exception e) {
-            ResponseEntity.badRequest().body(e.toString());
+            //Set non required fields
+            //Randomly select a Model simulating the VIN API
+            vehicle.setModel(models[new Random().nextInt(socketTypes.length)]);
+            vehicle.setBatteryPercentage(new Random().nextInt(100));
+            vehicle.setKmRange(new Random().nextInt(600));
+
+            try {
+                //Save the vehicle in the DB
+                vehicleService.saveVehicle(vehicle);
+            } catch (Exception e) {
+                ResponseEntity.badRequest().body(e.toString());
+            }
         }
 
-        //Create the connection between the user we found at the beginning and vehicle just created
+        //Create the connection between the user and vehicle we found at the beginning
         UserVehicle uv = new UserVehicle();
         uv.setUser(user);
         uv.setVehicle(vehicle);
@@ -85,6 +91,12 @@ public class UserDataController {
         }
         //Return the connection in the response
         return ResponseEntity.ok(uv);
+    }
+
+    @DeleteMapping("/deleteVehicle/{vin}")
+    public ResponseEntity<?> deleteVehicle(@PathVariable String vin){
+        vehicleService.deleteVehicleByVin(vin);
+        return ResponseEntity.ok("Delted");
     }
 
     @PostMapping("/setFavouriteVehicle")

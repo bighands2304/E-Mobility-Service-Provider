@@ -1,5 +1,6 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSRequestSender;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -8,13 +9,16 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointData
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.SessionDTO;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.ActiveReservation;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.Reservation;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Service.ReservationService;
 
 @Service
 public class CommandsSender {
+    @Autowired
+    ReservationService reservationService;
     private final String ocpiPath="/ocpi/cpo";
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public void reserveNow(ChargingPoint cp, Reservation reservation) {
+    public ResponseEntity<String> reserveNow(ChargingPoint cp, Reservation reservation) {
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
         headers.set("Authorization", cp.getCpo().getTokenEmsp());
@@ -30,12 +34,13 @@ public class CommandsSender {
 
         String urlTemplate = UriComponentsBuilder.fromHttpUrl(cp.getCpo().getCpmsUrl() + ocpiPath + "/commands/RESERVE_NOW").encode().toUriString();
 
-        restTemplate.exchange(
+        return restTemplate.exchange(
                 urlTemplate,
                 HttpMethod.POST,
                 entity,
                 String.class
         );
+
     }
 
     public void startSession(ActiveReservation reservation, ChargingPoint cp) {

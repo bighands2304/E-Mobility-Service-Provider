@@ -43,13 +43,15 @@ public class ReservationManager {
         Reservation reservation = new ActiveReservation();
         reservation.setUser(user);
         reservation.setSocketId(socketId);
-        reservation.setStartTime(LocalDateTime.now());
 
         //Save the reservation in the DB
         reservationService.save(reservation);
 
-        //Send the reservation to the cpms
-        commandsSender.reserveNow(cp, reservation);
+        //Send the reservation to the cpms, if negative delete the reservation and return error
+        if(commandsSender.reserveNow(cp, reservation).getStatusCode().is4xxClientError()){
+            reservationService.delete(reservation);
+            return ResponseEntity.badRequest().body("Impossible reserve");
+        }
 
         //Send reservation response
         return ResponseEntity.ok(reservation);

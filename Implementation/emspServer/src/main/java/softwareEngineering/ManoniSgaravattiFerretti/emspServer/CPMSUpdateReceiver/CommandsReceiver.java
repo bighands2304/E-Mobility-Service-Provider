@@ -3,6 +3,8 @@ package softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSUpdateReceiv
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingSessionManager.NotificationGenerator;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.NotificationSender;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.ActiveReservation;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.DeletedReservation;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.EndedReservation;
@@ -17,6 +19,8 @@ import java.util.Map;
 public class CommandsReceiver {
     @Autowired
     ReservationService reservationService;
+    @Autowired
+    NotificationSender notificationSender;
 
     //List of commands invokable by the CPMS:
     //• CANCEL_RESERVATION: Delete the reservation
@@ -35,9 +39,8 @@ public class CommandsReceiver {
                 DeletedReservation deletedReservation = (DeletedReservation) reservation;
                 deletedReservation.setDeletionTime(LocalDateTime.now());
 
-                //Save the reservation as deleted and delete the old reservation
+                //Save the reservation as deleted
                 reservationService.save(deletedReservation);
-                reservationService.delete(reservation);
             }
         }
 
@@ -65,6 +68,15 @@ public class CommandsReceiver {
             if(commandResult.get("result").equals("ACCEPTED")){
                 ActiveReservation reservation = (ActiveReservation) reservationService.getReservationById(Long.parseLong(uid));
                 EndedReservation endedReservation = (EndedReservation) reservation;
+
+                //Create a notification to send when the session ends
+                NotificationGenerator notification= new NotificationGenerator();
+                notification.setTo(reservation.getUser().getId());
+                notification.setInfo("Recharge ended");
+
+                //Send the notification to the user
+                notificationSender.sendToSpecificUser(notification);
+
                 //TODO insert real values
                 endedReservation.setEnergyAmount(1.0);
                 endedReservation.setEndTime(LocalDateTime.now());
