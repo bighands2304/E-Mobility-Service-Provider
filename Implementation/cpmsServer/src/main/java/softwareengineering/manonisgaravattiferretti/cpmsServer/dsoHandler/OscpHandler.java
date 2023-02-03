@@ -24,7 +24,6 @@ public class OscpHandler {
 
     @Autowired
     public OscpHandler(DSOOfferService dsoOfferService) {
-        logger.info("Created oscp handler");
         this.dsoOfferService = dsoOfferService;
     }
 

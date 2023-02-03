@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.DSOOffer;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.DSOOfferService;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.dsoHandler.openAdrDtos.PricingTimeSlotDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.dsoHandler.openAdrDtos.TimeOfUsePricingDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.DSOManager;
 
