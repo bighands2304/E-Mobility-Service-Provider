@@ -1,4 +1,5 @@
 import React, { useState, useContext } from "react";
+import { createOnButtonAlert } from "../../../components/utility/Alert";
 import {
   AccountBackground,
   AccountCover,
@@ -94,7 +95,7 @@ export const RegisterScreen = ({ navigation }) => {
               icon="email"
               mode="contained"
               onPress={async () => {
-                const result = await onRegister(
+                await onRegister(
                   email,
                   password,
                   repeatedPassword,
@@ -102,11 +103,6 @@ export const RegisterScreen = ({ navigation }) => {
                   name,
                   surname
                 );
-                if (result === true) {
-                  navigation.navigate("Login");
-                } else {
-                  console.log("b");
-                }
               }}
             >
               Register

@@ -1,6 +1,7 @@
 import React, { useState, createContext, useRef } from "react";
 import { signOut, onAuthStateChanged, getAuth } from "firebase/auth";
 import { loginRequest, registerRequest } from "./authentication.service";
+import { createOnButtonAlert } from "../../components/utility/Alert";
 
 export const AuthenticationContext = createContext();
 
@@ -50,12 +51,14 @@ export const AuthenticationContextProvider = ({ children }) => {
     }
     registerRequest(email, username, password, name, surname)
       .then((u) => {
-        setUser(u);
         setIsLoading(false);
+        createOnButtonAlert("Success", "Go to login to continue");
       })
       .catch((e) => {
         setIsLoading(false);
         setError(e.toString());
+        createOnButtonAlert("Error ", "Please retry");
+        return false;
       });
   };
   const onLogout = () => {
