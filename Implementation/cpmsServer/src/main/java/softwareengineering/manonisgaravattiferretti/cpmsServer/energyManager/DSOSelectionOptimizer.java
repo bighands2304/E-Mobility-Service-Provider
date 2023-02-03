@@ -9,7 +9,6 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.ent
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.DSOOffer;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.ChargingPointService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.DSOOfferService;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.dataWarehouse.groupByDtos.MeanConsumption;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.dataWarehouse.service.EnergyConsumptionService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.events.DSOOptimizerEvent;
 
@@ -50,6 +49,7 @@ public class DSOSelectionOptimizer {
 
     @Async
     void optimizeCp(String cpId, LocalDateTime now, LocalDateTime oneWeekAgo) {
+        // todo: change
         double meanConsumption = energyConsumptionService.findMeanConsumption(cpId, oneWeekAgo, now);
         List<DSOOffer> dsoOffers = dsoOfferService.findOffersOfCp(cpId);
         if (dsoOffers.size() <= 1) {

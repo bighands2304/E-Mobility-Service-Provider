@@ -1,4 +1,4 @@
-package softwareengineering.manonisgaravattiferretti.cpmsServer.dsoHandler.dtos;
+package softwareengineering.manonisgaravattiferretti.cpmsServer.dsoHandler.oscpDtos;
 
 import lombok.Data;
 

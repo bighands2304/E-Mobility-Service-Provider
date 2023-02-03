@@ -15,12 +15,10 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dto
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.EmspDetails;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.Reservation;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.ReservationService;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.SocketService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.OcppSender;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.cpmsReq.ConfMessage;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.cpmsReq.RemoteStartTransactionConf;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.cpmsReq.RemoteStopTransactionConf;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.cpmsReq.dtos.CommandResult;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.emspUpdateSender.OcpiCommandSender;
 
 import java.util.Optional;
@@ -31,13 +29,13 @@ import java.util.concurrent.ExecutionException;
 public class ChargingSessionController {
     private final ReservationService reservationService;
     private final OcppSender ocppSender;
-    private final OcpiCommandSender ocpiCommandSender;
+    private final ChargingPointCommandResponseDispatcher chargingPointResponseDispatcher;
 
     public ChargingSessionController(ReservationService reservationService, OcppSender ocppSender,
-                                     OcpiCommandSender ocpiCommandSender) {
+                                     ChargingPointCommandResponseDispatcher chargingPointResponseDispatcher) {
         this.reservationService = reservationService;
         this.ocppSender = ocppSender;
-        this.ocpiCommandSender = ocpiCommandSender;
+        this.chargingPointResponseDispatcher = chargingPointResponseDispatcher;
     }
 
     @PostMapping("/ocpi/cpo/commands/START_SESSION")
@@ -57,7 +55,8 @@ public class ChargingSessionController {
         CompletableFuture<ConfMessage> responseFuture = ocppSender.sendRemoteStartTransaction(
                 startSessionDTO.getChargingPointId(), startSessionDTO.getSocketId(),
                 null, startSessionDTO.getReservationId());
-        sendStartSessionResponse(responseFuture, emspDetails, reservationOptional.get().getReservationIdEmsp());
+        chargingPointResponseDispatcher.sendStartSessionResponse(responseFuture, emspDetails,
+                reservationOptional.get().getReservationIdEmsp());
         return ResponseEntity.ok().build();
     }
 
@@ -74,31 +73,8 @@ public class ChargingSessionController {
         }
         CompletableFuture<ConfMessage> responseFuture = ocppSender.sendRemoteStopTransaction(
                 reservationOptional.get().getSocket().getCpId(), reservationOptional.get().getInternalReservationId());
-        sendStopSessionResponse(responseFuture, emspDetails, reservationOptional.get().getReservationIdEmsp());
+        chargingPointResponseDispatcher.sendStopSessionResponse(responseFuture, emspDetails,
+                reservationOptional.get().getReservationIdEmsp());
         return ResponseEntity.ok().build();
-    }
-
-    @Async
-    void sendStartSessionResponse(CompletableFuture<ConfMessage> futureCpResponse, EmspDetails emspDetails, Long reservationId) {
-        CommandResultType commandResultType;
-        try {
-            RemoteStartTransactionConf response = (RemoteStartTransactionConf) futureCpResponse.get();
-            commandResultType = CommandResultType.getFromCpCommandResult(response.getCommandResult());
-        } catch (InterruptedException | ExecutionException e) {
-            commandResultType = CommandResultType.TIMEOUT;
-        }
-        ocpiCommandSender.sendCommandResult(emspDetails, reservationId, commandResultType, "START_SESSION");
-    }
-
-    @Async
-    void sendStopSessionResponse(CompletableFuture<ConfMessage> futureCpResponse, EmspDetails emspDetails, Long reservationId) {
-        CommandResultType commandResultType;
-        try {
-            RemoteStopTransactionConf response = (RemoteStopTransactionConf) futureCpResponse.get();
-            commandResultType = CommandResultType.getFromCpCommandResult(response.getCommandResult());
-        } catch (InterruptedException | ExecutionException e) {
-            commandResultType = CommandResultType.TIMEOUT;
-        }
-        ocpiCommandSender.sendCommandResult(emspDetails, reservationId, commandResultType, "STOP_SESSION");
     }
 }

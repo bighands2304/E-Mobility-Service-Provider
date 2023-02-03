@@ -10,10 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.AddChargingPointDTO;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.AddTariffDTO;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.ChangeSocketAvailabilityDTO;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.IncludeBatteryDTO;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.*;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.*;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.ChargingPointService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.DSOOfferService;
@@ -249,12 +246,14 @@ public class ChargingPointsManager {
     }
 
     @GetMapping("/api/CPO/chargingPoints/{id}/dso/offers")
-    public ResponseEntity<Iterable<DSOOffer>> getChargingPointDsoOffers(@PathVariable String id, @AuthenticationPrincipal CPO cpo) {
+    public ResponseEntity<Iterable<DSOOfferDTO>> getChargingPointDsoOffers(@PathVariable String id, @AuthenticationPrincipal CPO cpo) {
         Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(id, cpo.getCpoCode());
         if (chargingPointOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "charging point not found");
         }
-        return new ResponseEntity<>(dsoOfferService.findOffersOfCp(chargingPointOptional.get().getId()), HttpStatus.OK);
+        List<DSOOfferDTO> dsoOffers = dsoOfferService.findOffersOfCp(chargingPointOptional.get().getId())
+                .stream().map(EntityFromDTOConverter::fromOfferToDto).toList();
+        return new ResponseEntity<>(dsoOffers, HttpStatus.OK);
     }
 
     @PatchMapping("/api/CPO/chargingPoints/{id}/dso/offers/{offerId}")

@@ -6,14 +6,11 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalTime;
-import java.util.Timer;
-
 @Data
 @Document(collection = "dsoOffers")
 public class DSOOffer {
     @Id
-    private String offerId;
+    private String id;
     private double price;
     @JsonIgnore
     private boolean valid;

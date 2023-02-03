@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.DSOOfferService;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.dsoHandler.dtos.ForecastedBlockDTO;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.dsoHandler.dtos.GroupCapacityForecastDTO;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.dsoHandler.dtos.RegistrationDTO;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.dsoHandler.oscpDtos.ForecastedBlockDTO;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.dsoHandler.oscpDtos.GroupCapacityForecastDTO;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.dsoHandler.oscpDtos.RegistrationDTO;
 
 import java.util.Map;
 import java.util.OptionalDouble;
@@ -24,7 +24,6 @@ public class OscpHandler {
 
     @Autowired
     public OscpHandler(DSOOfferService dsoOfferService) {
-        logger.info("Created oscp handler");
         this.dsoOfferService = dsoOfferService;
     }
 

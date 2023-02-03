@@ -47,7 +47,6 @@ public class DSOOfferCustomUpdateImpl implements DSOOfferCustomUpdate {
         query.addCriteria(Criteria.where("chargingPointId").is(cpId));
         Update update = new Update();
         update.set("capacity", capacity);
-        update.set("valid", true);
         mongoOperations.updateFirst(query, update, DSOOffer.class);
     }
 
