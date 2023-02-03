@@ -1,12 +1,27 @@
 import axios from "axios";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import customFetch from "../../utils/axios";
+import { addTokenToLocalStorage } from "../../utils/localStorage";
 
-export const loginRequest = (auth, email, password) => {
-  signInWithEmailAndPassword(auth, email, password);
+export const loginRequest = async (email, password) => {
+  const obj = {
+    username: email,
+    password: password,
+  };
+  const url = "/login";
+  try {
+    const resp = await customFetch.post(url, obj);
+    console.log("resp" + JSON.stringify(resp));
+    const jwt = resp.data.jwt;
+    const user = resp.data.user;
+    addTokenToLocalStorage(jwt);
+    addTokenToLocalStorage(user);
+    return user;
+  } catch (error) {
+    return error.message;
+  }
 };
 
-import { removeUserFromLocalStorage } from "../../utils/localStorage";
 export const registerRequest = async (
   newEmail,
   mewUsername,
@@ -23,10 +38,7 @@ export const registerRequest = async (
   };
   const url = "/register";
   try {
-    console.log("preee");
     const resp = await customFetch.post(url, obj);
-    console.log("post");
-    console.log("resp =>=>=>=>=" + JSON.stringify(resp));
     return resp.data;
   } catch (error) {
     console.log("error" + error);

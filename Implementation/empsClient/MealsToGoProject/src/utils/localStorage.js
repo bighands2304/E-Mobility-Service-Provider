@@ -29,11 +29,8 @@ export const getUserFromLocalStorage = async () => {
   try {
     const user = await AsyncStorage.getItem("user");
     if (user === null || user === undefined) {
-      console.log("no user found");
-      console.log("user" + user);
       return user;
     }
-    console.log("user found" + JSON.stringify(user));
     return user;
   } catch (error) {
     console.log("error user");

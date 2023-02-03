@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { SafeArea } from "../../components/utility/safe-area.component";
 import { Text } from "../../components/typography/text.component";
 import { GreenButton } from "../../components/buttons/buttons.component";
+import { VehicleContext } from "../../services/vehicles/mock/vehcile.context";
 
 import { StyleSheet, TextInput, View } from "react-native";
 
 export const AddNewVehicle = ({ navigation }) => {
   const [vehicleName, setVehicleName] = useState("");
   const [vehicleCode, setVehicleCode] = useState("");
+  const { isLoading, AddVehicle } = useContext(VehicleContext);
 
   /*
 <SafeArea>
@@ -51,10 +53,7 @@ export const AddNewVehicle = ({ navigation }) => {
           />
         </View>
       </View>
-      <GreenButton
-        title="Submit"
-        onPress={() => navigation.navigate("VehiclesMain")}
-      />
+      <GreenButton title="Submit" onPress={() => AddVehicle(vehicleCode)} />
     </SafeArea>
   );
 };

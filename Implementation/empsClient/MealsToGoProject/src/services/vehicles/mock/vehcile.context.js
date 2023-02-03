@@ -1,7 +1,11 @@
 import React, { useState, useContext, createContext, useEffect } from "react";
 import { AuthenticationContext } from "../../authentication/authentication.context";
 
-import { vehicleRequest, vehicleTrasform } from "./vehicle.serice";
+import {
+  vehicleRequest,
+  vehicleTrasform,
+  addVehicleRequest,
+} from "./vehicle.serice";
 
 export const VehicleContext = createContext();
 
@@ -11,6 +15,7 @@ export const VehicleContextProvider = ({ children }) => {
   const [error, setError] = useState(null);
   // is just for try
   const { id } = useContext(AuthenticationContext);
+  const {add}
 
   const RetrieveVehciles = (uid) => {
     setIsLoading(true);
@@ -28,6 +33,21 @@ export const VehicleContextProvider = ({ children }) => {
         setError(err);
       });
   };
+
+  const AddVehicle = (vinCode) => {
+    setIsLoading(true);
+    addVehicleRequest(vinCode, id)
+      .then((resul) => {
+        setIsLoading(false);
+        RetrieveVehciles(id);
+      })
+      .catch((err) => {
+        console.log("error there" + err);
+        setIsLoading(false);
+        setError(err);
+      });
+  };
+
   useEffect(() => {
     if (id) {
       RetrieveVehciles(id);
@@ -44,6 +64,7 @@ export const VehicleContextProvider = ({ children }) => {
         vehicles,
         isLoading,
         error,
+        AddVehicle,
       }}
     >
       {children}
