@@ -11,4 +11,9 @@ public class VehicleService {
     VehicleRepository vehicleRepository;
 
     public void saveVehicle(Vehicle vehicle){vehicleRepository.save(vehicle);}
+
+    public Vehicle getVehicleByVin(String vin){return vehicleRepository.findVehicleByVINCode(vin);}
+
+    public void deleteVehicleByVin(String vin){ vehicleRepository.delete(vehicleRepository.findVehicleByVINCode(vin));}
+
 }

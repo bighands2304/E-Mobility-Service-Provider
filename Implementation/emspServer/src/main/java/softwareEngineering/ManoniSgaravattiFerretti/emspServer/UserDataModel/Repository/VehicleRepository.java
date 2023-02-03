@@ -7,4 +7,5 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Mod
 
 @Repository
 public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
+    Vehicle findVehicleByVINCode(String vin);
 }

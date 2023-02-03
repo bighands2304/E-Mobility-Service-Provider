@@ -16,7 +16,7 @@ import java.util.List;
 @EnableAutoConfiguration
 public class Vehicle {
     @Id
-    @Column(name="vin_code", nullable = false, unique = true)
+    @Column(name="vin_code", nullable = false, unique = true, length =17)
     private String VINCode;
     private String socketType;
     private String model;
