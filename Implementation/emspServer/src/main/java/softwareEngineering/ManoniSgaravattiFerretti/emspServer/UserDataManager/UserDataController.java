@@ -68,8 +68,10 @@ public class UserDataController {
         if(Boolean.parseBoolean(payload.get("favourite"))){
             uv.setFavourite(true);
             UserVehicle oldFavourite = userVehicleService.findFavouriteOfUser(user.getId());
-            oldFavourite.setFavourite(false);
-            userVehicleService.saveUserVehicle(oldFavourite);
+            if(oldFavourite!=null) {
+                oldFavourite.setFavourite(false);
+                userVehicleService.saveUserVehicle(oldFavourite);
+            }
         }
 
         //Save the connection between user and vehicle
@@ -94,10 +96,12 @@ public class UserDataController {
 
         //Find the actual favourite vehicle and set it as non-favourite
         UserVehicle oldFavourite = userVehicleService.findFavouriteOfUser(user.getId());
-        oldFavourite.setFavourite(false);
+        if(oldFavourite!=null) {
+            oldFavourite.setFavourite(false);
 
-        //Save the changes
-        userVehicleService.saveUserVehicle(oldFavourite);
+            //Save the changes
+            userVehicleService.saveUserVehicle(oldFavourite);
+        }
         userVehicleService.saveUserVehicle(newFavourite);
 
         //Return the new favourite vehicle in the response
