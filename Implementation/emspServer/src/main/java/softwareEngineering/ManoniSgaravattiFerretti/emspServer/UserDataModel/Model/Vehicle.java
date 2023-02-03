@@ -2,6 +2,7 @@ package softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Mo
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -16,7 +17,8 @@ import java.util.List;
 @EnableAutoConfiguration
 public class Vehicle {
     @Id
-    @Column(name="vin_code", nullable = false, unique = true, length =17)
+    @Column(name="vin_code", nullable = false, unique = true)
+    @Size(min = 1, max = 17)
     private String VINCode;
     private String socketType;
     private String model;
