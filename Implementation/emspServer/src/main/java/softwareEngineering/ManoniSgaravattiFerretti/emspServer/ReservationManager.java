@@ -15,6 +15,7 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Mod
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Service.ReservationService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Service.UserService;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @RestController
@@ -42,13 +43,15 @@ public class ReservationManager {
         Reservation reservation = new ActiveReservation();
         reservation.setUser(user);
         reservation.setSocketId(socketId);
-
-        //send the reservation to the cpms
-        commandsSender.reserveNow(cp, reservation);
-
+        reservation.setStartTime(LocalDateTime.now());
 
         //Save the reservation in the DB
         reservationService.save(reservation);
+
+        //Send the reservation to the cpms
+        commandsSender.reserveNow(cp, reservation);
+
+        //Send reservation response
         return ResponseEntity.ok(reservation);
     }
 }

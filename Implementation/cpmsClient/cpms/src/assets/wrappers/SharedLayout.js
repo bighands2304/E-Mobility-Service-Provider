@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components'
 
 const Wrapper = styled.section`
   .dashboard {
@@ -18,5 +18,5 @@ const Wrapper = styled.section`
       width: 90%;
     }
   }
-`;
-export default Wrapper;
+`
+export default Wrapper

@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components'
 
 const Wrapper = styled.section`
   display: grid;
@@ -12,6 +12,7 @@ const Wrapper = styled.section`
     max-width: 400px;
     border-top: 5px solid var(--primary-500);
   }
+
   h3 {
     text-align: center;
   }
@@ -30,5 +31,5 @@ const Wrapper = styled.section`
     cursor: pointer;
     letter-spacing: var(--letterSpacing);
   }
-`;
-export default Wrapper;
+`
+export default Wrapper

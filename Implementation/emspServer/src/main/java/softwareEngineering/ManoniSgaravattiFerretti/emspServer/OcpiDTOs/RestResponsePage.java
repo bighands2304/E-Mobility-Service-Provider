@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
+//Class for collecting Page responses when Rest calls are made
 public class RestResponsePage<T> extends PageImpl<T> {
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public RestResponsePage(@JsonProperty ("content") List<T> content,

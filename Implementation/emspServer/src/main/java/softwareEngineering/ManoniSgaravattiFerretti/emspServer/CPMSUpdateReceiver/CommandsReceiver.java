@@ -18,21 +18,24 @@ public class CommandsReceiver {
     @Autowired
     ReservationService reservationService;
 
-    //List of commands:
-    //• CANCEL_RESERVATION
-    //• RESERVE_NOW
-    //• START_SESSION
-    //• STOP_SESSION
-    //• UNLOCK_CONNECTOR
+    //List of commands invokable by the CPMS:
+    //• CANCEL_RESERVATION: Delete the reservation
+    //• RESERVE_NOW:
+    //• START_SESSION:
+    //• STOP_SESSION:
+    //• UNLOCK_CONNECTOR:
     @PostMapping("/{command}/{uid}")
     public ResponseEntity<?> cancelReservation(@PathVariable String command, @PathVariable String uid, @RequestBody Map<String,String> commandResult){
         if (command.equals("CANCEL_RESERVATION")){
             if(commandResult.get("result").equals("ACCEPTED")) {
+                //Get the reservation to delete
                 Reservation reservation = reservationService.getReservationById(Long.parseLong(uid));
 
+                //Set the reservation as deleted and set the deletion time to now
                 DeletedReservation deletedReservation = (DeletedReservation) reservation;
                 deletedReservation.setDeletionTime(LocalDateTime.now());
 
+                //Save the reservation as deleted and delete the old reservation
                 reservationService.save(deletedReservation);
                 reservationService.delete(reservation);
             }

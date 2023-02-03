@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components'
 
 const Wrapper = styled.main`
   nav {
@@ -36,5 +36,5 @@ const Wrapper = styled.main`
       display: block;
     }
   }
-`;
-export default Wrapper;
+`
+export default Wrapper

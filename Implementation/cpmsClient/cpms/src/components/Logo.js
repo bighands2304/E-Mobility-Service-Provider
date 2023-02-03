@@ -1,13 +1,6 @@
-import logo3 from "../assets/images/logo3.svg";
+import logo from '../assets/images/logo.svg';
 
 const Logo = () => {
-  return (
-    <img
-      src={logo3}
-      alt="e-mall logo"
-      className="logo"
-      style={{ width: "100px", height: "100px" }}
-    />
-  );
+  return <img src={logo} alt='jobster logo' className='logo' />;
 };
 export default Logo;
