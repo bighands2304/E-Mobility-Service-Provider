@@ -20,13 +20,8 @@ public class StationsResearchManager {
     LocationsSender locations;
     @Autowired
     TariffService tariffService;
-    @GetMapping("/getCPsInRange")
-    public ResponseEntity<?> getCpsInRange(@RequestBody Map<String, String> payload){
-        //Collect the payload
-        Double latitude = Double.parseDouble(payload.get("latitude"));
-        Double longitude = Double.parseDouble(payload.get("longitude"));
-        Double range = Double.parseDouble(payload.get("range"));
-
+    @GetMapping("/getCPsInRange/{latitude}/{longitude}/{range}")
+    public ResponseEntity<?> getCpsInRange(@PathVariable Double latitude, Double longitude, Double range){
         //Search for CPs in a certain range
         List<ChargingPoint> cps= cpService.getCPsInRange(latitude, latitude+range, longitude, longitude+range);
 

@@ -110,20 +110,20 @@ public class UserDataController {
         return ResponseEntity.ok(newFavourite);
     }
 
-    @GetMapping("/getUserVehicles")
-    public ResponseEntity<?> getUserVehicles(@RequestBody Map<String, String> payload){
+    @GetMapping("/getUserVehicles/{userId}")
+    public ResponseEntity<?> getUserVehicles(@PathVariable String userId){
         //Collect the vehicle user connection by the id of the user
-        List<UserVehicle> uv = userVehicleService.getUserVehicles(Long.parseLong(payload.get("userId")));
+        List<UserVehicle> uv = userVehicleService.getUserVehicles(Long.parseLong(userId));
         //Get just the vehicles from the list
         //List<Vehicle> vehicles = uv.stream().map(UserVehicle::getVehicle).collect(Collectors.toList());
         //Return the list of vehicles in the response
         return ResponseEntity.ok(uv);
     }
 
-    @GetMapping("/getReservationsOfUser")
-    public ResponseEntity<?> getReservations(@RequestBody Map<String, String> payload){
+    @GetMapping("/getReservationsOfUser/{userId}")
+    public ResponseEntity<?> getReservations(@PathVariable String userId){
         //Collect all the reservations(Active, Ended, and Deleted)
-        List<Reservation> reservations = reservationService.getReservationsByUserId(Long.parseLong(payload.get("userId")));
+        List<Reservation> reservations = reservationService.getReservationsByUserId(Long.parseLong(userId));
         //Return the reservations in the response
         return ResponseEntity.ok(reservations);
     }
