@@ -29,6 +29,10 @@ class CpConnection:
                                               on_open=self.on_open,
                                               on_message=self.on_message,
                                               on_close=self.on_close)
+        #self.websock = websocket.WebSocketApp(f"ws://localhost:8080/ocpp?token={self.auth_key}",
+        #                                      on_open=self.on_open,
+        #                                      on_message=self.on_message,
+        #                                      on_close=self.on_close)
         self.websock.run_forever()
 
     def on_open(self, ws: websocket.WebSocketApp):

@@ -1,4 +1,5 @@
 import datetime
+import json
 import time
 
 import numpy as np
@@ -7,8 +8,12 @@ import string
 import requests
 
 CPMS_URL = "https://cpmsserver.up.railway.app/oscp/fp"
+# CPMS_URL = "http://localhost:8080"
 letters = string.ascii_lowercase
-COMPANIES = ["Shell", "Enel", "Pure Power", "Green Power", "InnovaPower", "Airnergy", "AlternEnergy", "Geothermal Force"]
+COMPANIES = ["Shell", "Enel", "Pure Power", "Green Power", "InnovaPower", "Airnergy", "AlternEnergy",
+             "Geothermal Force"]
+CONTENT_TYPE = "application/json"
+ACCEPT_ENCODING = "gzip, deflate, br"
 
 
 class OscpConnection:
@@ -18,6 +23,9 @@ class OscpConnection:
         self.token = ''.join(random.choice(letters) for _ in range(16))
         self.id = ''.join(random.choice(letters) for _ in range(8))
         self.capacity_mean = random.randint(50, 100)
+        self.price_mean_0 = random.randint(50, 100) / 400
+        self.price_mean_1 = random.randint(100, 200) / 400
+        self.price_mean_2 = random.randint(75, 150) / 400
         if self.send_register() == 200:
             self.loop()
 
@@ -29,10 +37,10 @@ class OscpConnection:
             "cpId": self.cp_id,
             "url": "http://localhost:3000"
         }
-        resp = requests.post(CPMS_URL + "/register", json=msg,
-                             headers={"Content-Type": "application/json",
+        resp = requests.post(f"{CPMS_URL}/oscp/fp/register", json=msg,
+                             headers={"Content-Type": CONTENT_TYPE,
                                       "X-Requested-With": "XMLHttpRequest",
-                                      "Accept-Encoding": "gzip, deflate, br"})
+                                      "Accept-Encoding": ACCEPT_ENCODING})
         print(f"""
         Connected to cp with id = {self.cp_id} with the oscp protocol
         The status code of the registration is {resp.status_code}
@@ -41,7 +49,6 @@ class OscpConnection:
 
     def loop(self):
         while True:
-            time.sleep(600)
             try:
                 end_time = datetime.datetime.now()
                 start_time = end_time - datetime.timedelta(minutes=10)
@@ -52,15 +59,46 @@ class OscpConnection:
                     "forecastedBlocks": [{
                         "capacity": self.capacity_mean + capacity,
                         "unit": "KWh",
-                        "startTime": start_time,
-                        "endTime": end_time
+                        "startTime": start_time.isoformat(),
+                        "endTime": end_time.isoformat()
                     }]
                 }
-                requests.post(CPMS_URL + "/update_group_capacity_forecast?token=" + self.token,
+                requests.post(f"{CPMS_URL}/oscp/fp/update_group_capacity_forecast?token={self.token}",
                               json=capacity_forecast,
-                              headers={"Content-Type": "application/json",
+                              headers={"Content-Type": CONTENT_TYPE,
                                        "X-Requested-With": "XMLHttpRequest",
-                                       "Accept-Encoding": "gzip, deflate, br"})
+                                       "Accept-Encoding": ACCEPT_ENCODING})
+                time.sleep(60)
+                price = np.random.randn() / 10
+                tou_msg = {
+                    "timestamp": datetime.datetime.now().isoformat(),
+                    "intervals": [
+                        {
+                            "startTime": "00:00:00.000",
+                            "endTime": "07:00:00.000",
+                            "unit": "W",
+                            "price": self.price_mean_0 + price
+                        },
+                        {
+                            "startTime": "07:00:00.000",
+                            "endTime": "20:00:00.000",
+                            "unit": "W",
+                            "price": self.price_mean_1 + price
+                        },
+                        {
+                            "startTime": "20:00:00.000",
+                            "endTime": "23:59:59.999",
+                            "unit": "W",
+                            "price": self.price_mean_2 + price
+                        }
+                    ]
+                }
+                requests.post(f"{CPMS_URL}/openAdr/tou_pricing_event?token={self.token}&cpId={self.cp_id}",
+                              json=tou_msg,
+                              headers={"Content-Type": CONTENT_TYPE,
+                                       "X-Requested-With": "XMLHttpRequest",
+                                       "Accept-Encoding": ACCEPT_ENCODING})
             except requests.ConnectionError:
                 print(f"Oscp connection with cp = {self.cp_id} is failed")
                 return
+            time.sleep(3600)
