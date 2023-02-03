@@ -25,7 +25,7 @@ class CpConnection:
         self.auth_key = auth_key
 
     def create_connection(self):
-        self.websock = websocket.WebSocketApp(f"ws://localhost:8080/ocpp?token={self.auth_key}",
+        self.websock = websocket.WebSocketApp(f"ws://cpmsserver.up.railway.app/ocpp?token={self.auth_key}",
                                               on_open=self.on_open,
                                               on_message=self.on_message,
                                               on_close=self.on_close)
@@ -129,6 +129,7 @@ class CpConnection:
         self.websock.send(stomp_message)
 
 
+# can only be run in local with access to the command line
 class InteractiveConnection:
 
     def __init__(self):
@@ -192,7 +193,7 @@ def open_connection():
     cp_id = request.args.get("cp_id")
     cp = request.json
     print(f"trying to connect to {cp_id}")
-    #interactive_connections.add_connection(cp_id, auth_key, cp)
+    interactive_connections.add_connection(cp_id, auth_key, cp)
     threading.Thread(target=oscpDriver.OscpConnection, args=(cp_id,)).start()
     print(f"connection with charging point {cp_id} opened")
     return make_response("200 OK", 200)
