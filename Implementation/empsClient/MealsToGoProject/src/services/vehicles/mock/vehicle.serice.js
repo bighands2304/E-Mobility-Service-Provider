@@ -1,5 +1,6 @@
 import React from "react";
 import camelize from "camelize";
+import customFetch from "../../utils/axios";
 
 export const vehicleRequest = (userId) => {
   return new Promise((resolve, reject) => {
@@ -29,4 +30,20 @@ export const vehicleTrasform = ({ results = [] }) => {
     };
   });
   return camelize(mappedResults);
+};
+
+export const addVehicleRequest = async (vinCodeV, userIdV) => {
+  const obj = {
+    userId: userIdV,
+    vin: vinCodeV,
+    favourite: true,
+  };
+
+  const url = "/addVehicle";
+  try {
+    const resp = await customFetch.post(url, obj);
+    return resp.data;
+  } catch (error) {
+    console.log("error" + error);
+  }
 };

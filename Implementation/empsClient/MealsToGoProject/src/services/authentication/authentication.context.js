@@ -23,7 +23,7 @@ export const AuthenticationContextProvider = ({ children }) => {
   });
   const onLogin = (email, password) => {
     setIsLoading(true);
-    loginRequest(auth, email, password)
+    loginRequest(email, password)
       .then((u) => {
         setUser(u);
         setIsLoading(false);
