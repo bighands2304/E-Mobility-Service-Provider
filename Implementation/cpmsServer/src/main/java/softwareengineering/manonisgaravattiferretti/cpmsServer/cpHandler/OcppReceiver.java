@@ -80,6 +80,7 @@ public class OcppReceiver {
     public @ResponseBody StartTransactionConf handleStartTransaction(@RequestBody StartTransactionReq request,
                                                                      SimpMessageHeaderAccessor headerAccessor) {
         Long sessionId = reservationService.maxSessionId() + 1;
+        logger.info("Received start transaction for reservation with id = " + request.getReservationId());
         String cpId = sessionsManager.getChargingPointFromSession(headerAccessor.getSessionId());
         SessionStartedEvent sessionStartedEvent = new SessionStartedEvent(this, request.getReservationId(),
                 sessionId, request.getTimestamp(), cpId, request.getConnectorId());

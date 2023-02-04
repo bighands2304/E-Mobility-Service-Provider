@@ -7,5 +7,5 @@ import java.time.LocalDateTime;
 @Repository
 public interface ReservationCustomUpdate {
     void updateReservationStatus(String status, Long reservationInternalId, LocalDateTime timestamp);
-    void updateReservationEnergyAmount(Double energyAmount, Long sessionId, LocalDateTime timestamp);
+    void updateReservationEnergyAmount(Double energyAmount, Long internalReservationId, LocalDateTime timestamp);
 }

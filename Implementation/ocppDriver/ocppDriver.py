@@ -130,11 +130,11 @@ Trying to reconnect
             "meterValue": [{"timestamp": datetime.datetime.now().isoformat(), "sampledValue": 5.0}]
         }
         for _ in range(3):
-            time.sleep(10)
+            time.sleep(100)
             stomp_msg = stomper.send("/app/ocpp/MeterValue", json.dumps(meter_value_msg), content_type=CONTENT_TYPE)
             print(f"Sending meter value to cp: {self.cp_id}")
             self.websock.send(stomp_msg)
-        time.sleep(10)
+        time.sleep(100)
         stop_tr_msg = {
             "transactionId": reservation_id,
             "timestamp": datetime.datetime.now().isoformat()
