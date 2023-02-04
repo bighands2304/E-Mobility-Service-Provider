@@ -6,6 +6,7 @@ import {
   vehicleTrasform,
   addVehicleRequest,
   deleteVehicleRequest,
+  setFavouriteRequest,
 } from "./vehicle.serice";
 
 export const VehicleContext = createContext();
@@ -65,6 +66,22 @@ export const VehicleContextProvider = ({ children }) => {
       });
   };
 
+  const SetFavouriteVehicle = (vinCode) => {
+    setIsLoading(true);
+    setFavouriteRequest(vinCode, id, token)
+      .then((result) => {
+        setIsLoading(false);
+        RetrieveVehciles(id);
+        createOnButtonAlert("Success", "Vehicle Favourite");
+      })
+      .catch((err) => {
+        console.log("error there" + err);
+        setIsLoading(false);
+        setError(err);
+        createOnButtonAlert("Error", "Retry later");
+      });
+  };
+
   useEffect(() => {
     if (id) {
       RetrieveVehciles(id);
@@ -81,6 +98,7 @@ export const VehicleContextProvider = ({ children }) => {
         vehicles,
         isLoading,
         error,
+        SetFavouriteVehicle,
         AddNewVehicle,
         DeleteVehcile,
       }}

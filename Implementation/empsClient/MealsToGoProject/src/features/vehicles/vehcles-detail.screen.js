@@ -12,7 +12,7 @@ import {
 } from "../../components/buttons/buttons.component";
 
 export const VehicleDetailScreen = ({ route }) => {
-  const { DeleteVehcile } = useContext(VehicleContext);
+  const { DeleteVehcile, SetFavouriteVehicle } = useContext(VehicleContext);
 
   const { item } = route.params;
   const navigation = useNavigation();
@@ -36,9 +36,9 @@ export const VehicleDetailScreen = ({ route }) => {
       <View style={styles.separator2}></View>
       <View style={styles.buttonContainer}>
         <GreenButton
-          title="Find a CP"
+          title="Set as Favourite"
           onPress={() => {
-            navigation.navigate("VehiclesMain");
+            SetFavouriteVehicle(item.VinCode);
           }}
         />
 
