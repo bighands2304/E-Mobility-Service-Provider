@@ -115,8 +115,12 @@ export const MyList3Button = ({
   unit1,
   unit2,
   unit3,
+  onSubmit,
+  p1spec,
+  p2gen,
 }) => {
   let sortedData;
+  console.log("onS " + onSubmit);
 
   if (sortByFavourite) {
     sortedData = data.sort((a, b) => {
@@ -144,9 +148,12 @@ export const MyList3Button = ({
               <Text>
                 {filedname3} : {item[field3]} {unit3}
               </Text>
-              {item[field2] === "FREE" && (
+              {item[field2] === "AVAILABLE" && (
                 <View style={styles2.buttonContainer}>
-                  <GreenButton onPress={() => {}} title={"Reserve"} />
+                  <GreenButton
+                    onPress={() => onSubmit(item[p1spec], p2gen)}
+                    title={"Reserve"}
+                  />
                 </View>
               )}
             </View>

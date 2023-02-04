@@ -27,14 +27,9 @@ export const AuthenticationContextProvider = ({ children }) => {
     setIsLoading(true);
     loginRequest(email, password)
       .then((u) => {
-        console.log("usssusuusuususuus" + JSON.stringify(u));
-        console.log("user user" + u.user);
-        console.log("jwt wkt" + u.jwt);
-        console.log("se id " + u.user.id);
         setUser(u.user);
         setToken(u.jwt);
         setId(u.user.id);
-        console.log("now user id " + id);
 
         setIsLoading(false);
       })

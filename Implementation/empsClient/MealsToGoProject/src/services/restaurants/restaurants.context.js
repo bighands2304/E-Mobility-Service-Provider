@@ -1,8 +1,9 @@
 import React, { useState, useContext, createContext, useEffect } from "react";
-
+import { createOnButtonAlert } from "../../components/utility/Alert";
 import {
   restaurantsRequest,
   restaurantsTransform,
+  doReservationRequest,
 } from "./restaurants.service";
 
 import { LocationContext } from "../location/location.context";
@@ -15,7 +16,7 @@ export const RestaurantsContextProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const { location } = useContext(LocationContext);
-  const { token } = useContext(AuthenticationContext);
+  const { token, id } = useContext(AuthenticationContext);
 
   const retrieveRestaurants = (loc) => {
     setIsLoading(true);
@@ -25,7 +26,6 @@ export const RestaurantsContextProvider = ({ children }) => {
         .then(restaurantsTransform)
         .then((results) => {
           setIsLoading(false);
-
           setRestaurants(results);
         })
         .catch((err) => {
@@ -34,6 +34,28 @@ export const RestaurantsContextProvider = ({ children }) => {
           setError(err);
         });
     });
+  };
+
+  const doReservation = (socketId, cpId) => {
+    setIsLoading(true);
+    doReservationRequest(socketId, cpId, id, token)
+      .then((results) => {
+        createOnButtonAlert("Suchess", "Reservation created");
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        createOnButtonAlert("An Error Occurred", "Retry Later");
+        console.log("l");
+        console.log("l");
+        console.log("l");
+        console.log("l");
+        console.log("l");
+        console.log(err);
+        console.log(JSON.stringify(err));
+
+        setIsLoading(false);
+        setError(err);
+      });
   };
 
   useEffect(() => {
@@ -49,6 +71,7 @@ export const RestaurantsContextProvider = ({ children }) => {
         restaurants,
         isLoading,
         error,
+        doReservation,
       }}
     >
       {children}

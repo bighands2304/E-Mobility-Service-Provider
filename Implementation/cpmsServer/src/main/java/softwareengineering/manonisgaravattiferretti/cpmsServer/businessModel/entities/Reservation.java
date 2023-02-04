@@ -24,6 +24,7 @@ public class Reservation {
     private LocalDateTime endTime;
     private Double energyAmount;
     private Double totalCost;
+    private Double batteryPercentage;
     private LocalDateTime lastUpdated;
     private LocalDateTime expiryDate;
     @DocumentReference

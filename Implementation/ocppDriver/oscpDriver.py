@@ -63,11 +63,13 @@ class OscpConnection:
                         "endTime": end_time.isoformat()
                     }]
                 }
-                requests.post(f"{CPMS_URL}/oscp/fp/update_group_capacity_forecast?token={self.token}",
-                              json=capacity_forecast,
-                              headers={"Content-Type": CONTENT_TYPE,
-                                       "X-Requested-With": "XMLHttpRequest",
-                                       "Accept-Encoding": ACCEPT_ENCODING})
+                resp = requests.post(f"{CPMS_URL}/oscp/fp/update_group_capacity_forecast?token={self.token}",
+                                     json=capacity_forecast,
+                                     headers={"Content-Type": CONTENT_TYPE,
+                                              "X-Requested-With": "XMLHttpRequest",
+                                              "Accept-Encoding": ACCEPT_ENCODING})
+                if resp.status_code != 200:
+                    return
                 time.sleep(60)
                 price = np.random.randn() / 10
                 tou_msg = {

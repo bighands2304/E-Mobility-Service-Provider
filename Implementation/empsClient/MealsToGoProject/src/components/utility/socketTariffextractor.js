@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 
 export const socketTariff = (cp) => {
+  console.log("here modified soxket before" + JSON.stringify(cp.sockets));
   let modifiedSockets = cp.sockets
-    .filter((socket) => socket.availability === "available")
+    .filter((socket) => socket.availability === "AVAILABLE")
     .map((socket) => {
       for (let i = 0; i < cp.tariffs.length; i++) {
         if (socket.type === cp.tariffs[i].socketType) {
@@ -17,5 +18,6 @@ export const socketTariff = (cp) => {
       });
       return socket;
     });
+  console.log("here modified soxket after" + JSON.stringify(modifiedSockets));
   return modifiedSockets;
 };

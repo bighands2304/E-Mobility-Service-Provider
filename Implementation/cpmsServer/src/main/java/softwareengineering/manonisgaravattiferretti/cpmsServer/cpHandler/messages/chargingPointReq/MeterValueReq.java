@@ -14,4 +14,5 @@ public class MeterValueReq {
     private Long transactionId;
     @NotEmpty
     private List<MeterValue> meterValue;
+    private Double batteryPercentage;
 }

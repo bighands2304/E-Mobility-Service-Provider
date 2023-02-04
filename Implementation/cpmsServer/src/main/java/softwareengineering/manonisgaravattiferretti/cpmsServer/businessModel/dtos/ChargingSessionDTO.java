@@ -15,5 +15,6 @@ public class ChargingSessionDTO {
     private Integer socketId;
     private String status;
     private Double totalCost;
+    private Double batteryPercentage;
     private LocalDateTime lastUpdated;
 }
