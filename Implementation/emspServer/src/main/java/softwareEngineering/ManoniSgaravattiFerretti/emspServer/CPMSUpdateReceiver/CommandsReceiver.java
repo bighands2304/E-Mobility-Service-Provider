@@ -56,12 +56,7 @@ public class CommandsReceiver {
         }
 
         if (command.equals("START_SESSION")){
-            if(commandResult.get("result").equals("ACCEPTED")){
-                Reservation reservation = reservationService.getReservationById(Long.parseLong(uid));
-                reservation.setSessionId(Long.parseLong(uid));
-
-                reservationService.save(reservation);
-            }
+            if(commandResult.get("result").equals("ACCEPTED")){}
         }
 
         if (command.equals("STOP_SESSION")){
