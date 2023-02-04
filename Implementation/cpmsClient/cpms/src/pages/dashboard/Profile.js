@@ -7,7 +7,6 @@ import { updateUser } from "../../features/user/userSlice";
 
 const Profile = () => {
   const { isLoading, user } = useSelector((store) => store.user);
-  console.log("user +++ => " + JSON.stringify(user));
 
   const dispatch = useDispatch();
 

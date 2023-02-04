@@ -66,8 +66,6 @@ export const setFavouriteRequest = async (vinCode, idUser, jwt) => {
     userId: idUser,
     vin: vinCode,
   };
-  console.log("sending idUsser" + idUser);
-  console.log("sending VinCode" + vinCode);
 
   const customInstance = customFetch(jwt);
   let resp = await customInstance.post(url, obj);
