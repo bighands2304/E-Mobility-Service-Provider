@@ -1,5 +1,6 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSUpdateReceiver;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -57,7 +58,8 @@ public class SessionsReceiver {
         }
 
         if (session.getStatus().equals("COMPLETED")) {
-            EndedReservation reservation = (EndedReservation) reservationService.getReservationById(session.getReservationId());
+            EndedReservation reservation = new EndedReservation();
+            BeanUtils.copyProperties(reservation, reservationService.getReservationById(session.getReservationId()));
 
             reservation.setStartTime(session.getStartDateTime());
             reservation.setId(session.getReservationId());
@@ -72,8 +74,9 @@ public class SessionsReceiver {
             reservationService.save(reservation);
         }
 
-        if (session.getStatus().equals("INVALID")) {
-            DeletedReservation reservation = (DeletedReservation) reservationService.getReservationById(session.getReservationId());
+        if (session.getStatus().equals("INVALID") || session.getStatus().equals("DELETED")) {
+            DeletedReservation reservation = new DeletedReservation();
+            BeanUtils.copyProperties(reservation, reservationService.getReservationById(session.getReservationId()));
 
             reservation.setStartTime(session.getStartDateTime());
             reservation.setId(session.getReservationId());
