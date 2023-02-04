@@ -6,9 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.socket.WebSocketMessage;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.ReservationService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.chargingPointReq.*;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.cpmsReq.*;
@@ -17,6 +20,8 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.socketStatusManag
 import softwareengineering.manonisgaravattiferretti.cpmsServer.socketStatusManager.events.SessionStoppedEvent;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.socketStatusManager.events.SocketStatusChangeEvent;
 
+import java.util.Map;
+
 @Controller
 public class OcppReceiver {
     private static final Logger logger = LoggerFactory.getLogger(OcppReceiver.class);
@@ -24,14 +29,16 @@ public class OcppReceiver {
     private final SessionsManager sessionsManager;
     private final OcppSender ocppSender;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final SimpMessagingTemplate template;
 
     @Autowired
     public OcppReceiver(ReservationService reservationService, SessionsManager sessionsManager, OcppSender ocppSender,
-                        ApplicationEventPublisher applicationEventPublisher) {
+                        ApplicationEventPublisher applicationEventPublisher, SimpMessagingTemplate template) {
         this.reservationService = reservationService;
         this.sessionsManager = sessionsManager;
         this.ocppSender = ocppSender;
         this.applicationEventPublisher = applicationEventPublisher;
+        this.template = template;
     }
 
     @MessageMapping("/ocpp")
@@ -42,8 +49,13 @@ public class OcppReceiver {
     @MessageMapping("/ocpp/BootNotification")
     public @ResponseBody BootNotificationConf handleBootNotification(@RequestBody BootNotificationReq request,
                                                                      SimpMessageHeaderAccessor headerAccessor) {
-        logger.info("arrived boot notification message from session: " + headerAccessor.getSessionId());
-        return new BootNotificationConf(headerAccessor.getSessionId());
+        logger.info("arrived boot notification message from session: " + headerAccessor.getSessionAttributes().get("sessionId"));
+        //Map<String, Object> headers = Map.of("sessionId", headerAccessor.getSessionId());
+        sessionsManager.updateSessionId(request.getCpId(), headerAccessor.getSessionId());
+        //template.convertAndSendToUser(headerAccessor.getSessionId(), "topic/ocpp/BootNotification",
+        //        new BootNotificationConf(headerAccessor.getSessionId()), headers);
+        sessionsManager.getSessionIdFromChargingPointId(request.getCpId());
+        return new BootNotificationConf((String) headerAccessor.getSessionAttributes().get("sessionId"));
     }
 
     @MessageMapping("/ocpp/StatusNotification")
@@ -56,7 +68,7 @@ public class OcppReceiver {
         return new StatusNotificationConf();
     }
 
-    @MessageMapping("/ocpp/MeterValues")
+    @MessageMapping("/ocpp/MeterValue")
     public @ResponseBody MeterValueConf handleMeterValues(@RequestBody MeterValueReq request) {
         MeterValueEvent meterValueEvent = new MeterValueEvent(this, request.getTransactionId(),
                 request.getConnectorId(), request.getMeterValue());
@@ -110,6 +122,7 @@ public class OcppReceiver {
 
     @MessageMapping("/ocpp/ReserveNowConf")
     public void handleReserveNowConf(@RequestBody ReserveNowConf reserveNowConf) {
+        logger.info("Received reserve now");
         ocppSender.completeRequest(reserveNowConf, reserveNowConf.getRequestId());
     }
 

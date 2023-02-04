@@ -46,7 +46,7 @@ public class SessionStoppedListener implements ApplicationListener<SessionStoppe
         Integer socketId = reservationOptional.get().getSocket().getSocketId();
         socketService.updateSocketStatus(cpId, socketId, "AVAILABLE");
         Reservation reservation = reservationOptional.get();
-        reservation.setStatus("ENDED");
+        reservation.setStatus("COMPLETED");
         reservation.setLastUpdated(event.getTime());
         reservation.setTotalCost(priceManager.applyTariff(event.getReservationId(), reservation.getSocket().getCpId()));
         ocpiSessionSender.patchSession(EntityFromDTOConverter.chargingSessionDTOFromReservation(reservation),
