@@ -22,8 +22,8 @@ public class StatusMonitor {
     @Autowired
     CommandsSender commandsSender;
 
-    @PostMapping("/endReservation")
-    public ResponseEntity<?> endReservation(@RequestBody Map<String,String> payload){
+    @PostMapping("/endSession")
+    public ResponseEntity<?> endSession(@RequestBody Map<String,String> payload){
         Reservation reservation = reservationService.getReservationById(Long.parseLong(payload.get("reservationId")));
         if(reservation instanceof ActiveReservation activeReservation) {
             if(activeReservation.getSessionId()!=null){
