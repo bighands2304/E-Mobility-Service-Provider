@@ -77,7 +77,7 @@ public class LocationsSender {
                 newSocket.setSocketId(s.getSocketId().toString());
                 newSocket.setAvailability(s.getAvailability());
                 newSocket.setStatus(s.getStatus());
-                newSocket.setType(s.getSocketType());
+                newSocket.setType(s.getType());
                 newSocket.setLastUpdate(s.getLastUpdate());
                 newCp.addSocket(newSocket);
             }
@@ -95,15 +95,14 @@ public class LocationsSender {
         //?date_from={DateTime}&date_to={DateTime}&offset=0&limit=10
         String urlTemplate = UriComponentsBuilder.fromHttpUrl(cp.getCpo().getCpmsUrl()+ocpiPath+"/locations/"+cp.getCpId()).encode().toUriString();
 
-        ParameterizedTypeReference<RestResponsePage<ChargingPointDTO>> typo = new ParameterizedTypeReference<>() {};
-        ResponseEntity<RestResponsePage<ChargingPointDTO>> response = restTemplate.exchange(
+        ResponseEntity<ChargingPointDTO> response = restTemplate.exchange(
                 urlTemplate,
                 HttpMethod.GET,
                 entity,
-                typo
+                ChargingPointDTO.class
         );
 
-        ChargingPointDTO cpResponse = Objects.requireNonNull(response.getBody()).getContent().get(0);
+        ChargingPointDTO cpResponse = Objects.requireNonNull(response.getBody());
 
         ChargingPoint newCp = cpService.getCPById(cp.getCpId());
         if(newCp==null){
@@ -123,7 +122,7 @@ public class LocationsSender {
             newSocket.setSocketId(s.getSocketId().toString());
             newSocket.setAvailability(s.getAvailability());
             newSocket.setStatus(s.getStatus());
-            newSocket.setType(s.getSocketType());
+            newSocket.setType(s.getType());
             newSocket.setLastUpdate(s.getLastUpdate());
             newCp.addSocket(newSocket);
         }
@@ -156,7 +155,7 @@ public class LocationsSender {
             newSocket.setSocketId(socketResponse.getSocketId().toString());
             newSocket.setAvailability(socketResponse.getAvailability());
             newSocket.setStatus(socketResponse.getStatus());
-            newSocket.setType(socketResponse.getSocketType());
+            newSocket.setType(socketResponse.getType());
             newSocket.setLastUpdate(socketResponse.getLastUpdate());
             cp.addSocket(newSocket);
             cpService.save(cp);

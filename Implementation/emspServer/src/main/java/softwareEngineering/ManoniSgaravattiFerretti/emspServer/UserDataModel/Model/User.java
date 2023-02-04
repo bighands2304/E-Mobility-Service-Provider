@@ -22,7 +22,7 @@ public class User implements UserDetails {
     public User(){
         this.enable = true;
         this.accountNonExpired = true;
-        this.credentialExpired = true;
+        this.credentialNonExpired = true;
         this.accountNonLocked = true;
         this.authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
     }
@@ -37,7 +37,7 @@ public class User implements UserDetails {
         this.reservations=user.reservations;
         this.enable = true;
         this.accountNonExpired = true;
-        this.credentialExpired = true;
+        this.credentialNonExpired = true;
         this.accountNonLocked = true;
         this.authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
     }
@@ -64,7 +64,7 @@ public class User implements UserDetails {
     private List<ActiveReservation> reservations = new ArrayList<>();
 
     private boolean enable;
-    private boolean credentialExpired;
+    private boolean credentialNonExpired;
     private boolean accountNonExpired;
     private boolean accountNonLocked;
     private List<GrantedAuthority> authorities = new ArrayList<>();
@@ -86,7 +86,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return credentialExpired;
+        return credentialNonExpired;
     }
 
     @Override
