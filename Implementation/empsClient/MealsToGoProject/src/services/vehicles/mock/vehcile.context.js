@@ -6,6 +6,7 @@ import {
   vehicleTrasform,
   addVehicleRequest,
   deleteVehicleRequest,
+  setFavouriteRequest,
 } from "./vehicle.serice";
 
 export const VehicleContext = createContext();
@@ -15,13 +16,14 @@ export const VehicleContextProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   // is just for try
-  const { id } = useContext(AuthenticationContext);
+  const { id, token } = useContext(AuthenticationContext);
 
   const RetrieveVehciles = (uid) => {
+    console.log("retrive v for uid ==> " + uid);
     setIsLoading(true);
     setVehicles([]);
 
-    getVehicleRequest(uid)
+    getVehicleRequest(uid, token)
       .then(vehicleTrasform)
       .then((results) => {
         setIsLoading(false);
@@ -35,7 +37,7 @@ export const VehicleContextProvider = ({ children }) => {
 
   const AddNewVehicle = (vinCode) => {
     setIsLoading(true);
-    addVehicleRequest(vinCode, id)
+    addVehicleRequest(vinCode, id, token)
       .then((resul) => {
         setIsLoading(false);
         RetrieveVehciles(id);
@@ -50,7 +52,7 @@ export const VehicleContextProvider = ({ children }) => {
   };
   const DeleteVehcile = (vinCode) => {
     setIsLoading(true);
-    deleteVehicleRequest(vinCode)
+    deleteVehicleRequest(vinCode, token)
       .then((resul) => {
         setIsLoading(false);
         RetrieveVehciles(id);
@@ -61,6 +63,22 @@ export const VehicleContextProvider = ({ children }) => {
         setIsLoading(false);
         setError(err);
         createOnButtonAlert("Error", "Check your Vin Code");
+      });
+  };
+
+  const SetFavouriteVehicle = (vinCode) => {
+    setIsLoading(true);
+    setFavouriteRequest(vinCode, id, token)
+      .then((result) => {
+        setIsLoading(false);
+        RetrieveVehciles(id);
+        createOnButtonAlert("Success", "Vehicle Favourite");
+      })
+      .catch((err) => {
+        console.log("error there" + err);
+        setIsLoading(false);
+        setError(err);
+        createOnButtonAlert("Error", "Retry later");
       });
   };
 
@@ -80,6 +98,7 @@ export const VehicleContextProvider = ({ children }) => {
         vehicles,
         isLoading,
         error,
+        SetFavouriteVehicle,
         AddNewVehicle,
         DeleteVehcile,
       }}

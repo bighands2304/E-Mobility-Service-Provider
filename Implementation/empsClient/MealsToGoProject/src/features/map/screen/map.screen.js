@@ -18,7 +18,11 @@ export const MapScreen = ({ navigation }) => {
   const { restaurants = [] } = useContext(RestaurantsContext);
   const { favVehicle } = useContext(FavouritesContext);
   const [latDelta, setLatDelta] = useState(0);
-  let socketTypeFav = favVehicle[0].SocketType;
+  let socketTypeFav = "FAST";
+  if (favVehicle) {
+    socketTypeFav = favVehicle[0].SocketType;
+  }
+
   //console.log("fav =======>=>=>" + JSON.stringify(socketTypeFav));
   //console.log("cps =======>=>=>" + JSON.stringify(restaurants));
   const colorDarkMap = "#000000";

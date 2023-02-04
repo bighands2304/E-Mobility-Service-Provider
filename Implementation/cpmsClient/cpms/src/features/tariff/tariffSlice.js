@@ -48,7 +48,7 @@ const tariffSlice = createSlice({
       })
       .addCase(setTariffSpecial.fulfilled, (state, { payload }) => {
         state.isLoading = false;
-        console.log("GOOOOO");
+
         toast.success("Suchess");
       })
       .addCase(setTariffSpecial.rejected, (state, { payload }) => {

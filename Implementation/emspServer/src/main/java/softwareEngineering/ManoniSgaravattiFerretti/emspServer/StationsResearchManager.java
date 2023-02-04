@@ -12,6 +12,7 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointData
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.TariffService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.ChargingPointDTO;
 import org.springframework.beans.BeanUtils;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.ChargingPointUserDTO;
 
 
 import java.lang.reflect.Type;
@@ -33,27 +34,27 @@ public class StationsResearchManager {
     LocationsSender locations;
     @Autowired
     TariffService tariffService;
-    Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>) (json, type, jsonDeserializationContext) ->
-            ZonedDateTime.parse(json.getAsJsonPrimitive().getAsString()).toLocalDateTime()).create();
 
     @GetMapping("/getCPsInRange/{latitude}/{longitude}/{range}")
     public ResponseEntity<?> getCpsInRange(@PathVariable Double latitude, @PathVariable Double longitude, @PathVariable Double range){
         //Search for CPs in a certain range
         List<ChargingPoint> cps= cpService.getCPsInRange(latitude, latitude+range, longitude, longitude+range);
 
-        List<JsonElement> jsonCPs = new ArrayList<>();
+        List<ChargingPointUserDTO> cpsDTO= new ArrayList<>();
+
         for (ChargingPoint cp: cps) {
-            JsonElement jsonCP = gson.toJsonTree(cp);
+            ChargingPointUserDTO cpDTO = new ChargingPointUserDTO();
+            BeanUtils.copyProperties(cp, cpDTO);
             List<Tariff> tariffs = new ArrayList<>();
             for (String tariffId: cp.getTariffsId()) {
                 tariffs.add(tariffService.getTariffById(tariffId));
             }
-            jsonCP.getAsJsonObject().addProperty("tariffs", gson.toJson(tariffs));
-            jsonCPs.add(jsonCP);
+            cpDTO.setTariffs(tariffs);
+            cpsDTO.add(cpDTO);
         }
 
         //Return the response with the list of CPs found
-        return ResponseEntity.ok(gson.toJson(jsonCPs));
+        return ResponseEntity.ok(cpsDTO);
     }
 
     @GetMapping("/getCP/{cpId}")
@@ -64,15 +65,16 @@ public class StationsResearchManager {
         //Fetch the status of the cp from its cpms
         locations.getCp(cp);
 
-        JsonElement jsonCP = gson.toJsonTree(cp);
+        ChargingPointUserDTO cpDTO = new ChargingPointUserDTO();
+        BeanUtils.copyProperties(cp, cpDTO);
         List<Tariff> tariffs = new ArrayList<>();
         for (String tariffId: cp.getTariffsId()) {
             tariffs.add(tariffService.getTariffById(tariffId));
         }
-        jsonCP.getAsJsonObject().addProperty("tariffs", gson.toJson(tariffs));
+        cpDTO.setTariffs(tariffs);
 
         //Return last information
-        return ResponseEntity.ok(gson.toJson(jsonCP));
+        return ResponseEntity.ok(cpDTO);
     }
 
     @GetMapping("/getTariff/{tariffId}")

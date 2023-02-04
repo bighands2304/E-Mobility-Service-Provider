@@ -17,7 +17,7 @@ export const vehicleTrasform = (results) => {
   return camelize(mappedResults);
 };
 
-export const addVehicleRequest = async (vinCodeV, userIdV) => {
+export const addVehicleRequest = async (vinCodeV, userIdV, jwt) => {
   const obj = {
     userId: userIdV,
     vin: vinCodeV,
@@ -26,7 +26,8 @@ export const addVehicleRequest = async (vinCodeV, userIdV) => {
 
   const url = "/user/addVehicle";
   try {
-    const resp = await customFetch.post(url, obj);
+    const customInstance = customFetch(jwt);
+    const resp = await customInstance.post(url, obj);
 
     const results = resp.data;
     return results;
@@ -35,11 +36,12 @@ export const addVehicleRequest = async (vinCodeV, userIdV) => {
   }
 };
 
-export const getVehicleRequest = async (idUser) => {
+export const getVehicleRequest = async (idUser, jwt) => {
   const url = `/user/getUserVehicles/${idUser}`;
 
   try {
-    const resp = await customFetch.get(url);
+    const customInstance = customFetch(jwt);
+    const resp = await customInstance.get(url);
     const results = resp.data.map((d) => d.vehicle);
 
     return resp.data;
@@ -48,11 +50,24 @@ export const getVehicleRequest = async (idUser) => {
   }
 };
 
-export const deleteVehicleRequest = async (vinCode) => {
+export const deleteVehicleRequest = async (vinCode, jwt) => {
   const url = `user/deleteVehicle/${vinCode}`;
   try {
-    const resp = await customFetch.delete(url);
+    const customInstance = customFetch(jwt);
+    const resp = await customInstance.delete(url);
   } catch (error) {
     console.log(JSON.stringify(error));
   }
+};
+
+export const setFavouriteRequest = async (vinCode, idUser, jwt) => {
+  const url = "user/setFavouriteVehicle";
+  const obj = {
+    userId: idUser,
+    vin: vinCode,
+  };
+
+  const customInstance = customFetch(jwt);
+  let resp = await customInstance.post(url, obj);
+  return resp;
 };
