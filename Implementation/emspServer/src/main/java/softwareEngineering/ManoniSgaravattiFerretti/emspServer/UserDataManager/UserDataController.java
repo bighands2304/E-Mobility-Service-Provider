@@ -105,7 +105,7 @@ public class UserDataController {
         User user = userService.findById(Long.parseLong(payload.get("userId")));
 
         //Find the new favourite vehicle and set it as favourite
-        UserVehicle newFavourite = userVehicleService.findVehcileByIds(user.getId(), Long.parseLong(payload.get("vin")));
+        UserVehicle newFavourite = userVehicleService.findVehcileByIds(user.getId(), payload.get("vin"));
         newFavourite.setFavourite(true);
 
         //Find the actual favourite vehicle and set it as non-favourite

@@ -12,5 +12,5 @@ import java.util.List;
 public interface UserVehicleRepository extends JpaRepository<UserVehicle, UserVehicleId> {
     List<UserVehicle> findAllByUserId(Long userId);
     UserVehicle findByUserIdAndFavouriteIsTrue(Long userId);
-    UserVehicle findByUserIdAndVehicleVINCode(Long userId, Long vehicleVin);
+    UserVehicle findByUserIdAndVehicleVINCode(Long userId, String vehicleVin);
 }

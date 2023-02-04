@@ -2,6 +2,7 @@ package softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDat
 
 
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Transient;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.Id;
