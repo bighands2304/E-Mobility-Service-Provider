@@ -35,6 +35,7 @@ public class ReservationManager {
         String cpId = payload.get("cpId");
         String socketId = payload.get("socketId");
 
+        LocalDateTime reserveTime=LocalDateTime.now();
         //Create the reservation
         User user = userService.findById(userId);
         ChargingPoint cp = cpService.getCPById(cpId);
@@ -42,7 +43,8 @@ public class ReservationManager {
         reservation.setUser(user);
         reservation.setCpId(cpId);
         reservation.setSocketId(socketId);
-        reservation.setStartTime(LocalDateTime.now());
+        reservation.setStartTime(reserveTime);
+        reservation.setExpiryDate(reserveTime.plusMinutes(20));
 
         //Save the reservation in the DB
         reservationService.save(reservation);

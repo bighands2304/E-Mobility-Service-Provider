@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 public class SessionDTO {
     private String sessionId;
     private Long reservationId;
+    private Double batteryPercentage;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
     private LocalDateTime expiryDate;

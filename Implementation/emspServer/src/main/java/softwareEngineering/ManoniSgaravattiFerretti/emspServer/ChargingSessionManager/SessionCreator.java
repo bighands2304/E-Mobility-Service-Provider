@@ -13,6 +13,7 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Mod
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.Reservation;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Service.ReservationService;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @RestController
@@ -29,9 +30,11 @@ public class SessionCreator {
     @PostMapping("/startChargingSession")
     public ResponseEntity<?> startChargingSession(@RequestBody Map<String,String> payload){
         Reservation reservation = reservationService.getReservationById(Long.parseLong(payload.get("reservationId")));
+        if (reservation.getExpiryDate().isAfter(LocalDateTime.now()))
+            return ResponseEntity.badRequest().body("Reservation expired");
         if (reservation instanceof ActiveReservation activeReservation) {
             //Send startSession request to the CPMS and save the active reservation in the DB
-            if(commandsSender.startSession(activeReservation).getStatusCode().is4xxClientError()){
+            if(commandsSender.startSession(activeReservation).getStatusCode().is2xxSuccessful()){
                 reservationService.save(activeReservation);
                 return ResponseEntity.ok(activeReservation);
             }

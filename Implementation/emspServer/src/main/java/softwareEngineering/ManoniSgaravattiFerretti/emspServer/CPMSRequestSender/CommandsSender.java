@@ -31,7 +31,7 @@ public class CommandsSender {
         session.setReservationId(reservation.getId());
         session.setChargingPointId(cp.getCpId());
         session.setSocketId(reservation.getSocketId());
-        session.setExpiryDate(reservation.getStartTime().plusMinutes(20));
+        session.setExpiryDate(reservation.getExpiryDate());
 
         HttpEntity<?> entity = new HttpEntity<>(session, headers);
 
@@ -60,7 +60,7 @@ public class CommandsSender {
 
         HttpEntity<?> entity = new HttpEntity<>(session, headers);
 
-        String urlTemplate = UriComponentsBuilder.fromHttpUrl(cp.getCpo().getCpmsUrl() + ocpiPath + "/commands/START_SESSION/"+reservation.getId()).encode().toUriString();
+        String urlTemplate = UriComponentsBuilder.fromHttpUrl(cp.getCpo().getCpmsUrl() + ocpiPath + "/commands/START_SESSION").encode().toUriString();
 
         return restTemplate.exchange(
                 urlTemplate,
