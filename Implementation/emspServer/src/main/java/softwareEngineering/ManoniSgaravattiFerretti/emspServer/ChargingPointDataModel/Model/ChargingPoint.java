@@ -29,7 +29,6 @@ public class ChargingPoint {
     private ChargingPointOperator cpo;
     private List<Socket> sockets = new ArrayList<>();
     private List<String> tariffsId = new ArrayList<>();
-    private List<Tariff> tariffs = new ArrayList<>();
 
     public void addSocket(Socket newSocket){ sockets.add(newSocket);}
 
