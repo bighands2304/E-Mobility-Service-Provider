@@ -18,5 +18,5 @@ public class UserVehicleService {
 
     public UserVehicle findFavouriteOfUser(Long userId){return userVehicleRepository.findByUserIdAndFavouriteIsTrue(userId);}
 
-    public UserVehicle findVehcileByIds(Long userId, Long vehicleVin){return userVehicleRepository.findByUserIdAndVehicleVINCode(userId,vehicleVin);}
+    public UserVehicle findVehcileByIds(Long userId, String vehicleVin){return userVehicleRepository.findByUserIdAndVehicleVINCode(userId,vehicleVin);}
 }
