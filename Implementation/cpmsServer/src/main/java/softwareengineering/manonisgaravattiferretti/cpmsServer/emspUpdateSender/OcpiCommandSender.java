@@ -11,6 +11,7 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dto
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.EmspDetails;
 
 import java.time.Duration;
+import java.util.Map;
 
 @Component
 public class OcpiCommandSender {
@@ -23,8 +24,9 @@ public class OcpiCommandSender {
         String path = "commands/" + commandType + "/" + emspReservationId;
         WebClient.RequestBodySpec requestBodySpec = OcpiHeaderBuilder
                 .buildHeader(emspDetails, HttpMethod.POST, path);
+        Map<String, Object> body = Map.of("result", commandResultType);
         ResponseEntity<Void> response = requestBodySpec
-                .bodyValue(commandResultType)
+                .bodyValue(body)
                 .retrieve()
                 .toBodilessEntity()
                 .block(Duration.ofSeconds(10));
