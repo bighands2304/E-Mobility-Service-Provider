@@ -5,9 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.SessionDTO;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.ActiveReservation;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.DeletedReservation;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.EndedReservation;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.Reservation;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Service.ReservationService;
 
 @RestController
@@ -18,12 +16,12 @@ public class SessionsReceiver {
 
     @PutMapping("/{session_id}")
     public ResponseEntity<?> putSession(@PathVariable String session_id, @RequestBody SessionDTO session){
-        ActiveReservation reservation = (ActiveReservation) reservationService.getReservationById(session.getReservationId());
+        Reservation reservation = reservationService.getReservationById(session.getReservationId());
 
         reservation.setStartTime(session.getStartDateTime());
         reservation.setId(session.getReservationId());
         reservation.setSessionId(Long.parseLong(session_id));
-        reservation.setSocketId(session.getSocketId());
+        reservation.setSocketId(session.getSocketId().toString());
         reservation.setBatteryPercentage(session.getBatteryPercentage());
 
         reservationService.save(reservation);
@@ -34,37 +32,36 @@ public class SessionsReceiver {
     @PatchMapping("/{session_id}")
     public ResponseEntity<?> patchSession(@PathVariable String session_id, @RequestBody SessionDTO session){
         if (session.getStatus().equals("ACTIVE")) {
-            ActiveReservation reservation = (ActiveReservation) reservationService.getReservationById(session.getReservationId());
+            Reservation reservation = reservationService.getReservationById(session.getReservationId());
 
             reservation.setStartTime(session.getStartDateTime());
             reservation.setId(session.getReservationId());
             reservation.setSessionId(Long.parseLong(session_id));
-            reservation.setSocketId(session.getSocketId());
+            reservation.setSocketId(session.getSocketId().toString());
             reservation.setBatteryPercentage(session.getBatteryPercentage());
 
             reservationService.save(reservation);
         }
 
         if (session.getStatus().equals("RESERVATION")) {
-            ActiveReservation reservation = (ActiveReservation) reservationService.getReservationById(session.getReservationId());
+            Reservation reservation = reservationService.getReservationById(session.getReservationId());
 
             reservation.setStartTime(session.getStartDateTime());
             reservation.setId(session.getReservationId());
             reservation.setSessionId(Long.parseLong(session.getSessionId()));
-            reservation.setSocketId(session.getSocketId());
+            reservation.setSocketId(session.getSocketId().toString());
             reservation.setBatteryPercentage(session.getBatteryPercentage());
 
             reservationService.save(reservation);
         }
 
         if (session.getStatus().equals("COMPLETED")) {
-            EndedReservation reservation = new EndedReservation();
-            BeanUtils.copyProperties(reservation, reservationService.getReservationById(session.getReservationId()));
+            Reservation reservation = reservationService.getReservationById(session.getReservationId());
 
             reservation.setStartTime(session.getStartDateTime());
             reservation.setId(session.getReservationId());
             reservation.setSessionId(Long.parseLong(session.getSessionId()));
-            reservation.setSocketId(session.getSocketId());
+            reservation.setSocketId(session.getSocketId().toString());
             reservation.setBatteryPercentage(session.getBatteryPercentage());
 
             reservation.setEndTime(session.getEndDateTime());
@@ -75,12 +72,11 @@ public class SessionsReceiver {
         }
 
         if (session.getStatus().equals("INVALID") || session.getStatus().equals("DELETED")) {
-            DeletedReservation reservation = new DeletedReservation();
-            BeanUtils.copyProperties(reservation, reservationService.getReservationById(session.getReservationId()));
+            Reservation reservation = reservationService.getReservationById(session.getReservationId());
 
             reservation.setStartTime(session.getStartDateTime());
             reservation.setId(session.getReservationId());
-            reservation.setSocketId(session.getSocketId());
+            reservation.setSocketId(session.getSocketId().toString());
             reservation.setBatteryPercentage(session.getBatteryPercentage());
 
             reservation.setDeletionTime(session.getEndDateTime());

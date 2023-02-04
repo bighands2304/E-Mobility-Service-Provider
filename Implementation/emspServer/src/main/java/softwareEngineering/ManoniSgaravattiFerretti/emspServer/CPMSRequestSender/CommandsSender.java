@@ -8,7 +8,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.ChargingPoint;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.ChargingPointService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.SessionDTO;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.ActiveReservation;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.Reservation;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Service.ReservationService;
 
@@ -30,7 +29,7 @@ public class CommandsSender {
         SessionDTO session = new SessionDTO();
         session.setReservationId(reservation.getId());
         session.setChargingPointId(cp.getCpId());
-        session.setSocketId(reservation.getSocketId());
+        session.setSocketId(Integer.parseInt(reservation.getSocketId()));
         session.setExpiryDate(reservation.getExpiryDate());
 
         HttpEntity<?> entity = new HttpEntity<>(session, headers);
@@ -46,7 +45,7 @@ public class CommandsSender {
 
     }
 
-    public ResponseEntity<String> startSession(ActiveReservation reservation) {
+    public ResponseEntity<String> startSession(Reservation reservation) {
         ChargingPoint cp= cpService.getCPById(reservation.getCpId());
 
         HttpHeaders headers = new HttpHeaders();
@@ -56,7 +55,7 @@ public class CommandsSender {
         SessionDTO session = new SessionDTO();
         session.setReservationId(reservation.getId());
         session.setChargingPointId(cp.getCpId());
-        session.setSocketId(reservation.getSocketId());
+        session.setSocketId(Integer.parseInt(reservation.getSocketId()));
 
         HttpEntity<?> entity = new HttpEntity<>(session, headers);
 
@@ -70,7 +69,7 @@ public class CommandsSender {
         );
     }
 
-    public ResponseEntity<String> stopSession(ActiveReservation reservation) {
+    public ResponseEntity<String> stopSession(Reservation reservation) {
         ChargingPoint cp= cpService.getCPById(reservation.getCpId());
 
         HttpHeaders headers = new HttpHeaders();
@@ -89,7 +88,7 @@ public class CommandsSender {
         );
     }
 
-    public ResponseEntity<String> cancelReservation(ActiveReservation reservation) {
+    public ResponseEntity<String> cancelReservation(Reservation reservation) {
         ChargingPoint cp= cpService.getCPById(reservation.getCpId());
 
         HttpHeaders headers = new HttpHeaders();

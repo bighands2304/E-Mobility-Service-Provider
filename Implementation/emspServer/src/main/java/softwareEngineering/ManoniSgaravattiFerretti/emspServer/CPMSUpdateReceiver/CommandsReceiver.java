@@ -3,14 +3,10 @@ package softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSUpdateReceiv
 import com.google.firebase.messaging.FirebaseMessagingException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingSessionManager.NotificationGenerator;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.NotificationSender;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.ActiveReservation;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.DeletedReservation;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.EndedReservation;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.Reservation;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Service.ReservationService;
 
@@ -37,13 +33,13 @@ public class CommandsReceiver {
             if(commandResult.get("result").equals("ACCEPTED")) {
                 //Get the reservation to delete
                 Reservation reservation = reservationService.getReservationById(Long.parseLong(uid));
+                if (reservation.getType().equals("RESERVED")) {
+                    //Set the reservation as deleted and set the deletion time to now
+                    reservation.setDeletionTime(LocalDateTime.now());
+                    //Save the reservation as deleted
 
-                //Set the reservation as deleted and set the deletion time to now
-                DeletedReservation deletedReservation = (DeletedReservation) reservation;
-                deletedReservation.setDeletionTime(LocalDateTime.now());
-
-                //Save the reservation as deleted
-                reservationService.save(deletedReservation);
+                    reservationService.save(reservation);
+                }
             }
         }
 
@@ -51,29 +47,21 @@ public class CommandsReceiver {
             Reservation reservation = reservationService.getReservationById(Long.parseLong(uid));
             if(commandResult.get("result").equals("ACCEPTED")){
 
-                ActiveReservation activeReservation = (ActiveReservation) reservation;
-                activeReservation.setStartTime(LocalDateTime.now());
+                reservation.setStartTime(LocalDateTime.now());
 
-                reservationService.save(activeReservation);
+                reservationService.save(reservation);
             }if(commandResult.get("result").equals("TIMEOUT")){
                 reservationService.delete(reservation);
             }
         }
 
         if (command.equals("START_SESSION")){
-            if(commandResult.get("result").equals("ACCEPTED")){
-                ActiveReservation reservation = (ActiveReservation) reservationService.getReservationById(Long.parseLong(uid));
-                reservation.setSessionId(Long.parseLong(uid));
-
-                reservationService.save(reservation);
-            }
+            if(commandResult.get("result").equals("ACCEPTED")){}
         }
 
         if (command.equals("STOP_SESSION")){
             if(commandResult.get("result").equals("ACCEPTED")){
-                ActiveReservation reservation = (ActiveReservation) reservationService.getReservationById(Long.parseLong(uid));
-                EndedReservation endedReservation = new EndedReservation();
-                BeanUtils.copyProperties(endedReservation, reservation);
+                Reservation reservation = reservationService.getReservationById(Long.parseLong(uid));
 
                 //Create a notification to send when the session ends
                 NotificationGenerator notification= new NotificationGenerator();
@@ -87,8 +75,7 @@ public class CommandsReceiver {
                 } catch (FirebaseMessagingException e) {}
 
 
-                reservationService.delete(reservation);
-                reservationService.save(endedReservation);
+                reservationService.save(reservation);
             }
         }
 
