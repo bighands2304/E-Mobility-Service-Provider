@@ -1,5 +1,7 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.GeneratedValue;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
@@ -15,6 +17,7 @@ import java.util.List;
 
 @Data
 @Document
+@JsonIgnoreProperties(value= {"token", "tokenEmsp", "password", "username"})
 public class ChargingPointOperator implements UserDetails{
     public ChargingPointOperator(){
         this.authorities.add(new SimpleGrantedAuthority("ROLE_CPMS"));
@@ -25,7 +28,6 @@ public class ChargingPointOperator implements UserDetails{
     private String tokenEmsp;
     private String iban;
     private String cpmsUrl;
-    private List<ChargingPoint> chargingPoints;
     private List<GrantedAuthority> authorities = new ArrayList<>();
 
     @Override

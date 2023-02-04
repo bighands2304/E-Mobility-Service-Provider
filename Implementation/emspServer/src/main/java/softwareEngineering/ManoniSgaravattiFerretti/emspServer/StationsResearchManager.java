@@ -5,11 +5,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSRequestSender.LocationsSender;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.ChargingPoint;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.Tariff;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.ChargingPointService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.TariffService;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
 
 @RestController
 @RequestMapping("/user")
@@ -25,6 +27,15 @@ public class StationsResearchManager {
         //Search for CPs in a certain range
         List<ChargingPoint> cps= cpService.getCPsInRange(latitude, latitude+range, longitude, longitude+range);
 
+        for (ChargingPoint cp: cps) {
+            List<Tariff> tariffs = new ArrayList<>();
+            for (String tariffId: cp.getTariffsId()) {
+                tariffs.add(tariffService.getTariffById(tariffId));
+            }
+            cp.setTariffs(tariffs);
+            cpService.save(cp);
+        }
+
         //Return the response with the list of CPs found
         return ResponseEntity.ok(cps);
     }
@@ -36,6 +47,13 @@ public class StationsResearchManager {
 
         //Fetch the status of the cp from its cpms
         locations.getCp(cp);
+
+        List<Tariff> tariffs = new ArrayList<>();
+        for (String tariffId: cp.getTariffsId()) {
+            tariffs.add(tariffService.getTariffById(tariffId));
+        }
+        cp.setTariffs(tariffs);
+        cpService.save(cp);
 
         //Return last information
         return ResponseEntity.ok(cpService.getCPById(cpId));
