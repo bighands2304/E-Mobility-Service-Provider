@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.ChargingPoint;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.ChargingPointService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.SessionDTO;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.ActiveReservation;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.Reservation;
@@ -15,6 +16,8 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Ser
 public class CommandsSender {
     @Autowired
     ReservationService reservationService;
+    @Autowired
+    ChargingPointService cpService;
     private final String ocpiPath="/ocpi/cpo";
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -43,7 +46,9 @@ public class CommandsSender {
 
     }
 
-    public void startSession(ActiveReservation reservation, ChargingPoint cp) {
+    public ResponseEntity<String> startSession(ActiveReservation reservation) {
+        ChargingPoint cp= cpService.getCPById(reservation.getCpId());
+
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
         headers.set("Authorization", cp.getCpo().getTokenEmsp());
@@ -55,9 +60,47 @@ public class CommandsSender {
 
         HttpEntity<?> entity = new HttpEntity<>(session, headers);
 
-        String urlTemplate = UriComponentsBuilder.fromHttpUrl(cp.getCpo().getCpmsUrl() + ocpiPath + "/commands/START_SESSION").encode().toUriString();
+        String urlTemplate = UriComponentsBuilder.fromHttpUrl(cp.getCpo().getCpmsUrl() + ocpiPath + "/commands/START_SESSION/"+reservation.getId()).encode().toUriString();
 
-        restTemplate.exchange(
+        return restTemplate.exchange(
+                urlTemplate,
+                HttpMethod.POST,
+                entity,
+                String.class
+        );
+    }
+
+    public ResponseEntity<String> stopSession(ActiveReservation reservation) {
+        ChargingPoint cp= cpService.getCPById(reservation.getCpId());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+        headers.set("Authorization", cp.getCpo().getTokenEmsp());
+
+        HttpEntity<?> entity = new HttpEntity<>(headers);
+
+        String urlTemplate = UriComponentsBuilder.fromHttpUrl(cp.getCpo().getCpmsUrl() + ocpiPath + "/commands/STOP_SESSION/"+reservation.getSessionId()).encode().toUriString();
+
+        return restTemplate.exchange(
+                urlTemplate,
+                HttpMethod.POST,
+                entity,
+                String.class
+        );
+    }
+
+    public ResponseEntity<String> cancelReservation(ActiveReservation reservation) {
+        ChargingPoint cp= cpService.getCPById(reservation.getCpId());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+        headers.set("Authorization", cp.getCpo().getTokenEmsp());
+
+        HttpEntity<?> entity = new HttpEntity<>(headers);
+
+        String urlTemplate = UriComponentsBuilder.fromHttpUrl(cp.getCpo().getCpmsUrl() + ocpiPath + "/commands/CANCEL_RESERVATION/"+reservation.getId()).encode().toUriString();
+
+        return restTemplate.exchange(
                 urlTemplate,
                 HttpMethod.POST,
                 entity,

@@ -21,5 +21,6 @@ public abstract class Reservation {
     private User user;
 
     private String tariffId;
+    private String cpId;
     private String socketId;
 }

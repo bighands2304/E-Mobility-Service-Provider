@@ -2,14 +2,12 @@ package softwareEngineering.ManoniSgaravattiFerretti.emspServer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSRequestSender.CommandsSender;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.ChargingPoint;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.ChargingPointService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.ActiveReservation;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.DeletedReservation;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.Reservation;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.User;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Service.ReservationService;
@@ -42,6 +40,7 @@ public class ReservationManager {
         ChargingPoint cp = cpService.getCPById(cpId);
         Reservation reservation = new ActiveReservation();
         reservation.setUser(user);
+        reservation.setCpId(cpId);
         reservation.setSocketId(socketId);
 
         //Save the reservation in the DB
@@ -55,5 +54,25 @@ public class ReservationManager {
 
         //Send reservation response
         return ResponseEntity.ok(reservation);
+    }
+
+    @DeleteMapping("/deleteReservation/{reservationId}")
+    public ResponseEntity<?> deleteReservation(@PathVariable Long reservationId){
+        Reservation reservation = reservationService.getReservationById(reservationId);
+        if (reservation instanceof ActiveReservation activeReservation) {
+            if (activeReservation.getSessionId()==null) {
+                //Send the deletion to its CPMS and retrieve the response code
+                if(commandsSender.cancelReservation(activeReservation).getStatusCode().is2xxSuccessful()){
+                    return ResponseEntity.ok("Deleted correctly");
+                }else {
+                    return ResponseEntity.badRequest().body("Error deleting the reservation");
+                }
+
+            }else {
+                return ResponseEntity.badRequest().body("That's not an active reservation");
+            }
+        }else {
+            return ResponseEntity.badRequest().body("That's not an active reservation");
+        }
     }
 }

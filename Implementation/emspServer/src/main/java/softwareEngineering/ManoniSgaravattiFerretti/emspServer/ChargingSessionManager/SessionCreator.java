@@ -29,13 +29,13 @@ public class SessionCreator {
     @PostMapping("/startChargingSession")
     public ResponseEntity<?> startChargingSession(@RequestBody Map<String,String> payload){
         Reservation reservation = reservationService.getReservationById(Long.parseLong(payload.get("reservationId")));
-        ChargingPoint cp = cpService.getCPById(payload.get("cpId"));
         if (reservation instanceof ActiveReservation activeReservation) {
-            //send start request to the CPMS
-            commandsSender.startSession(activeReservation, cp);
-            reservationService.save(activeReservation);
-            reservationService.delete(reservation);
-            return ResponseEntity.ok(activeReservation);
+            //Send startSession request to the CPMS and save the active reservation in the DB
+            if(commandsSender.startSession(activeReservation).getStatusCode().is4xxClientError()){
+                reservationService.save(activeReservation);
+                return ResponseEntity.ok(activeReservation);
+            }
+            return ResponseEntity.badRequest().body("Impossible start the Charging Session");
 
         }else {
             return ResponseEntity.badRequest().body("Reservation is not an active reservation");
