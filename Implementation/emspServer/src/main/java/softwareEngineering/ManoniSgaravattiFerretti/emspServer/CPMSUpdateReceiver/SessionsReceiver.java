@@ -18,10 +18,7 @@ public class SessionsReceiver {
     public ResponseEntity<?> putSession(@PathVariable String session_id, @RequestBody SessionDTO session){
         Reservation reservation = reservationService.getReservationById(session.getReservationId());
 
-        reservation.setStartTime(session.getStartDateTime());
-        reservation.setId(session.getReservationId());
         reservation.setSessionId(Long.parseLong(session_id));
-        reservation.setSocketId(session.getSocketId().toString());
         reservation.setBatteryPercentage(session.getBatteryPercentage());
 
         reservationService.save(reservation);
@@ -31,8 +28,8 @@ public class SessionsReceiver {
 
     @PatchMapping("/{session_id}")
     public ResponseEntity<?> patchSession(@PathVariable String session_id, @RequestBody SessionDTO session){
+        Reservation reservation = reservationService.getReservationById(session.getReservationId());
         if (session.getStatus().equals("ACTIVE")) {
-            Reservation reservation = reservationService.getReservationById(session.getReservationId());
 
             reservation.setSessionId(Long.parseLong(session_id));
             reservation.setBatteryPercentage(session.getBatteryPercentage());
@@ -40,19 +37,9 @@ public class SessionsReceiver {
             reservationService.save(reservation);
         }
 
-        if (session.getStatus().equals("RESERVATION")) {
-            Reservation reservation = reservationService.getReservationById(session.getReservationId());
-
-            reservation.setStartTime(session.getStartDateTime());
-            reservation.setId(session.getReservationId());
-            reservation.setSocketId(session.getSocketId().toString());
-
-            reservationService.save(reservation);
-        }
+        if (session.getStatus().equals("RESERVATION")) {}
 
         if (session.getStatus().equals("COMPLETED")) {
-            Reservation reservation = reservationService.getReservationById(session.getReservationId());
-
             reservation.setEndTime(session.getEndDateTime());
             reservation.setEnergyAmount(session.getKwh());
             reservation.setPrice(session.getTotalCost());
@@ -61,8 +48,6 @@ public class SessionsReceiver {
         }
 
         if (session.getStatus().equals("INVALID") || session.getStatus().equals("DELETED")) {
-            Reservation reservation = reservationService.getReservationById(session.getReservationId());
-
             reservation.setDeletionTime(session.getEndDateTime());
 
             reservationService.save(reservation);
