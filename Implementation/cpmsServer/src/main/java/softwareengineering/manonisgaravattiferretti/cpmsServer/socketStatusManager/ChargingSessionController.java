@@ -54,7 +54,7 @@ public class ChargingSessionController {
         // Todo: select a charging profile?
         CompletableFuture<ConfMessage> responseFuture = ocppSender.sendRemoteStartTransaction(
                 startSessionDTO.getChargingPointId(), startSessionDTO.getSocketId(),
-                null, startSessionDTO.getReservationId());
+                null, reservationOptional.get().getInternalReservationId());
         chargingPointResponseDispatcher.sendStartSessionResponse(responseFuture, emspDetails,
                 reservationOptional.get().getReservationIdEmsp());
         return ResponseEntity.ok().build();

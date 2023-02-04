@@ -6,5 +6,5 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class BootNotificationReq {
-    private String message;
+    private String cpId;
 }

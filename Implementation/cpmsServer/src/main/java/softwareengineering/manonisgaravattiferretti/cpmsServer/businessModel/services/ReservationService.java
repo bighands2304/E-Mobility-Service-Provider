@@ -38,8 +38,8 @@ public class ReservationService {
         reservationRepository.updateReservationStatus(status, reservationInternalId, timestamp);
     }
 
-    public void updateSessionEnergyConsumption(Double energyConsumption, Long sessionId, LocalDateTime timestamp) {
-        reservationRepository.updateReservationEnergyAmount(energyConsumption, sessionId, timestamp);
+    public void updateSessionEnergyConsumption(Double energyConsumption, Long internalReservationId, LocalDateTime timestamp) {
+        reservationRepository.updateReservationEnergyAmount(energyConsumption, internalReservationId, timestamp);
     }
 
     public long getReservationsCount() {
@@ -55,6 +55,10 @@ public class ReservationService {
         reservation.setExpiryDate(reserveNowDTO.getExpiryDate());
         reservation.setStatus("RESERVED");
         reservation.setLastUpdated(LocalDateTime.now());
+        reservationRepository.save(reservation);
+    }
+
+    public void insertReservation(Reservation reservation) {
         reservationRepository.save(reservation);
     }
 
