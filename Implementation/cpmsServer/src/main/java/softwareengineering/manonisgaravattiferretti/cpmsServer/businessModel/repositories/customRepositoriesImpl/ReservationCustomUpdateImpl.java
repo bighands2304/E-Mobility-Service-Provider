@@ -25,6 +25,9 @@ public class ReservationCustomUpdateImpl implements ReservationCustomUpdate {
         Update update = new Update();
         update.set("status", status);
         update.set("lastUpdated", timestamp);
+        if (status.equals("COMPLETED")) {
+            update.set("endTime", timestamp);
+        }
         mongoOperations.updateFirst(query, update, Reservation.class);
     }
 

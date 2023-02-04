@@ -1,5 +1,7 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.cpManager;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ public class PriceManager implements ApplicationListener<TogglePriceOptimizerEve
     private final OcpiTariffSender ocpiTariffSender;
     private final EmspDetailsService emspDetailsService;
     private final ReservationService reservationService;
+    private final Logger logger = LoggerFactory.getLogger(PriceManager.class);
 
     @Autowired
     public PriceManager(ChargingPointService chargingPointService, PriceOptimizer priceOptimizer,
@@ -68,9 +71,14 @@ public class PriceManager implements ApplicationListener<TogglePriceOptimizerEve
                 EntityFromDTOConverter.fromAddTariffDTOToSpecialOffer(addTariffDTO, tariffId) :
                 EntityFromDTOConverter.fromAddTariffDTOToTariff(addTariffDTO, tariffId);
         tariff.setLastUpdated(LocalDateTime.now());
+        List<EmspDetails> emspDetailsList = emspDetailsService.findAll();
+        for (EmspDetails emspDetails: emspDetailsList) {
+            if (emspDetails.getUrl() != null) {
+                ocpiTariffSender.putTariff(addTariffDTO, tariffId, emspDetails);
+            }
+        }
         chargingPointService.removeTariff(cpId, tariffId);
         chargingPointService.addTariff(cpId, tariff);
-        // todo: send patch to emsp
         return tariff;
     }
 
@@ -83,8 +91,9 @@ public class PriceManager implements ApplicationListener<TogglePriceOptimizerEve
         }
     }
 
-    public Double applyTariff(Long reservationId, String cpInternalId) {
-        Optional<ChargingPoint> chargingPoint = chargingPointService.findChargingPointByInternalId(cpInternalId);
+    public Double applyTariff(Long reservationId, String cpId) {
+        logger.info("Applying tariff to cp = {} at reservation with id = {}", cpId, reservationId);
+        Optional<ChargingPoint> chargingPoint = chargingPointService.findChargingPointByExternalId(cpId);
         Optional<Reservation> reservation = reservationService.findReservationByInternalId(reservationId);
         if (chargingPoint.isEmpty() || reservation.isEmpty()) {
             return 0.0;
@@ -111,7 +120,8 @@ public class PriceManager implements ApplicationListener<TogglePriceOptimizerEve
                          return fakeTariff;
                     });
         }
-        return bestTariff.getPrice() * sessionDuration;
+        logger.info("The cost of the session is: " + bestTariff.getPrice() * reservation.get().getEnergyAmount());
+        return bestTariff.getPrice() * reservation.get().getEnergyAmount();
     }
 
     private boolean matches(SpecialOffer specialOffer, Reservation reservation, long sessionDuration) {

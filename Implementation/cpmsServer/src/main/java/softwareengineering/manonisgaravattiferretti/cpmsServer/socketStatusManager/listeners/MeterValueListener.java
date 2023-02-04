@@ -34,7 +34,8 @@ public class MeterValueListener implements ApplicationListener<MeterValueEvent> 
                 .map(MeterValue::getSampledValue)
                 .reduce(0.0, Double::sum);
         Reservation reservation = reservationOptional.get();
-        reservation.setEnergyAmount(energyConsumed + reservation.getEnergyAmount());
+        double energyAmount = energyConsumed + ((reservation.getEnergyAmount() == null) ? 0.0 : reservation.getEnergyAmount());
+        reservation.setEnergyAmount(energyAmount);
         reservation.setLastUpdated(LocalDateTime.now());
         reservationService.insertReservation(reservation);
         ocpiSessionSender.patchSession(EntityFromDTOConverter.chargingSessionDTOFromReservation(reservation),
