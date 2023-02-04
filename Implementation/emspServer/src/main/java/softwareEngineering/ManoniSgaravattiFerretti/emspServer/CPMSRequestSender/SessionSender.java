@@ -9,9 +9,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.ChargingPointOperator;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.RestResponsePage;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.SessionDTO;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.ActiveReservation;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.DeletedReservation;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.EndedReservation;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.Reservation;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Service.ReservationService;
 
@@ -51,27 +48,25 @@ public class SessionSender {
             newSession.setSocketId(s.getSocketId());
             switch (s.getStatus()) {
                 case "ACTIVE", "RESERVATION" -> {
-                    ActiveReservation newActiveSession = (ActiveReservation) newSession;
-                    newActiveSession.setSessionId(Long.parseLong(s.getSessionId()));
-                    reservationService.save(newActiveSession);
+                    newSession.setSessionId(Long.parseLong(s.getSessionId()));
+                    reservationService.save(newSession);
                 }
                 case "COMPLETED" -> {
-                    EndedReservation newEndedReservation = (EndedReservation) newSession;
-                    newEndedReservation.setEndTime(s.getEndDateTime());
-                    newEndedReservation.setPrice(s.getTotalCost());
-                    newEndedReservation.setEnergyAmount(s.getKwh());
-                    reservationService.save(newEndedReservation);
+
+                    newSession.setEndTime(s.getEndDateTime());
+                    newSession.setPrice(s.getTotalCost());
+                    newSession.setEnergyAmount(s.getKwh());
+                    reservationService.save(newSession);
                 }
                 case "INVALID" -> {
-                    DeletedReservation newDeletedReservation = (DeletedReservation) newSession;
-                    newDeletedReservation.setDeletionTime(s.getEndDateTime());
-                    reservationService.save(newDeletedReservation);
+                    newSession.setDeletionTime(s.getEndDateTime());
+                    reservationService.save(newSession);
                 }
             }
         }
     }
 
-    public void getSession(ChargingPointOperator cpo, ActiveReservation reservation) {
+    public void getSession(ChargingPointOperator cpo, Reservation reservation) {
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
         headers.set("Authorization", cpo.getTokenEmsp());
@@ -95,21 +90,18 @@ public class SessionSender {
         newSession.setSocketId(session.getSocketId());
         switch (session.getStatus()) {
             case "ACTIVE", "RESERVATION" -> {
-                ActiveReservation newActiveSession = (ActiveReservation) newSession;
-                newActiveSession.setSessionId(Long.parseLong(session.getSessionId()));
-                reservationService.save(newActiveSession);
+                newSession.setSessionId(Long.parseLong(session.getSessionId()));
+                reservationService.save(newSession);
             }
             case "COMPLETED" -> {
-                EndedReservation newEndedReservation = (EndedReservation) newSession;
-                newEndedReservation.setEndTime(session.getEndDateTime());
-                newEndedReservation.setPrice(session.getTotalCost());
-                newEndedReservation.setEnergyAmount(session.getKwh());
-                reservationService.save(newEndedReservation);
+                newSession.setEndTime(session.getEndDateTime());
+                newSession.setPrice(session.getTotalCost());
+                newSession.setEnergyAmount(session.getKwh());
+                reservationService.save(newSession);
             }
             case "INVALID" -> {
-                DeletedReservation newDeletedReservation = (DeletedReservation) newSession;
-                newDeletedReservation.setDeletionTime(session.getEndDateTime());
-                reservationService.save(newDeletedReservation);
+                newSession.setDeletionTime(session.getEndDateTime());
+                reservationService.save(newSession);
             }
         }
     }

@@ -6,8 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSRequestSender.CommandsSender;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.ChargingPoint;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.ChargingPointService;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.ActiveReservation;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.DeletedReservation;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.Reservation;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.User;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Service.ReservationService;
@@ -39,7 +37,7 @@ public class ReservationManager {
         //Create the reservation
         User user = userService.findById(userId);
         ChargingPoint cp = cpService.getCPById(cpId);
-        Reservation reservation = new ActiveReservation();
+        Reservation reservation = new Reservation();
         reservation.setUser(user);
         reservation.setCpId(cpId);
         reservation.setSocketId(socketId);
@@ -62,18 +60,13 @@ public class ReservationManager {
     @DeleteMapping("/deleteReservation/{reservationId}")
     public ResponseEntity<?> deleteReservation(@PathVariable Long reservationId){
         Reservation reservation = reservationService.getReservationById(reservationId);
-        if (reservation instanceof ActiveReservation activeReservation) {
-            if (activeReservation.getSessionId()==null) {
+        if (reservation.getType().equals("RESERVED")) {
                 //Send the deletion to its CPMS and retrieve the response code
-                if(commandsSender.cancelReservation(activeReservation).getStatusCode().is2xxSuccessful()){
+                if(commandsSender.cancelReservation(reservation).getStatusCode().is2xxSuccessful()){
                     return ResponseEntity.ok("Deleted correctly");
                 }else {
                     return ResponseEntity.badRequest().body("Error deleting the reservation");
                 }
-
-            }else {
-                return ResponseEntity.badRequest().body("That's not an active reservation");
-            }
         }else {
             return ResponseEntity.badRequest().body("That's not an active reservation");
         }
