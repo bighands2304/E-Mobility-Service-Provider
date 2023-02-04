@@ -31,12 +31,8 @@ class CpConnection:
         self.auth_key = auth_key
 
     def create_connection(self):
-        # self.websock = websocket.WebSocketApp(f"wss://cpmsserver.up.railway.app/ocpp?token={self.auth_key}",
-        #                                      on_open=self.on_open,
-        #                                      on_message=self.on_message,
-        #                                      on_close=self.on_close,
-        #                                      on_error=self.on_error)
-        self.websock = websocket.WebSocketApp(f"ws://localhost:8080/ocpp?token={self.auth_key}",
+        # self.websock = websocket.WebSocketApp(f"ws://localhost:8080/ocpp?token={self.auth_key}",
+        self.websock = websocket.WebSocketApp(f"wss://cpmsserver.up.railway.app/ocpp?token={self.auth_key}",
                                               on_open=self.on_open,
                                               on_message=self.on_message,
                                               on_close=self.on_close,
@@ -79,7 +75,9 @@ The message parsed is
             self.on_message_to_accept("/app/ocpp/" + MAPPING[destination] + "Conf", request_id)
         elif destination == "RemoteStartTransaction/topic/ocpp/RemoteStartTransaction":
             request_id = message_unpacked["headers"]["requestId"]
-            self.on_remote_start_transaction(body, request_id)
+            t = threading.Thread(target=self.on_remote_start_transaction, args=(body, request_id))
+            t.start()
+            #self.on_remote_start_transaction(body, request_id)
         elif destination == "RemoteStopTransaction/topic/ocpp/RemoteStopTransaction":
             request_id = message_unpacked["headers"]["requestId"]
             self.on_remote_stop_transaction(body, request_id)
@@ -143,12 +141,13 @@ Trying to reconnect
         self.websock.send(stomp_msg)
 
     def on_remote_stop_transaction(self, message, request_id):
-        self.on_message_to_accept("/app/ocpp/RemoteStartTransactionConf", request_id)
+        self.on_message_to_accept("/app/ocpp/RemoteStopTransactionConf", request_id)
         time.sleep(10)
         stop_tr_msg = {
             "transactionId": message['transactionId'],
             "timestamp": datetime.datetime.now().isoformat()
         }
+        print("Sending stop transaction")
         stomp_msg = stomper.send("/app/ocpp/StopTransaction", json.dumps(stop_tr_msg), content_type=CONTENT_TYPE)
         self.websock.send(stomp_msg)
 
