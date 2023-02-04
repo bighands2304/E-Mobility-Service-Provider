@@ -39,11 +39,9 @@ public class CommandsReceiver {
                 Reservation reservation = reservationService.getReservationById(Long.parseLong(uid));
 
                 //Set the reservation as deleted and set the deletion time to now
-                DeletedReservation deletedReservation = new DeletedReservation();
-                BeanUtils.copyProperties(deletedReservation, reservation);
+                DeletedReservation deletedReservation = (DeletedReservation) reservation;
                 deletedReservation.setDeletionTime(LocalDateTime.now());
 
-                reservationService.delete(reservation);
                 //Save the reservation as deleted
                 reservationService.save(deletedReservation);
             }
