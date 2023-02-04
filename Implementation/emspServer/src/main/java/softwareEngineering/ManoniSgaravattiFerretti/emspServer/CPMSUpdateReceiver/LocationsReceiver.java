@@ -10,6 +10,8 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointData
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.ChargingPointOperatorService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.ChargingPointService;
 
+import java.util.ArrayList;
+
 @RestController
 @RequestMapping("/ocpi/emsp/locations")
 public class LocationsReceiver {
@@ -19,7 +21,10 @@ public class LocationsReceiver {
     ChargingPointOperatorService cpoService;
     @PutMapping("/{cp_id}")
     public ResponseEntity<?> putCP(@PathVariable String cp_id, @RequestBody ChargingPointDTO cp, @RequestHeader("Authorization") String auth){
-        ChargingPoint newCp = new ChargingPoint();
+        ChargingPoint newCp = cpService.getCPById(cp_id);
+        if (newCp==null) {
+            newCp = new ChargingPoint();
+        }
         newCp.setTariffsId(cp.getTariffIds());
         newCp.setName(cp.getName());
         newCp.setAddress(cp.getAddress());
@@ -29,10 +34,11 @@ public class LocationsReceiver {
         newCp.setLongitude(cp.getLongitude());
         newCp.setLastUpdate(cp.getLastUpdated());
 
+        newCp.setSockets(new ArrayList<>());
         for (SocketDTO s : cp.getSockets()) {
             Socket newSocket = new Socket();
             newSocket.setSocketId(s.getSocketId().toString());
-            newSocket.setType(s.getSocketType());
+            newSocket.setType(s.getType());
             newSocket.setStatus(s.getStatus());
             newSocket.setLastUpdate(s.getLastUpdate());
             newSocket.setAvailability(s.getAvailability());
@@ -48,7 +54,7 @@ public class LocationsReceiver {
 
         Socket newSocket = new Socket();
         newSocket.setSocketId(socket_id);
-        newSocket.setType(socket.getSocketType());
+        newSocket.setType(socket.getType());
         newSocket.setStatus(socket.getStatus());
         newSocket.setLastUpdate(socket.getLastUpdate());
         newSocket.setAvailability(socket.getAvailability());
@@ -81,7 +87,7 @@ public class LocationsReceiver {
         Socket socket = chargingPoint.getSockets().stream().filter(socket1 -> socket1.getSocketId().equals(socket_id)).toList().get(0);
         chargingPoint.removeSocket(socket);
 
-        socket.setType(updatedSocket.getSocketType());
+        socket.setType(updatedSocket.getType());
         socket.setStatus(updatedSocket.getStatus());
         socket.setLastUpdate(updatedSocket.getLastUpdate());
         socket.setAvailability(updatedSocket.getAvailability());

@@ -27,7 +27,7 @@ public class MeterValueListener implements ApplicationListener<MeterValueEvent> 
     @Override
     public void onApplicationEvent(MeterValueEvent event) {
         Optional<Reservation> reservationOptional = reservationService.findReservationByInternalId(event.getReservationId());
-        if (reservationOptional.isEmpty()) {
+        if (reservationOptional.isEmpty() || !reservationOptional.get().getStatus().equals("ACTIVE")) {
             return;
         }
         Double energyConsumed = event.getMeterValues().stream()
