@@ -76,11 +76,15 @@ public class ReservationController {
     @PostMapping("/ocpi/cpo/commands/CANCEL_RESERVATION/{id}")
     public ResponseEntity<?> cancelReservation(@PathVariable Long id, @AuthenticationPrincipal EmspDetails emspDetails) {
         Optional<Reservation> reservationOptional = reservationService.findReservationByEmspId(id, emspDetails);
+        // todo: check expiry date (set invalid)
         if (reservationOptional.isEmpty()) {
             logger.info("Received CANCEL_RESERVATION command, the reservation was not found");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "reservation not found");
         }
         logger.info("Received CANCEL_RESERVATION command, all parameters are ok");
+        if (!reservationOptional.get().getStatus().equals("RESERVED")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cannot delete reservation");
+        }
         String cpId = reservationOptional.get().getSocket().getCpId();
         Long reservationId = reservationOptional.get().getInternalReservationId();
         CompletableFuture<ConfMessage> responseFuture = ocppSender.sendCancelReservation(cpId, reservationId);
