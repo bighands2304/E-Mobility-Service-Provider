@@ -31,6 +31,7 @@ class CpConnection:
         self.auth_key = auth_key
         self.reconnect = True
         self.send_heartbeat = False
+        self.closed = True
 
     def create_connection(self):
         # self.websock = websocket.WebSocketApp(f"ws://localhost:8080/ocpp?token={self.auth_key}",
@@ -52,6 +53,7 @@ class CpConnection:
             sub_msg = stomper.subscribe(f"/topic/{self.cp_id + topic}/topic/ocpp/{topic}", self.cp_id + topic)
             self.websock.send(sub_msg)
         self.send_heartbeat = True
+        self.closed = False
         threading.Thread(target=self.heartbeat_loop).start()
 
     def on_message(self, ws, message):
@@ -91,6 +93,7 @@ The message parsed is
 
     def on_close(self, ws, a, b):
         self.send_heartbeat = False
+        self.closed = True
         print(f'''
 ==========================================================================================
 Connection with {self.cp_id} (session id = {self.session_id}) closed
@@ -107,7 +110,8 @@ Trying to reconnect (reconnect = {self.reconnect})
 
     def close_connection(self):
         self.reconnect = False
-        self.websock.close()
+        if not self.closed:
+            self.websock.close()
 
     def on_boot_notification_conf(self, message):
         self.session_id = message["sessionId"]
@@ -131,17 +135,18 @@ Trying to reconnect (reconnect = {self.reconnect})
         print(f"sending StartTransaction to cp: {self.cp_id}")
         stomp_msg = stomper.send("/app/ocpp/StartTransaction", json.dumps(start_tr_msg), content_type=CONTENT_TYPE)
         self.websock.send(stomp_msg)
-        meter_value_msg = {
-            "connectorId": connector_id,
-            "transactionId": reservation_id,
-            "meterValue": [{"timestamp": datetime.datetime.now().isoformat(), "sampledValue": 5.0}]
-        }
-        for _ in range(3):
-            time.sleep(10)
+        for i in range(5):
+            meter_value_msg = {
+                "connectorId": connector_id,
+                "transactionId": reservation_id,
+                "meterValue": [{"timestamp": datetime.datetime.now().isoformat(), "sampledValue": 5.0}],
+                "batteryPercentage": (i + 1) / 5
+            }
+            time.sleep(100)
             stomp_msg = stomper.send("/app/ocpp/MeterValue", json.dumps(meter_value_msg), content_type=CONTENT_TYPE)
             print(f"Sending meter value to cp: {self.cp_id}")
             self.websock.send(stomp_msg)
-        time.sleep(10)
+        time.sleep(100)
         stop_tr_msg = {
             "transactionId": reservation_id,
             "timestamp": datetime.datetime.now().isoformat()
@@ -167,11 +172,11 @@ Trying to reconnect (reconnect = {self.reconnect})
 
     def heartbeat_loop(self):
         while self.send_heartbeat:
-            time.sleep(120)
             print(f"Cp id = {self.cp_id}, sending heartbeat")
             message = {"timestamp": datetime.datetime.now().isoformat(), "cpId": self.cp_id}
             stomp_msg = stomper.send("/app/ocpp/Heartbeat", json.dumps(message), content_type=CONTENT_TYPE)
             self.websock.send(stomp_msg)
+            time.sleep(120)
 
 
 # can only be run in local with access to the command line

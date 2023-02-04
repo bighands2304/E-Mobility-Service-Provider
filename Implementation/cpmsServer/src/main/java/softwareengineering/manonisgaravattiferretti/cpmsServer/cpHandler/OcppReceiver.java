@@ -7,11 +7,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.socket.WebSocketMessage;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.ReservationService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.chargingPointReq.*;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.cpmsReq.*;
@@ -19,8 +17,6 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.socketStatusManag
 import softwareengineering.manonisgaravattiferretti.cpmsServer.socketStatusManager.events.SessionStartedEvent;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.socketStatusManager.events.SessionStoppedEvent;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.socketStatusManager.events.SocketStatusChangeEvent;
-
-import java.util.Map;
 
 @Controller
 public class OcppReceiver {
@@ -66,7 +62,7 @@ public class OcppReceiver {
     @MessageMapping("/ocpp/MeterValue")
     public void handleMeterValues(@RequestBody MeterValueReq request) {
         MeterValueEvent meterValueEvent = new MeterValueEvent(this, request.getTransactionId(),
-                request.getConnectorId(), request.getMeterValue());
+                request.getConnectorId(), request.getMeterValue(), request.getBatteryPercentage());
         applicationEventPublisher.publishEvent(meterValueEvent);
     }
 

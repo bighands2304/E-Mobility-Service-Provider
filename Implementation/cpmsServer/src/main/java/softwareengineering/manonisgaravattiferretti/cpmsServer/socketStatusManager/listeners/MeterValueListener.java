@@ -37,6 +37,7 @@ public class MeterValueListener implements ApplicationListener<MeterValueEvent> 
         double energyAmount = energyConsumed + ((reservation.getEnergyAmount() == null) ? 0.0 : reservation.getEnergyAmount());
         reservation.setEnergyAmount(energyAmount);
         reservation.setLastUpdated(LocalDateTime.now());
+        reservation.setBatteryPercentage(event.getBatteryPercentage());
         reservationService.insertReservation(reservation);
         ocpiSessionSender.patchSession(EntityFromDTOConverter.chargingSessionDTOFromReservation(reservation),
                 reservation.getEmspDetails());

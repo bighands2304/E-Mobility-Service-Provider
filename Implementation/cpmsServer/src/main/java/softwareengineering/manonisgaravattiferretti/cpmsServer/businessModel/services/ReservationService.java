@@ -38,8 +38,9 @@ public class ReservationService {
         reservationRepository.updateReservationStatus(status, reservationInternalId, timestamp);
     }
 
-    public void updateSessionEnergyConsumption(Double energyConsumption, Long internalReservationId, LocalDateTime timestamp) {
-        reservationRepository.updateReservationEnergyAmount(energyConsumption, internalReservationId, timestamp);
+    public void updateSessionEnergyConsumption(Double energyConsumption, Long internalReservationId,
+                                               LocalDateTime timestamp, Double batteryPercentage) {
+        reservationRepository.updateReservationEnergyAmount(energyConsumption, internalReservationId, timestamp, batteryPercentage);
     }
 
     public long getReservationsCount() {
