@@ -1,10 +1,11 @@
 import React, { useState, useContext, createContext, useEffect } from "react";
 import { AuthenticationContext } from "../../authentication/authentication.context";
-
+import { createOnButtonAlert } from "../../../components/utility/Alert";
 import {
-  vehicleRequest,
+  getVehicleRequest,
   vehicleTrasform,
   addVehicleRequest,
+  deleteVehicleRequest,
 } from "./vehicle.serice";
 
 export const VehicleContext = createContext();
@@ -15,36 +16,51 @@ export const VehicleContextProvider = ({ children }) => {
   const [error, setError] = useState(null);
   // is just for try
   const { id } = useContext(AuthenticationContext);
-  const {add}
 
   const RetrieveVehciles = (uid) => {
     setIsLoading(true);
     setVehicles([]);
 
-    vehicleRequest(uid)
+    getVehicleRequest(uid)
       .then(vehicleTrasform)
       .then((results) => {
         setIsLoading(false);
         setVehicles(results);
       })
       .catch((err) => {
-        console.log("error there" + err);
         setIsLoading(false);
         setError(err);
       });
   };
 
-  const AddVehicle = (vinCode) => {
+  const AddNewVehicle = (vinCode) => {
     setIsLoading(true);
     addVehicleRequest(vinCode, id)
       .then((resul) => {
         setIsLoading(false);
         RetrieveVehciles(id);
+        createOnButtonAlert("Success", "Vehicle Added");
       })
       .catch((err) => {
         console.log("error there" + err);
         setIsLoading(false);
         setError(err);
+        createOnButtonAlert("Error", "Check your Vin Code");
+      });
+  };
+  const DeleteVehcile = (vinCode) => {
+    setIsLoading(true);
+    deleteVehicleRequest(vinCode)
+      .then((resul) => {
+        setIsLoading(false);
+        RetrieveVehciles(id);
+        createOnButtonAlert("Success", "Vehicle Deleted");
+      })
+      .catch((err) => {
+        console.log("error there" + err);
+        setIsLoading(false);
+        setError(err);
+        createOnButtonAlert("Error", "Check your Vin Code");
       });
   };
 
@@ -64,7 +80,8 @@ export const VehicleContextProvider = ({ children }) => {
         vehicles,
         isLoading,
         error,
-        AddVehicle,
+        AddNewVehicle,
+        DeleteVehcile,
       }}
     >
       {children}

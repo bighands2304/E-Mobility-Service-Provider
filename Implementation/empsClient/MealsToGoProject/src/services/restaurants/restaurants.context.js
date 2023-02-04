@@ -16,6 +16,11 @@ export const RestaurantsContextProvider = ({ children }) => {
   const { location } = useContext(LocationContext);
 
   const retrieveRestaurants = (loc) => {
+    console.log("this is the loc that arrive to retrieveRestaurants " + loc);
+    console.log("this is the loc that arrive to retrieveRestaurants " + loc);
+    console.log("this is the loc that arrive to retrieveRestaurants " + loc);
+    console.log("this is the loc that arrive to retrieveRestaurants " + loc);
+    console.log("this is the loc that arrive to retrieveRestaurants " + loc);
     setIsLoading(true);
     setRestaurants([]);
     setTimeout(() => {
@@ -37,7 +42,18 @@ export const RestaurantsContextProvider = ({ children }) => {
   useEffect(() => {
     if (location) {
       const locationString = `${location.lat},${location.lng}`;
-      retrieveRestaurants(locationString);
+      retrieveRestaurants(location);
+      console.log("location that i send" + JSON.stringify(location));
+      console.log("location that i send" + JSON.stringify(location));
+      console.log("location that i send" + JSON.stringify(location));
+      console.log("I do it ");
+      console.log("I do it ");
+      console.log("I do it ");
+      console.log("I do it ");
+
+      console.log("location that i sendRRRRR" + JSON.stringify(locationString));
+      console.log("location that i sendRRR" + JSON.stringify(locationString));
+      console.log("location that i sendRRR" + JSON.stringify(locationString));
     }
   }, [location]);
 

@@ -22,6 +22,7 @@ export const RestaurantInfoCard = ({ restaurant = {} }) => {
   const offerIcon =
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSySiFKb2TXagm7fozKF74N8HCYLZaQyradQQ&usqp=CAU";
   // to do : false is closed.
+  console.log("restaurant card " + JSON.stringify(restaurant));
   return (
     <RestaurantCard elevation={5}>
       <View>
