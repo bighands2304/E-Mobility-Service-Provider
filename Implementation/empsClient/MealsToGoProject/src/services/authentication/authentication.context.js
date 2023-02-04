@@ -1,6 +1,11 @@
 import React, { useState, createContext, useRef } from "react";
-import { signOut, onAuthStateChanged, getAuth } from "firebase/auth";
-import { loginRequest, registerRequest } from "./authentication.service";
+import axios from "axios";
+
+import {
+  loginRequest,
+  registerRequest,
+  logoutRequest,
+} from "./authentication.service";
 import { createOnButtonAlert } from "../../components/utility/Alert";
 
 export const AuthenticationContext = createContext();
@@ -9,26 +14,25 @@ export const AuthenticationContextProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState(null);
   // this is just for try
-  const [id, setId] = useState(1);
+  const [id, setId] = useState();
   const [error, setError] = useState(null);
-  const auth = useRef(getAuth()).current;
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [token, setToken] = useState();
 
-  onAuthStateChanged(auth, (usr) => {
-    if (usr) {
-      setUser(usr);
-      setIsLoading(false);
-    } else {
-      setIsLoading(false);
-    }
-  });
   const onLogin = (email, password) => {
     setIsLoading(true);
     loginRequest(email, password)
       .then((u) => {
-        setUser(u);
+        console.log("usssusuusuususuus" + JSON.stringify(u));
+        setUser(u.user);
+        setToken(u.jwt);
+        setIsAuthenticated(true);
+        setId(u.user.id);
+        console.log("now user id " + id);
         setIsLoading(false);
       })
       .catch((e) => {
+        console.log("bbbbbbb");
         setIsLoading(false);
         setError(e.toString());
       });
@@ -62,16 +66,15 @@ export const AuthenticationContextProvider = ({ children }) => {
       });
   };
   const onLogout = () => {
-    signOut(auth).then(() => {
-      setUser(null);
-      setError(null);
-    });
+    setIsAuthenticated(false);
+    setUser(null);
+    setError(null);
+    setId(null);
   };
 
   return (
     <AuthenticationContext.Provider
       value={{
-        isAuthenticated: !!user,
         user,
         id,
         isLoading,
@@ -79,6 +82,7 @@ export const AuthenticationContextProvider = ({ children }) => {
         onLogin,
         onRegister,
         onLogout,
+        isAuthenticated,
       }}
     >
       {children}

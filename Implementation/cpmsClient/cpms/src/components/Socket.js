@@ -41,7 +41,7 @@ const Socket = ({ cp, socket, id, socketId, type, status, availability }) => {
       startingTime: dateString,
     };
 
-    console.log("object" + JSON.stringify(obj));
+    //console.log("object" + JSON.stringify(obj));
     dispatch(changeAvailabilityHelper(obj));
   };
 

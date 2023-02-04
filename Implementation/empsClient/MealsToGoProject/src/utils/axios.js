@@ -1,23 +1,18 @@
 import axios from "axios";
-import {
-  getUserFromLocalStorage,
-  getTokenFromLocalStorage,
-} from "./localStorage";
 
-const customFetch = axios.create({
-  baseURL: "https://emspserver.up.railway.app/",
-});
+const customFetch = (token) => {
+  const instance = axios.create({
+    baseURL: "https://emspserver.up.railway.app/",
+  });
 
-customFetch.interceptors.request.use(async (config) => {
-  const [user, token] = await Promise.all([
-    getUserFromLocalStorage(),
-    getTokenFromLocalStorage(),
-  ]);
+  instance.interceptors.request.use((config) => {
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+    return config;
+  });
 
-  if (user) {
-    config.headers["Authorization"] = `Bearer ${token}`;
-  }
-  return config;
-});
+  return instance;
+};
 
 export default customFetch;
