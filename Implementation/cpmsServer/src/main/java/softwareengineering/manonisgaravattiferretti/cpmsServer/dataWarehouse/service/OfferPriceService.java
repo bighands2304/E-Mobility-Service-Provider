@@ -44,4 +44,8 @@ public class OfferPriceService {
     public Optional<OfferPrice> find(String cpId, String dsoId, LocalDateTime timestamp) {
         return offerPriceRepository.findById(new DimensionsPrimaryKey(dsoId, cpId, timestamp));
     }
+
+    public double findMeanPrice(String cpId, String dsoId, LocalDateTime from, LocalDateTime to) {
+        return offerPriceRepository.getMeanPrice(cpId, dsoId, from, to);
+    }
 }
