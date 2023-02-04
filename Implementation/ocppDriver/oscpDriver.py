@@ -64,10 +64,10 @@ class OscpConnection:
                     }]
                 }
                 requests.post(f"{CPMS_URL}/oscp/fp/update_group_capacity_forecast?token={self.token}",
-                                     json=capacity_forecast,
-                                     headers={"Content-Type": CONTENT_TYPE,
-                                              "X-Requested-With": "XMLHttpRequest",
-                                              "Accept-Encoding": ACCEPT_ENCODING})
+                              json=capacity_forecast,
+                              headers={"Content-Type": CONTENT_TYPE,
+                                       "X-Requested-With": "XMLHttpRequest",
+                                       "Accept-Encoding": ACCEPT_ENCODING})
                 time.sleep(60)
                 price = np.random.randn() / 10
                 tou_msg = {
@@ -96,8 +96,7 @@ class OscpConnection:
                 requests.post(f"{CPMS_URL}/openAdr/tou_pricing_event?token={self.token}&cpId={self.cp_id}",
                               json=tou_msg,
                               headers={"Content-Type": CONTENT_TYPE,
-                                       "X-Requested-With": "XMLHttpRequest",
-                                       "Accept-Encoding": ACCEPT_ENCODING})
+                                       "X-Requested-With": "XMLHttpRequest", "Accept-Encoding": ACCEPT_ENCODING})
             except requests.ConnectionError:
                 print(f"Oscp connection with cp = {self.cp_id} is failed")
                 return
