@@ -1,5 +1,6 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSUpdateReceiver;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,7 @@ public class SessionsReceiver {
         reservation.setId(session.getReservationId());
         reservation.setSessionId(Long.parseLong(session_id));
         reservation.setSocketId(session.getSocketId());
+        reservation.setBatteryPercentage(session.getBatteryPercentage());
 
         reservationService.save(reservation);
 
@@ -38,6 +40,7 @@ public class SessionsReceiver {
             reservation.setId(session.getReservationId());
             reservation.setSessionId(Long.parseLong(session_id));
             reservation.setSocketId(session.getSocketId());
+            reservation.setBatteryPercentage(session.getBatteryPercentage());
 
             reservationService.save(reservation);
         }
@@ -49,17 +52,20 @@ public class SessionsReceiver {
             reservation.setId(session.getReservationId());
             reservation.setSessionId(Long.parseLong(session.getSessionId()));
             reservation.setSocketId(session.getSocketId());
+            reservation.setBatteryPercentage(session.getBatteryPercentage());
 
             reservationService.save(reservation);
         }
 
         if (session.getStatus().equals("COMPLETED")) {
-            EndedReservation reservation = (EndedReservation) reservationService.getReservationById(session.getReservationId());
+            EndedReservation reservation = new EndedReservation();
+            BeanUtils.copyProperties(reservation, reservationService.getReservationById(session.getReservationId()));
 
             reservation.setStartTime(session.getStartDateTime());
             reservation.setId(session.getReservationId());
             reservation.setSessionId(Long.parseLong(session.getSessionId()));
             reservation.setSocketId(session.getSocketId());
+            reservation.setBatteryPercentage(session.getBatteryPercentage());
 
             reservation.setEndTime(session.getEndDateTime());
             reservation.setEnergyAmount(session.getKwh());
@@ -68,12 +74,14 @@ public class SessionsReceiver {
             reservationService.save(reservation);
         }
 
-        if (session.getStatus().equals("INVALID")) {
-            DeletedReservation reservation = (DeletedReservation) reservationService.getReservationById(session.getReservationId());
+        if (session.getStatus().equals("INVALID") || session.getStatus().equals("DELETED")) {
+            DeletedReservation reservation = new DeletedReservation();
+            BeanUtils.copyProperties(reservation, reservationService.getReservationById(session.getReservationId()));
 
             reservation.setStartTime(session.getStartDateTime());
             reservation.setId(session.getReservationId());
             reservation.setSocketId(session.getSocketId());
+            reservation.setBatteryPercentage(session.getBatteryPercentage());
 
             reservation.setDeletionTime(session.getEndDateTime());
 

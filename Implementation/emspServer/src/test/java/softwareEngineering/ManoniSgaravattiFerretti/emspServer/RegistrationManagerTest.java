@@ -51,13 +51,6 @@ class RegistrationManagerTest {
                         "\"surname\":\"Surname\"" +
                     "}";
 
-        User user = new User();
-        user.setUsername("Username");
-        user.setEmail("email@gmail.com");
-        user.setPassword(mockPasswordEncoder.encode("Password"));
-        user.setName("Name");
-        user.setSurname("Surname");
-
         // Run the test
         final MockHttpServletResponse response = mockMvc.perform(post("/register")
                         .with(csrf())
@@ -68,6 +61,14 @@ class RegistrationManagerTest {
         // Verify the results
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.getContentAsString()).contains("\"enabled\":true");
+
+        User user = new User();
+        user.setUsername("Username");
+        user.setEmail("email@gmail.com");
+        user.setPassword(mockPasswordEncoder.encode("Password"));
+        user.setName("Name");
+        user.setSurname("Surname");
+
 
         verify(mockUserService).saveUser(user);
 

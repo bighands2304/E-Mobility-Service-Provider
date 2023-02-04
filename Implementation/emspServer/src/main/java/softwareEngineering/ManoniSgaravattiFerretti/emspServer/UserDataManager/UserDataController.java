@@ -1,8 +1,10 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataManager;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDTOs.ReservationUserDTO;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.Reservation;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.User;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.UserVehicle;
@@ -136,7 +138,13 @@ public class UserDataController {
     public ResponseEntity<?> getReservations(@PathVariable String userId){
         //Collect all the reservations(Active, Ended, and Deleted)
         List<Reservation> reservations = reservationService.getReservationsByUserId(Long.parseLong(userId));
+        List<ReservationUserDTO> reservationsDTO = new ArrayList<>();
+        for (Reservation r: reservations) {
+            ReservationUserDTO reservationDTO = new ReservationUserDTO(r);
+            BeanUtils.copyProperties(r, reservationDTO);
+            reservationsDTO.add(reservationDTO);
+        }
         //Return the reservations in the response
-        return ResponseEntity.ok(reservations);
+        return ResponseEntity.ok(reservationsDTO);
     }
 }

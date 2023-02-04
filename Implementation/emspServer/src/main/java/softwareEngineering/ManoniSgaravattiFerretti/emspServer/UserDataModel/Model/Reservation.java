@@ -17,6 +17,8 @@ public abstract class Reservation {
     @Column(name="reservation_id", nullable = false, unique = true)
     private Long id;
     private LocalDateTime startTime;
+    private LocalDateTime expiryDate;
+    private Double batteryPercentage;
     @ManyToOne
     private User user;
 

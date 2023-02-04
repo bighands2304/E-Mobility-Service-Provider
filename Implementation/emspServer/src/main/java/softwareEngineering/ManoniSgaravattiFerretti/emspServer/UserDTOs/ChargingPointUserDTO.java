@@ -1,4 +1,4 @@
-package softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs;
+package softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDTOs;
 
 import lombok.Data;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.ChargingPointOperator;
