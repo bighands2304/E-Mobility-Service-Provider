@@ -29,10 +29,12 @@ class CpConnection:
         self.cp_id = cp_id
         self.websock = None
         self.auth_key = auth_key
+        self.reconnect = True
 
     def create_connection(self):
         # self.websock = websocket.WebSocketApp(f"ws://localhost:8080/ocpp?token={self.auth_key}",
-        self.websock = websocket.WebSocketApp(f"wss://cpmsserver.up.railway.app/ocpp?token={self.auth_key}",
+        #self.websock = websocket.WebSocketApp(f"wss://cpmsserver.up.railway.app/ocpp?token={self.auth_key}",
+        self.websock = websocket.WebSocketApp(f"ws://localhost:8080/ocpp?token={self.auth_key}",
                                               on_open=self.on_open,
                                               on_message=self.on_message,
                                               on_close=self.on_close,
@@ -46,6 +48,9 @@ class CpConnection:
         self.websock.send(stomper.send("/app/ocpp/BootNotification",
                                        json.dumps({"cpId": self.cp_id}),
                                        content_type=CONTENT_TYPE))
+        for topic in TOPICS:
+            sub_msg = stomper.subscribe(f"/topic/{self.cp_id + topic}/topic/ocpp/{topic}", self.cp_id + topic)
+            self.websock.send(sub_msg)
 
     def on_message(self, ws, message):
         message_unpacked = stomper.unpack_frame(message)
@@ -86,23 +91,23 @@ The message parsed is
         print(f'''
 ==========================================================================================
 Connection with {self.cp_id} (session id = {self.session_id}) closed
-Trying to reconnect
+Current time: {datetime.datetime.now().isoformat()}
+Trying to reconnect (reconnect = {self.reconnect})
 ==========================================================================================
         ''')
-        time.sleep(600)
-        self.create_connection()
+        if self.reconnect:
+            time.sleep(180)
+            self.create_connection()
 
     def on_error(self, ws, message):
         print(f"error {message}: current time = {datetime.datetime.now().isoformat()}")
 
     def close_connection(self):
+        self.reconnect = False
         self.websock.close()
 
     def on_boot_notification_conf(self, message):
         self.session_id = message["sessionId"]
-        for topic in TOPICS:
-            sub_msg = stomper.subscribe(f"/topic/{self.cp_id + topic}/topic/ocpp/{topic}", self.cp_id + topic)
-            self.websock.send(sub_msg)
 
     def on_message_to_accept(self, topic, request_id):
         print("sending ACCEPTED as a response")
@@ -125,18 +130,20 @@ Trying to reconnect
         self.websock.send(stomp_msg)
         meter_value_msg = {
             "connectorId": connector_id,
+            "transactionId": reservation_id,
             "meterValue": [{"timestamp": datetime.datetime.now().isoformat(), "sampledValue": 5.0}]
         }
         for _ in range(3):
-            time.sleep(100)
+            time.sleep(10)
             stomp_msg = stomper.send("/app/ocpp/MeterValue", json.dumps(meter_value_msg), content_type=CONTENT_TYPE)
             print(f"Sending meter value to cp: {self.cp_id}")
             self.websock.send(stomp_msg)
-        time.sleep(100)
+        time.sleep(10)
         stop_tr_msg = {
             "transactionId": reservation_id,
             "timestamp": datetime.datetime.now().isoformat()
         }
+        print(f"Sending stop transaction to cp: {self.cp_id}")
         stomp_msg = stomper.send("/app/ocpp/StopTransaction", json.dumps(stop_tr_msg), content_type=CONTENT_TYPE)
         self.websock.send(stomp_msg)
 
@@ -165,6 +172,8 @@ class InteractiveConnection:
         self.threads = dict()
 
     def add_connection(self, cp_id, auth_key, cp):
+        if cp_id in self.connections.keys():
+            self.connections[cp_id].close_connection()
         cp_connection = CpConnection(cp_id, auth_key)
         self.connections[cp_id] = cp_connection
         self.cps[cp_id] = cp
