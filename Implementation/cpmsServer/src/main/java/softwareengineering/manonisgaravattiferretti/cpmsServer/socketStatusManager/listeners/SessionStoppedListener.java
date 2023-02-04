@@ -37,7 +37,7 @@ public class SessionStoppedListener implements ApplicationListener<SessionStoppe
     @Override
     public void onApplicationEvent(SessionStoppedEvent event) {
         Optional<Reservation> reservationOptional = reservationService.findReservationByInternalId(event.getReservationId());
-        if (reservationOptional.isEmpty()) {
+        if (reservationOptional.isEmpty() || !reservationOptional.get().getStatus().equals("ACTIVE")) {
             return;
         }
         reservationService.updateReservationStatus(reservationOptional.get().getInternalReservationId(),
