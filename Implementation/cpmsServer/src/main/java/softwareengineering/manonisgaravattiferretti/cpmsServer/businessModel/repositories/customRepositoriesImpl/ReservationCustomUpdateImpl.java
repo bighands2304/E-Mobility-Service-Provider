@@ -29,9 +29,9 @@ public class ReservationCustomUpdateImpl implements ReservationCustomUpdate {
     }
 
     @Override
-    public void updateReservationEnergyAmount(Double energyAmount, Long sessionId, LocalDateTime timestamp) {
+    public void updateReservationEnergyAmount(Double energyAmount, Long internalReservationId, LocalDateTime timestamp) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("sessionId").is(sessionId));
+        query.addCriteria(Criteria.where("internalReservationId").is(internalReservationId));
         Update update = new Update();
         update.set("energyAmount", energyAmount);
         update.set("lastUpdated", timestamp);

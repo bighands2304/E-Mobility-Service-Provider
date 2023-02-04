@@ -22,11 +22,11 @@ export const locationTransform = (result) => {
 };
 
 const searchAddress = async (address) => {
-  // console.log("adress==> " + address);
-  // console.log("type of adress==> " + typeof address);
+  console.log("adress==> " + address);
+  console.log("type of adress==> " + typeof address);
   const res = await opencage.geocode({
     q: address,
-    key: "7796dd56956a4c6bbc4a09bbba9fe9a9",
+    key: "a9f061754c7a406b8536b97bee7ffb8f",
   });
   const coordinates = res.results[0].geometry;
   // console.log("one position==>" + JSON.stringify(res.results[0].bounds));

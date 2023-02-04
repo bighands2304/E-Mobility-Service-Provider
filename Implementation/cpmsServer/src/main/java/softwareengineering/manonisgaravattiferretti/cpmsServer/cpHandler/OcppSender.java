@@ -1,5 +1,7 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -12,12 +14,14 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 
 @Service
 public class OcppSender {
     private final SessionsManager sessionsManager;
     private final SimpMessagingTemplate template;
     private final Map<String, CompletableFuture<ConfMessage>> pendingResponses = new ConcurrentHashMap<>();
+    private final Logger logger = LoggerFactory.getLogger(OcppSender.class);
 
     @Autowired
     public OcppSender(SessionsManager sessionsManager, SimpMessagingTemplate template) {
@@ -81,10 +85,11 @@ public class OcppSender {
         String requestId = UUID.randomUUID().toString();
         String sessionId = sessionsManager.getSessionIdFromChargingPointId(cpId);
         if (sessionId == null) {
-            return CompletableFuture.completedFuture(null);
+            return CompletableFuture.failedFuture(new RuntimeException());
         }
-        Map<String, Object> headers = Map.of("requestId", requestId);
-        template.convertAndSendToUser(sessionId, "topic/ocpp/" + messageName, message, headers);
+        logger.info("Sending message " + messageName +" to session id" + sessionId);
+        Map<String, Object> headers = Map.of("requestId", requestId, "sessionId", sessionId);
+        template.convertAndSend("/topic/"+ cpId + messageName + "/topic/ocpp/" + messageName, message, headers);
         CompletableFuture<ConfMessage> futureResponse = new CompletableFuture<>();
         pendingResponses.put(requestId, futureResponse);
         return futureResponse;

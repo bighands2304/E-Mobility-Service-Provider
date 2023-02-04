@@ -5,6 +5,6 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.message
 
 @Data
 public class ReserveNowConf implements ConfMessage {
-    private ReservationStatus reservationStatus;
+    private ReservationStatus commandResult;
     private String requestId;
 }

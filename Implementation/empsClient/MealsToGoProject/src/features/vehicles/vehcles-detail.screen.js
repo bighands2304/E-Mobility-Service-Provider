@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
 import { SafeArea } from "../../components/utility/safe-area.component";
 import { Text } from "../../components/typography/text.component";
 import { useNavigation } from "@react-navigation/native";
 import { StyleSheet, View } from "react-native";
+import { VehicleContext } from "../../services/vehicles/mock/vehcile.context";
+
 import {
   RedButton,
   GreenButton,
@@ -10,6 +12,8 @@ import {
 } from "../../components/buttons/buttons.component";
 
 export const VehicleDetailScreen = ({ route }) => {
+  const { DeleteVehcile } = useContext(VehicleContext);
+
   const { item } = route.params;
   const navigation = useNavigation();
   return (
@@ -41,7 +45,7 @@ export const VehicleDetailScreen = ({ route }) => {
         <RedButton
           title="Remove Vehicle"
           // dummy
-          onPress={() => navigation.navigate("VehiclesMain")}
+          onPress={() => DeleteVehcile(item.VinCode)}
         />
       </View>
     </SafeArea>

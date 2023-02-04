@@ -16,7 +16,6 @@ const Socket = ({ cp, socket, id, socketId, type, status, availability }) => {
   const changeAvailabilityHelper = createAsyncThunk(
     `/chargingPoints/${cp.id}/sockets/${socketId}`,
     async (data, thunkAPI) => {
-      console.log("data receeived" + JSON.stringify(data));
       const url = `/chargingPoints/${cp.id}/sockets/${socketId}`;
       changeAvailability(data, url, thunkAPI).then((resp) => {
         if ((resp.status === 200) | (resp.status === 201)) {

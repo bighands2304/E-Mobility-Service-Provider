@@ -26,16 +26,17 @@ public class MeterValueListener implements ApplicationListener<MeterValueEvent> 
 
     @Override
     public void onApplicationEvent(MeterValueEvent event) {
-        Optional<Reservation> reservationOptional = reservationService.findReservationBySessionId(event.getSessionId());
+        Optional<Reservation> reservationOptional = reservationService.findReservationByInternalId(event.getReservationId());
         if (reservationOptional.isEmpty()) {
             return;
         }
         Double energyConsumed = event.getMeterValues().stream()
                 .map(MeterValue::getSampledValue)
                 .reduce(0.0, Double::sum);
-        reservationService.updateSessionEnergyConsumption(energyConsumed, event.getSessionId(), LocalDateTime.now());
         Reservation reservation = reservationOptional.get();
         reservation.setEnergyAmount(energyConsumed + reservation.getEnergyAmount());
+        reservation.setLastUpdated(LocalDateTime.now());
+        reservationService.insertReservation(reservation);
         ocpiSessionSender.patchSession(EntityFromDTOConverter.chargingSessionDTOFromReservation(reservation),
                 reservation.getEmspDetails());
     }

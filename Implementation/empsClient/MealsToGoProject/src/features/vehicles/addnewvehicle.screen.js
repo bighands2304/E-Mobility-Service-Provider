@@ -9,37 +9,8 @@ import { StyleSheet, TextInput, View } from "react-native";
 export const AddNewVehicle = ({ navigation }) => {
   const [vehicleName, setVehicleName] = useState("");
   const [vehicleCode, setVehicleCode] = useState("");
-  const { isLoading, AddVehicle } = useContext(VehicleContext);
+  const { isLoading, AddNewVehicle } = useContext(VehicleContext);
 
-  /*
-<SafeArea>
-      <Text variant="title">Vehicle Details </Text>
-      <View style={styles.container}>
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Vehicle Name:</Text>
-          <TextInput
-            style={styles.input}
-            value={vehicleName}
-            onChangeText={(text) => setVehicleName(text)}
-          />
-        </View>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Vin Code:</Text>
-          <TextInput
-            style={styles.input}
-            value={vehicleCode}
-            onChangeText={(text) => setVehicleCode(text)}
-          />
-        </View>
-      </View>
-      <GreenButton
-        title="Submit"
-        onPress={() => navigation.navigate("Vehicles")}
-      />
-    </SafeArea>
-
-  */
   return (
     <SafeArea>
       <Text variant="title">Add Vehicle </Text>
@@ -53,7 +24,12 @@ export const AddNewVehicle = ({ navigation }) => {
           />
         </View>
       </View>
-      <GreenButton title="Submit" onPress={() => AddVehicle(vehicleCode)} />
+      <GreenButton
+        title="Submit"
+        onPress={() => {
+          AddNewVehicle(vehicleCode);
+        }}
+      />
     </SafeArea>
   );
 };

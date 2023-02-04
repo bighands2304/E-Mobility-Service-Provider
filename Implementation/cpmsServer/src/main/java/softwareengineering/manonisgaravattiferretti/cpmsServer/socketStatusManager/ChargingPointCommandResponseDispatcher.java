@@ -1,5 +1,7 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.socketStatusManager;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -23,6 +25,7 @@ public class ChargingPointCommandResponseDispatcher {
     private final OcpiCommandSender ocpiCommandSender;
     private final ReservationService reservationService;
     private final SocketService socketService;
+    private final Logger logger = LoggerFactory.getLogger(ChargingPointCommandResponseDispatcher.class);
 
     @Autowired
     public ChargingPointCommandResponseDispatcher(OcpiCommandSender ocpiCommandSender,
@@ -39,12 +42,14 @@ public class ChargingPointCommandResponseDispatcher {
         CommandResultType commandResultType;
         try {
             ReserveNowConf response = (ReserveNowConf) futureCpResponse.orTimeout(5, TimeUnit.SECONDS).get();
-            commandResultType = CommandResultType.getFromReservationStatus(response.getReservationStatus());
-            if (response.getReservationStatus() == ReservationStatus.ACCEPTED) {
+            logger.info("response from the charging point: " + response);
+            commandResultType = CommandResultType.getFromReservationStatus(response.getCommandResult());
+            if (response.getCommandResult() == ReservationStatus.ACCEPTED) {
                 socketService.updateSocketStatus(reserveNowDTO.getChargingPointId(), reserveNowDTO.getSocketId(), "RESERVED");
                 reservationService.insertReservation(reserveNowDTO, internalReservationId, socket, emspDetails);
             }
         } catch (InterruptedException | ExecutionException e) {
+            logger.info("response from the charging point not received");
             commandResultType = CommandResultType.TIMEOUT;
         }
         ocpiCommandSender.sendCommandResult(emspDetails, reserveNowDTO.getReservationId(), commandResultType, "RESERVE_NOW");

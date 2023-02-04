@@ -24,12 +24,14 @@ export const MapScreen = ({ navigation }) => {
   const colorDarkMap = "#000000";
   const colorRedMap = "#CF1827";
   const colorGreenMap = "#0064ff";
+  console.log("location structure " + JSON.stringify(location));
 
   useEffect(() => {
     const northeastLat = location.result.viewport.northeast.lat;
     const southwestLat = location.result.viewport.southwest.lat;
     setLatDelta(northeastLat - southwestLat);
   }, [location]);
+  console.log("location" + location);
   return (
     <>
       <Search />
