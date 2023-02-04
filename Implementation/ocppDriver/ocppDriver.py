@@ -30,11 +30,11 @@ class CpConnection:
         self.websock = None
         self.auth_key = auth_key
         self.reconnect = True
+        self.send_heartbeat = False
 
     def create_connection(self):
         # self.websock = websocket.WebSocketApp(f"ws://localhost:8080/ocpp?token={self.auth_key}",
-        #self.websock = websocket.WebSocketApp(f"wss://cpmsserver.up.railway.app/ocpp?token={self.auth_key}",
-        self.websock = websocket.WebSocketApp(f"ws://localhost:8080/ocpp?token={self.auth_key}",
+        self.websock = websocket.WebSocketApp(f"wss://cpmsserver.up.railway.app/ocpp?token={self.auth_key}",
                                               on_open=self.on_open,
                                               on_message=self.on_message,
                                               on_close=self.on_close,
@@ -51,6 +51,8 @@ class CpConnection:
         for topic in TOPICS:
             sub_msg = stomper.subscribe(f"/topic/{self.cp_id + topic}/topic/ocpp/{topic}", self.cp_id + topic)
             self.websock.send(sub_msg)
+        self.send_heartbeat = True
+        threading.Thread(target=self.heartbeat_loop).start()
 
     def on_message(self, ws, message):
         message_unpacked = stomper.unpack_frame(message)
@@ -88,6 +90,7 @@ The message parsed is
             self.on_remote_stop_transaction(body, request_id)
 
     def on_close(self, ws, a, b):
+        self.send_heartbeat = False
         print(f'''
 ==========================================================================================
 Connection with {self.cp_id} (session id = {self.session_id}) closed
@@ -161,6 +164,14 @@ Trying to reconnect (reconnect = {self.reconnect})
     def send_msg(self, topic, message):
         stomp_message = stomper.send(topic, message, content_type="application/json")
         self.websock.send(stomp_message)
+
+    def heartbeat_loop(self):
+        while self.send_heartbeat:
+            time.sleep(120)
+            print(f"Cp id = {self.cp_id}, sending heartbeat")
+            message = {"timestamp": datetime.datetime.now().isoformat(), "cpId": self.cp_id}
+            stomp_msg = stomper.send("/app/ocpp/Heartbeat", json.dumps(message), content_type=CONTENT_TYPE)
+            self.websock.send(stomp_msg)
 
 
 # can only be run in local with access to the command line
