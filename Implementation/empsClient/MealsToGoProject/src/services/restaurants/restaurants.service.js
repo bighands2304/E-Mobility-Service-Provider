@@ -1,6 +1,4 @@
 import React from "react";
-import { mocks, mockImages } from "./mock";
-import camelize from "camelize";
 import customFetch from "../../utils/axios";
 
 export const restaurantsRequest = async (location, jwt) => {
@@ -27,6 +25,45 @@ export const restaurantsRequest = async (location, jwt) => {
   return updated_cp;
 };
 
-export const restaurantsTransform = (result) => {
-  return result;
+// ok ?
+export const doReservationRequest = async (sId, cId, id, token) => {
+  const url = "/user/makeReservation";
+  const customInstance = customFetch(token);
+  const obj = {
+    userId: id,
+    cpId: cId,
+    socketId: sId,
+  };
+  const resp = customInstance.post(url, obj);
+  return resp;
+};
+
+// ok?
+export const deleteReservationRequest = async (reservationId, token) => {
+  const url = `/user/deleteReservation/${reservationId}`;
+  const customInstance = customFetch(token);
+  const resp = await customInstance.delete(url);
+  return resp;
+};
+
+export const startSessionRequest = async (rId, token) => {
+  const url = "/user/startChargingSession";
+  const customInstance = customFetch(token);
+  const obj = {
+    reservationId: rId,
+  };
+
+  const resp = await customInstance.post(url, obj);
+  return resp;
+};
+
+//ok?
+export const endSessionRequest = async (resId, token) => {
+  const url = "/user/endSession";
+  const obj = {
+    reservationId: resId,
+  };
+  const customInstance = customFetch(token);
+  const resp = await customInstance.post(obj, url);
+  return resp;
 };
