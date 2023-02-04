@@ -43,18 +43,22 @@ public class CommandsReceiver {
                 BeanUtils.copyProperties(deletedReservation, reservation);
                 deletedReservation.setDeletionTime(LocalDateTime.now());
 
+                reservationService.delete(reservation);
                 //Save the reservation as deleted
                 reservationService.save(deletedReservation);
             }
         }
 
         if (command.equals("RESERVE_NOW")){
+            Reservation reservation = reservationService.getReservationById(Long.parseLong(uid));
             if(commandResult.get("result").equals("ACCEPTED")){
-                Reservation reservation = reservationService.getReservationById(Long.parseLong(uid));
+
                 ActiveReservation activeReservation = (ActiveReservation) reservation;
                 activeReservation.setStartTime(LocalDateTime.now());
 
                 reservationService.save(activeReservation);
+            }if(commandResult.get("result").equals("TIMEOUT")){
+                reservationService.delete(reservation);
             }
         }
 
@@ -85,6 +89,7 @@ public class CommandsReceiver {
                 } catch (FirebaseMessagingException e) {}
 
 
+                reservationService.delete(reservation);
                 reservationService.save(endedReservation);
             }
         }
