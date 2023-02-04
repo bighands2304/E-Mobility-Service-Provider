@@ -81,10 +81,10 @@ public class ReservationController {
             logger.info("Received CANCEL_RESERVATION command, the reservation was not found");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "reservation not found");
         }
-        logger.info("Received CANCEL_RESERVATION command, all parameters are ok");
         if (!reservationOptional.get().getStatus().equals("RESERVED")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cannot delete reservation");
         }
+        logger.info("Received CANCEL_RESERVATION command, all parameters are ok");
         String cpId = reservationOptional.get().getSocket().getCpId();
         Long reservationId = reservationOptional.get().getInternalReservationId();
         CompletableFuture<ConfMessage> responseFuture = ocppSender.sendCancelReservation(cpId, reservationId);
