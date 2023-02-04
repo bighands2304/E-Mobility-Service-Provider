@@ -46,7 +46,7 @@ public class LoginManager {
     }
 
     @PostMapping("/api/CPO/login")
-    public ResponseEntity<?> login(@RequestBody @Valid CPOLoginDTO loginDTO) {
+    public ResponseEntity<Map<String,Object>> login(@RequestBody @Valid CPOLoginDTO loginDTO) {
         logger.info("Login request received: " + loginDTO);
         try{
             authenticationManager.authenticate(

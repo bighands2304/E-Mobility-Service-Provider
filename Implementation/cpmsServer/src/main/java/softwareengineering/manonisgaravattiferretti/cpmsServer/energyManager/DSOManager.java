@@ -38,7 +38,7 @@ public class DSOManager implements ApplicationListener<ToggleDsoSelectionOptimiz
 
     @Override
     public void onApplicationEvent(ToggleDsoSelectionOptimizerEvent event) {
-        chargingPointService.updateToggleOptimizer(event.getCpId(), "DsoSelection", event.isAutomatic());
+        chargingPointService.updateToggleOptimizer(event.getCpId(), "DSOSelection", event.isAutomatic());
         dsoSelectionOptimizer.switchOptimizer(event.getCpId(), event.isAutomatic());
     }
 
