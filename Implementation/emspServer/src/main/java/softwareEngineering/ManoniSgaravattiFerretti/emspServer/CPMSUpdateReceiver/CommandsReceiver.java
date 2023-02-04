@@ -1,7 +1,9 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSUpdateReceiver;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingSessionManager.NotificationGenerator;
@@ -37,7 +39,8 @@ public class CommandsReceiver {
                 Reservation reservation = reservationService.getReservationById(Long.parseLong(uid));
 
                 //Set the reservation as deleted and set the deletion time to now
-                DeletedReservation deletedReservation = (DeletedReservation) reservation;
+                DeletedReservation deletedReservation = new DeletedReservation();
+                BeanUtils.copyProperties(deletedReservation, reservation);
                 deletedReservation.setDeletionTime(LocalDateTime.now());
 
                 //Save the reservation as deleted
@@ -67,7 +70,8 @@ public class CommandsReceiver {
         if (command.equals("STOP_SESSION")){
             if(commandResult.get("result").equals("ACCEPTED")){
                 ActiveReservation reservation = (ActiveReservation) reservationService.getReservationById(Long.parseLong(uid));
-                EndedReservation endedReservation = (EndedReservation) reservation;
+                EndedReservation endedReservation = new EndedReservation();
+                BeanUtils.copyProperties(endedReservation, reservation);
 
                 //Create a notification to send when the session ends
                 NotificationGenerator notification= new NotificationGenerator();
