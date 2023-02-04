@@ -16,4 +16,5 @@ public interface DSOOfferRepository extends MongoRepository<DSOOffer, String>, D
                                                                                  boolean inUse);
     Optional<DSOOffer> findDSOOfferByChargingPointIdAndInUse(String cpId, boolean inUse);
     List<DSOOffer> findDSOOffersByChargingPointIdAndDsoToken(String cpId, String dsoToken);
+    List<DSOOffer> findDSOOffersByChargingPointInternalIdAndInUse(String cpId, boolean inUse);
 }

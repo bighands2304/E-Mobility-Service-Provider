@@ -43,6 +43,7 @@ public class SessionStartedListener implements ApplicationListener<SessionStarte
         String cpId = reservationOptional.get().getSocket().getCpId();
         Integer socketId = reservationOptional.get().getSocket().getSocketId();
         Reservation reservation = reservationOptional.get();
+        reservation.setStartTime(event.getTime());
         reservation.setSessionId(event.getSessionId());
         reservation.setStatus("ACTIVE");
         reservation.setLastUpdated(event.getTime());

@@ -42,6 +42,7 @@ public class ReservationManager {
         reservation.setUser(user);
         reservation.setCpId(cpId);
         reservation.setSocketId(socketId);
+        reservation.setStartTime(LocalDateTime.now());
 
         //Save the reservation in the DB
         reservationService.save(reservation);

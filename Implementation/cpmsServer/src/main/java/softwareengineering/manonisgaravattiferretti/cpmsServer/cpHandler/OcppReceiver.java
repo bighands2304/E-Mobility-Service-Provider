@@ -41,17 +41,17 @@ public class OcppReceiver {
         this.template = template;
     }
 
-    @MessageMapping("/ocpp")
-    public void handleMessage(String messageJson) {
-        logger.info("message " + messageJson);
-    }
-
     @MessageMapping("/ocpp/BootNotification")
     public @ResponseBody BootNotificationConf handleBootNotification(@RequestBody BootNotificationReq request,
                                                                      SimpMessageHeaderAccessor headerAccessor) {
         logger.info("arrived boot notification message from session: " + headerAccessor.getSessionAttributes().get("sessionId"));
         sessionsManager.updateSessionId(request.getCpId(), headerAccessor.getSessionId());
         return new BootNotificationConf((String) headerAccessor.getSessionAttributes().get("sessionId"));
+    }
+
+    @MessageMapping("/ocpp/Heartbeat")
+    public void handleHeartbeat(@RequestBody HeartbeatReq heartbeatReq) {
+        logger.info("Received an heartbeat from cp with id = " + heartbeatReq.getCpId());
     }
 
     @MessageMapping("/ocpp/StatusNotification")

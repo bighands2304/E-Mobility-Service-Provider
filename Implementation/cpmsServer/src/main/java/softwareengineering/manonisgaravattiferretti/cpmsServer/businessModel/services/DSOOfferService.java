@@ -81,4 +81,12 @@ public class DSOOfferService {
     public Optional<DSOOffer> findCurrentCpOffer(String cpId, boolean inUse) {
         return dsoOfferRepository.findDSOOfferByChargingPointIdAndInUse(cpId, inUse);
     }
+
+    public void clear() {
+        dsoOfferRepository.deleteAll();
+    }
+
+    public List<DSOOffer> findCurrentCpOffers(String cpInternalId) {
+        return dsoOfferRepository.findDSOOffersByChargingPointInternalIdAndInUse(cpInternalId, true);
+    }
 }
