@@ -1,5 +1,6 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSUpdateReceiver;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -71,10 +72,14 @@ public class CommandsReceiver {
                 //Create a notification to send when the session ends
                 NotificationGenerator notification= new NotificationGenerator();
                 notification.setTo(reservation.getUser().getId());
-                notification.setInfo("Recharge ended");
+                notification.setTitle("Session ended");
+                notification.setBody("Go to unplug your car");
 
                 //Send the notification to the user
-                notificationSender.sendToSpecificUser(notification);
+                try {
+                    notificationSender.sendNotification(notification);
+                } catch (FirebaseMessagingException e) {}
+
 
                 reservationService.save(endedReservation);
             }

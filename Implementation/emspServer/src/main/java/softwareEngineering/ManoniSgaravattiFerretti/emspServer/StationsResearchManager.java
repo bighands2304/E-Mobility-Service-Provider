@@ -21,7 +21,7 @@ public class StationsResearchManager {
     @Autowired
     TariffService tariffService;
     @GetMapping("/getCPsInRange/{latitude}/{longitude}/{range}")
-    public ResponseEntity<?> getCpsInRange(@PathVariable Double latitude, Double longitude, Double range){
+    public ResponseEntity<?> getCpsInRange(@PathVariable Double latitude, @PathVariable Double longitude, @PathVariable Double range){
         //Search for CPs in a certain range
         List<ChargingPoint> cps= cpService.getCPsInRange(latitude, latitude+range, longitude, longitude+range);
 
