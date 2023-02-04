@@ -62,13 +62,13 @@ public class ChargingSessionController {
 
     @PostMapping("/ocpi/cpo/commands/STOP_SESSION/{sessionId}")
     public ResponseEntity<?> stopSession(@PathVariable Long sessionId,
-                                          @AuthenticationPrincipal EmspDetails emspDetails) {
+                                         @AuthenticationPrincipal EmspDetails emspDetails) {
         Optional<Reservation> reservationOptional = reservationService.findReservationBySessionId(sessionId);
         if (reservationOptional.isEmpty() ||
                 !reservationOptional.get().getEmspDetails().getEmspToken().equals(emspDetails.getEmspToken())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "session not found");
         }
-        if (!reservationOptional.get().getStatus().equals("CHARGING")) {
+        if (!reservationOptional.get().getStatus().equals("ACTIVE")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "session is already finished");
         }
         CompletableFuture<ConfMessage> responseFuture = ocppSender.sendRemoteStopTransaction(

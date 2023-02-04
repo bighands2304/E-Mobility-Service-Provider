@@ -6,6 +6,7 @@ import {
 } from "./restaurants.service";
 
 import { LocationContext } from "../location/location.context";
+import { AuthenticationContext } from "../authentication/authentication.context";
 
 export const RestaurantsContext = createContext();
 
@@ -14,12 +15,13 @@ export const RestaurantsContextProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const { location } = useContext(LocationContext);
+  const { token } = useContext(AuthenticationContext);
 
   const retrieveRestaurants = (loc) => {
     setIsLoading(true);
     setRestaurants([]);
     setTimeout(() => {
-      restaurantsRequest(loc)
+      restaurantsRequest(loc, token)
         .then(restaurantsTransform)
         .then((results) => {
           setIsLoading(false);

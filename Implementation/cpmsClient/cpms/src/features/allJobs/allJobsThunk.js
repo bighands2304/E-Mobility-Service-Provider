@@ -4,9 +4,9 @@ export const getAllCPsThunk = async (_, thunkAPI) => {
   let url = `/chargingPoints`;
 
   try {
-    console.log("asking all cps");
+    // console.log("asking all cps");
     const resp = await customFetch.get(url);
-    console.log("respoinse ==> " + JSON.stringify(resp.data));
+    // console.log("respoinse ==> " + JSON.stringify(resp.data));
     return resp.data;
   } catch (error) {
     return error.message;

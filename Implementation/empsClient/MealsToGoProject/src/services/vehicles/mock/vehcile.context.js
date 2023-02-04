@@ -15,13 +15,14 @@ export const VehicleContextProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   // is just for try
-  const { id } = useContext(AuthenticationContext);
+  const { id, token } = useContext(AuthenticationContext);
 
   const RetrieveVehciles = (uid) => {
+    console.log("retrive v for uid ==> " + uid);
     setIsLoading(true);
     setVehicles([]);
 
-    getVehicleRequest(uid)
+    getVehicleRequest(uid, token)
       .then(vehicleTrasform)
       .then((results) => {
         setIsLoading(false);
@@ -35,7 +36,7 @@ export const VehicleContextProvider = ({ children }) => {
 
   const AddNewVehicle = (vinCode) => {
     setIsLoading(true);
-    addVehicleRequest(vinCode, id)
+    addVehicleRequest(vinCode, id, token)
       .then((resul) => {
         setIsLoading(false);
         RetrieveVehciles(id);
@@ -50,7 +51,7 @@ export const VehicleContextProvider = ({ children }) => {
   };
   const DeleteVehcile = (vinCode) => {
     setIsLoading(true);
-    deleteVehicleRequest(vinCode)
+    deleteVehicleRequest(vinCode, token)
       .then((resul) => {
         setIsLoading(false);
         RetrieveVehciles(id);

@@ -3,7 +3,7 @@ import { mocks, mockImages } from "./mock";
 import camelize from "camelize";
 import customFetch from "../../utils/axios";
 
-export const restaurantsRequest = async (location) => {
+export const restaurantsRequest = async (location, jwt) => {
   console.log(
     "this is the loc that arrive to Request in serice" +
       JSON.stringify(location)
@@ -17,8 +17,10 @@ export const restaurantsRequest = async (location) => {
   const url = `/user/getCPsInRange/${latS}/${lonS}/${distS}`;
 
   console.log(url);
+
   try {
-    const resp = await customFetch.get(url);
+    const customInstance = customFetch(jwt);
+    const resp = await customInstance.get(url);
 
     console.log(JSON.stringify(resp.data));
     const cp = resp.data;
@@ -32,9 +34,9 @@ export const restaurantsRequest = async (location) => {
 
     return updated_cp;
   } catch (error) {
-    console.log(error);
-    console.log(error.message);
-    console.log(JSON.stringify(error));
+    //  console.log(error);
+    //   console.log(error.message);
+    //   console.log(JSON.stringify(error));
     console.log("bad ass");
   }
 };

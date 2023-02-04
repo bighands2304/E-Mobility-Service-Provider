@@ -1,5 +1,4 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.messages.chargingPointReq;
 
-public class HeartbeatReq
-{
+public class HeartbeatReq {
 }

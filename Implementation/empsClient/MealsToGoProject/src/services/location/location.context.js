@@ -26,14 +26,13 @@ export const LocationContextProvider = ({ children }) => {
       .then((result) => {
         setIsLoading(false);
         setLocation(result);
-        console.log("result ===> " + JSON.stringify(result));
+        //  console.log("result ===> " + JSON.stringify(result));
       })
       .catch((err) => {
-        console.log("error");
+        console.log("error location reuqest");
 
-        console.log(JSON.stringify(error));
+        // console.log(JSON.stringify(error));
 
-        console.log("error");
         setIsLoading(false);
         setError(err);
       });

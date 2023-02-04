@@ -50,30 +50,24 @@ public class OcppReceiver {
     public @ResponseBody BootNotificationConf handleBootNotification(@RequestBody BootNotificationReq request,
                                                                      SimpMessageHeaderAccessor headerAccessor) {
         logger.info("arrived boot notification message from session: " + headerAccessor.getSessionAttributes().get("sessionId"));
-        //Map<String, Object> headers = Map.of("sessionId", headerAccessor.getSessionId());
         sessionsManager.updateSessionId(request.getCpId(), headerAccessor.getSessionId());
-        //template.convertAndSendToUser(headerAccessor.getSessionId(), "topic/ocpp/BootNotification",
-        //        new BootNotificationConf(headerAccessor.getSessionId()), headers);
-        sessionsManager.getSessionIdFromChargingPointId(request.getCpId());
         return new BootNotificationConf((String) headerAccessor.getSessionAttributes().get("sessionId"));
     }
 
     @MessageMapping("/ocpp/StatusNotification")
-    public @ResponseBody StatusNotificationConf handleStatusNotification(@RequestBody StatusNotificationReq request,
+    public void handleStatusNotification(@RequestBody StatusNotificationReq request,
                                                                          SimpMessageHeaderAccessor headerAccessor) {
         SocketStatusChangeEvent socketStatusChangeEvent = new SocketStatusChangeEvent(this,
                 sessionsManager.getChargingPointFromSession(headerAccessor.getSessionId()), request.getConnectorId(),
                 request.getStatus(), request.getTimestamp());
         applicationEventPublisher.publishEvent(socketStatusChangeEvent);
-        return new StatusNotificationConf();
     }
 
     @MessageMapping("/ocpp/MeterValue")
-    public @ResponseBody MeterValueConf handleMeterValues(@RequestBody MeterValueReq request) {
+    public void handleMeterValues(@RequestBody MeterValueReq request) {
         MeterValueEvent meterValueEvent = new MeterValueEvent(this, request.getTransactionId(),
                 request.getConnectorId(), request.getMeterValue());
         applicationEventPublisher.publishEvent(meterValueEvent);
-        return new MeterValueConf();
     }
 
     @MessageMapping("/ocpp/StartTransaction")
@@ -89,11 +83,10 @@ public class OcppReceiver {
     }
 
     @MessageMapping("/ocpp/StopTransaction")
-    public @ResponseBody StopTransactionConf handleStopTransaction(@RequestBody StopTransactionReq request) {
+    public void handleStopTransaction(@RequestBody StopTransactionReq request) {
         SessionStoppedEvent sessionStoppedEvent = new SessionStoppedEvent(this, request.getTransactionId(),
                 request.getTimestamp(), request.getTransactionData());
         applicationEventPublisher.publishEvent(sessionStoppedEvent);
-        return new StopTransactionConf();
     }
 
     @MessageMapping("/ocpp/ChangeAvailabilityConf")

@@ -1,7 +1,4 @@
-import axios from "axios";
-import { signInWithEmailAndPassword } from "firebase/auth";
 import customFetch from "../../utils/axios";
-import { addTokenToLocalStorage } from "../../utils/localStorage";
 
 export const loginRequest = async (email, password) => {
   const obj = {
@@ -9,17 +6,17 @@ export const loginRequest = async (email, password) => {
     password: password,
   };
   const url = "/login";
-  try {
-    const resp = await customFetch.post(url, obj);
-    console.log("resp" + JSON.stringify(resp));
-    const jwt = resp.data.jwt;
-    const user = resp.data.user;
-    addTokenToLocalStorage(jwt);
-    addTokenToLocalStorage(user);
-    return user;
-  } catch (error) {
-    return error.message;
-  }
+
+  const customInstance = customFetch();
+  const resp = await customInstance.post(url, obj);
+  const jwt = resp.data.jwt;
+  const user = resp.data.user;
+  console.log("goalllllll");
+  console.log("goalllllll");
+  console.log("goalllllll");
+  console.log("goalllllll");
+  console.log("goalllllll");
+  return { user, jwt };
 };
 
 export const registerRequest = async (

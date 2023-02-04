@@ -41,7 +41,7 @@ public class SessionStoppedListener implements ApplicationListener<SessionStoppe
             return;
         }
         reservationService.updateReservationStatus(reservationOptional.get().getInternalReservationId(),
-                "ENDED", event.getTime());
+                "COMPLETED", event.getTime());
         String cpId = reservationOptional.get().getSocket().getCpId();
         Integer socketId = reservationOptional.get().getSocket().getSocketId();
         socketService.updateSocketStatus(cpId, socketId, "AVAILABLE");
