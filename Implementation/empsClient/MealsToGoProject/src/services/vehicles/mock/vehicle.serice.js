@@ -59,3 +59,17 @@ export const deleteVehicleRequest = async (vinCode, jwt) => {
     console.log(JSON.stringify(error));
   }
 };
+
+export const setFavouriteRequest = async (vinCode, idUser, jwt) => {
+  const url = "user/setFavouriteVehicle";
+  const obj = {
+    userId: idUser,
+    vin: vinCode,
+  };
+  console.log("sending idUsser" + idUser);
+  console.log("sending VinCode" + vinCode);
+
+  const customInstance = customFetch(jwt);
+  let resp = await customInstance.post(url, obj);
+  return resp;
+};
