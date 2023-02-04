@@ -77,7 +77,7 @@ public class EntityFromDTOConverter {
     public static ChargingPoint fromAddCpDTOToCp(AddChargingPointDTO addChargingPointDTO, String cpoCode) {
         ChargingPoint chargingPoint = new ChargingPoint();
         BeanUtils.copyProperties(addChargingPointDTO, chargingPoint);
-        List<Socket> sockets = addChargingPointDTO.getCpSockets().stream()
+        List<Socket> sockets = addChargingPointDTO.getSockets().stream()
                 .map(socketDto -> {
                     Socket socket = new Socket();
                     BeanUtils.copyProperties(socketDto, socket);
