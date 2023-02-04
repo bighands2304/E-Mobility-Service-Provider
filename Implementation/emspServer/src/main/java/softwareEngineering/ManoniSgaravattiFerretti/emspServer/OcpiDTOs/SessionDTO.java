@@ -14,7 +14,7 @@ public class SessionDTO {
     private LocalDateTime expiryDate;
     private Double kwh;
     private String chargingPointId;
-    private String socketId;
+    private Integer socketId;
     private String status;
     private Double totalCost;
     private LocalDateTime lastUpdated;

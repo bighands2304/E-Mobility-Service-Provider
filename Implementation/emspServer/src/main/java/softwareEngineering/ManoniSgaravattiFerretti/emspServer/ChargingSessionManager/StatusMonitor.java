@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.CPMSRequestSender.CommandsSender;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.Reservation;
@@ -11,7 +12,8 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Ser
 
 import java.util.Map;
 
-@RestController("/user")
+@RestController
+@RequestMapping("/user")
 public class StatusMonitor {
     @Autowired
     ReservationService reservationService;

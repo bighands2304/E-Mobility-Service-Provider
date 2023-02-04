@@ -45,7 +45,7 @@ public class SessionSender {
             Reservation newSession = reservationService.getReservationById(s.getReservationId());
             newSession.setStartTime(s.getStartDateTime());
             newSession.setId(s.getReservationId());
-            newSession.setSocketId(s.getSocketId());
+            newSession.setSocketId(s.getSocketId().toString());
             switch (s.getStatus()) {
                 case "ACTIVE", "RESERVATION" -> {
                     newSession.setSessionId(Long.parseLong(s.getSessionId()));
@@ -87,7 +87,7 @@ public class SessionSender {
         Reservation newSession = reservationService.getReservationById(session.getReservationId());
         newSession.setStartTime(session.getStartDateTime());
         newSession.setId(session.getReservationId());
-        newSession.setSocketId(session.getSocketId());
+        newSession.setSocketId(session.getSocketId().toString());
         switch (session.getStatus()) {
             case "ACTIVE", "RESERVATION" -> {
                 newSession.setSessionId(Long.parseLong(session.getSessionId()));

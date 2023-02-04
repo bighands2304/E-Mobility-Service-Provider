@@ -29,7 +29,7 @@ public class CommandsSender {
         SessionDTO session = new SessionDTO();
         session.setReservationId(reservation.getId());
         session.setChargingPointId(cp.getCpId());
-        session.setSocketId(reservation.getSocketId());
+        session.setSocketId(Integer.parseInt(reservation.getSocketId()));
         session.setExpiryDate(reservation.getExpiryDate());
 
         HttpEntity<?> entity = new HttpEntity<>(session, headers);
@@ -55,7 +55,7 @@ public class CommandsSender {
         SessionDTO session = new SessionDTO();
         session.setReservationId(reservation.getId());
         session.setChargingPointId(cp.getCpId());
-        session.setSocketId(reservation.getSocketId());
+        session.setSocketId(Integer.parseInt(reservation.getSocketId()));
 
         HttpEntity<?> entity = new HttpEntity<>(session, headers);
 
