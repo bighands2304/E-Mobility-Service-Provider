@@ -1,6 +1,6 @@
 import Wrapper from "../assets/wrappers/JobInfo";
 
-export const JobInfo = ({ icon, text }) => {
+export const CPInfo = ({ icon, text }) => {
   return (
     <Wrapper>
       <span className="icon">{icon} </span>
@@ -9,7 +9,7 @@ export const JobInfo = ({ icon, text }) => {
   );
 };
 
-export const JobInfoText = ({ text }) => {
+export const CPInfoText = ({ text }) => {
   return (
     <Wrapper>
       <span className="text">{text} </span>

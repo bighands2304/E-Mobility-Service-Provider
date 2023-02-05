@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Wrapper from "../../assets/wrappers/DashboardFormPage";
-import { JobInfoText } from "../../components/JobInfo";
+import { CPInfoText } from "../../components/CPInfo";
 import { Divider, Button } from "@material-ui/core";
 
 const Offer = ({ cp, offer }) => {
@@ -17,18 +17,16 @@ const Offer = ({ cp, offer }) => {
       <div className="content">
         <div className="content-center">
           <ul>
-            <JobInfoText text={`Price: ${offer.price}`} />
-            <JobInfoText
-              text={`start : ${offer.availableTimeSlot.startTime}`}
-            />
-            <JobInfoText text={`end: ${offer.availableTimeSlot.endTime}`} />
+            <CPInfoText text={`Price: ${offer.price}`} />
+            <CPInfoText text={`start : ${offer.availableTimeSlot.startTime}`} />
+            <CPInfoText text={`end: ${offer.availableTimeSlot.endTime}`} />
 
             {offer.availableTimeSlot.isInUse && (
               <>
-                <JobInfoText
+                <CPInfoText
                   text={`Start Usage: ${offer.usedTimeSlot.startTime}`}
                 />
-                <JobInfoText
+                <CPInfoText
                   text={`End Esage : ${offer.availableTimeSlot.endTime}`}
                 />
               </>

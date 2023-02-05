@@ -2,11 +2,10 @@ import React, { useState } from "react";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { useDispatch } from "react-redux";
 import Wrapper from "../assets/wrappers/Job";
-import { JobInfoText } from "./JobInfo";
 import Switch from "react-switch";
-import { Divider } from "@material-ui/core";
 import { toast } from "react-toastify";
 import { changeAvailability } from "../features/socket/socketThunk";
+import { CPInfoText } from "./CPInfo";
 
 const Socket = ({ cp, socket, id, socketId, type, status, availability }) => {
   const [isAvailable, setIsAvailable] = useState(availability === "AVAILABLE");
@@ -57,9 +56,9 @@ const Socket = ({ cp, socket, id, socketId, type, status, availability }) => {
       <div className="content">
         <div className="content-center">
           <ul>
-            <JobInfoText text={`Availability: `} />
+            <CPInfoText text={`Availability: `} />
             <Switch onChange={handleAvailabilityUpdate} checked={isAvailable} />
-            <JobInfoText
+            <CPInfoText
               text={`Status: ${status === "AVAILABLE" ? "Free" : status}`}
             />
           </ul>

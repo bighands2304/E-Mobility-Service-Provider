@@ -1,5 +1,5 @@
 import Wrapper from "../../assets/wrappers/Job";
-import { JobInfoText } from "../../components/JobInfo";
+import { CPInfoText } from "../../components/CPInfo";
 import { Divider } from "@material-ui/core";
 const Tariff = ({
   tariff,
@@ -22,10 +22,10 @@ const Tariff = ({
       <div className="content">
         <div className="content-center">
           <ul>
-            <JobInfoText text={`Price: ${price}`} />
-            <JobInfoText text={`start : ${startDate}`} />
-            <JobInfoText text={`end: ${endDate}`} />
-            <JobInfoText text={`Prstep Size: ${stepSize}`} />
+            <CPInfoText text={`Price: ${price}`} />
+            <CPInfoText text={`start : ${startDate}`} />
+            <CPInfoText text={`end: ${endDate}`} />
+            <CPInfoText text={`Prstep Size: ${stepSize}`} />
           </ul>
         </div>
         <footer></footer>

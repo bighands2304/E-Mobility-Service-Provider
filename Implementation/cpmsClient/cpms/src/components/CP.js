@@ -2,13 +2,13 @@ import { FaLocationArrow, FaBriefcase, FaCalendarAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import Wrapper from "../assets/wrappers/Job";
 import { useDispatch } from "react-redux";
-import { JobInfo, JobInfoText } from "./JobInfo";
+import { CPInfo, CPInfoText } from "./CPInfo";
 import moment from "moment";
-import { deleteJob, setEditJob } from "../features/job/jobSlice";
+import { deleteJob, setEditJob } from "../features/cp/cpSlice";
 
 import { Divider } from "@material-ui/core";
 
-const Job = ({
+const CP = ({
   cp,
   cpId,
   name,
@@ -31,17 +31,17 @@ const Job = ({
       </header>
       <div className="content">
         <div className="content-center">
-          <JobInfo icon={<FaLocationArrow />} text={address} />
+          <CPInfo icon={<FaLocationArrow />} text={address} />
           <ul>
-            <JobInfoText
+            <CPInfoText
               text={`Price Optimizer: ${togglePriceOptimizer ? "On" : "Off"}`}
             />
-            <JobInfoText
+            <CPInfoText
               text={`Energy Mix Optimizer: ${
                 toggleEnergyMixOptimizer ? "On" : "Off"
               }`}
             />
-            <JobInfoText
+            <CPInfoText
               text={` DSO Selection Optimizer: ${
                 toggleDSOSelectionOptimizer ? "On" : "Off"
               }`}
@@ -59,4 +59,4 @@ const Job = ({
     </Wrapper>
   );
 };
-export default Job;
+export default CP;

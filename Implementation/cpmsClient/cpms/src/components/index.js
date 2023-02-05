@@ -2,7 +2,7 @@ import BigSidebar from "./BigSidebar";
 import ChartsContainer from "./ChartsContainer";
 import FormRow from "./FormRow";
 import FormRowSelect from "./FormRowSelect";
-import JobsContainer from "./JobsContainer";
+import CPsContainer from "./CPsContainer";
 import Logo from "./Logo";
 import Navbar from "./Navbar";
 import SearchContainer from "./SearchContainer";
@@ -17,7 +17,7 @@ export {
   SmallSidebar,
   BigSidebar,
   FormRowSelect,
-  JobsContainer,
+  CPsContainer,
   SearchContainer,
   StatsContainer,
   ChartsContainer,

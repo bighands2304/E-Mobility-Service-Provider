@@ -1,10 +1,10 @@
-import { JobsContainer } from "../../components";
+import { CPsContainer } from "../../components";
 
-const AllJobs = () => {
+const AllCps = () => {
   return (
     <>
-      <JobsContainer />
+      <CPsContainer />
     </>
   );
 };
-export default AllJobs;
+export default AllCps;

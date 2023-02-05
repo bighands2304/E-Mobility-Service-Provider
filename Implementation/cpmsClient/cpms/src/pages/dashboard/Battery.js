@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import Wrapper from "../../assets/wrappers/Job";
-import { JobInfoText } from "../../components/JobInfo";
+import { CPInfoText } from "../../components/CPInfo";
 import { Divider } from "@material-ui/core";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Battery = ({
   cp,
@@ -26,10 +26,10 @@ const Battery = ({
       <div className="content">
         <div className="content-center">
           <ul>
-            <JobInfoText text={`Maximum Capacity: ${maxCapacity}`} />
-            <JobInfoText text={`Minimum Level : ${minLevel}`} />
-            <JobInfoText text={`Maximum Level: ${maxLevel}`} />
-            <JobInfoText text={`Status: ${status}`} />
+            <CPInfoText text={`Maximum Capacity: ${maxCapacity}`} />
+            <CPInfoText text={`Minimum Level : ${minLevel}`} />
+            <CPInfoText text={`Maximum Level: ${maxLevel}`} />
+            <CPInfoText text={`Status: ${status}`} />
           </ul>
         </div>
         <footer>
