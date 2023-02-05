@@ -18,7 +18,7 @@ export const selectOffer = createAsyncThunk(
 
 export const getAllOffers = createAsyncThunk("getAll", async (cp, thunkAPI) => {
   const url = `/chargingPoints/${cp.id}/dso/offers`;
-  return getAllOffersThunk(url, thunkAPI);
+  await getAllOffersThunk(url, thunkAPI);
 });
 
 const offerSlice = createSlice({
@@ -54,11 +54,12 @@ const offerSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(getAllOffers.fulfilled, (state, { payload }) => {
+        state.offerlist = payload;
         state.isLoading = false;
-        state.offers = payload;
       })
-      .addCase(getAllOffers.pending, (state) => {
+      .addCase(getAllOffers.rejected, (state) => {
         state.isLoading = false;
+        console.log("BBB");
       });
   },
 });
