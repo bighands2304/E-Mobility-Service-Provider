@@ -3,7 +3,7 @@ import { FormRow } from "../../components";
 import Wrapper from "../../assets/wrappers/DashboardFormPage";
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
-import { FormRowSelect2, FormRowSelect } from "../../components/FormRowSelect";
+import { FormRowSelect } from "../../components/FormRowSelect";
 import { addCpT } from "../../features/cp/cpSlice";
 
 function AddCp() {
