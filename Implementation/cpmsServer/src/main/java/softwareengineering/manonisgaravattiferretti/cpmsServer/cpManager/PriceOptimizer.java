@@ -42,7 +42,7 @@ public class PriceOptimizer {
         this.applicationEventPublisher = applicationEventPublisher;
     }
 
-    @Scheduled(fixedRate = 60000000)
+    @Scheduled(fixedRate = 14400000)
     public void optimize() {
         for (String cpId: optimizerSet.keySet()) {
             if (optimizerSet.get(cpId)) {

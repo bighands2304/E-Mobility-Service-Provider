@@ -176,7 +176,7 @@ Trying to reconnect (reconnect = {self.reconnect})
             message = {"timestamp": datetime.datetime.now().isoformat(), "cpId": self.cp_id}
             stomp_msg = stomper.send("/app/ocpp/Heartbeat", json.dumps(message), content_type=CONTENT_TYPE)
             self.websock.send(stomp_msg)
-            time.sleep(120)
+            time.sleep(60)
 
 
 # can only be run in local with access to the command line

@@ -58,6 +58,8 @@ public class EntityFromDTOConverter {
         chargingSessionDTO.setChargingPointId(reservation.getSocket().getCpId());
         chargingSessionDTO.setKwh(reservation.getEnergyAmount());
         chargingSessionDTO.setSocketId(reservation.getSocket().getSocketId());
+        chargingSessionDTO.setStartDateTime(reservation.getStartTime());
+        chargingSessionDTO.setEndDateTime(reservation.getEndTime());
         return chargingSessionDTO;
     }
 

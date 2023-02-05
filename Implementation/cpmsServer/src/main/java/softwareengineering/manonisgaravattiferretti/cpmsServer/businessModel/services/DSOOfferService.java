@@ -74,6 +74,7 @@ public class DSOOfferService {
         dsoOffer.setCompanyName(companyName);
         dsoOffer.setChargingPointId(cpId);
         dsoOffer.setValid(false);
+        dsoOffer.setInUse(false);
         dsoOffer.setAvailableTimeSlot(new OfferTimeSlot(LocalTime.MIN, LocalTime.MAX));
         insertOffer(dsoOffer);
     }
