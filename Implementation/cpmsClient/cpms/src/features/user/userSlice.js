@@ -37,6 +37,7 @@ export const loginUser = createAsyncThunk(
 export const updateUser = createAsyncThunk(
   "user/updateUser",
   async (password, thunkAPI) => {
+    console.log("user in update user " + JSON.stringify(password));
     return updateUserThunk("/changePassword", password, thunkAPI);
   }
 );

@@ -33,8 +33,7 @@ export const updateUserThunk = async (url, password, thunkAPI) => {
 export const clearStoreThunk = async (message, thunkAPI) => {
   try {
     thunkAPI.dispatch(logoutUser(message));
-    thunkAPI.dispatch(clearAllJobsState());
-    thunkAPI.dispatch(clearValues());
+
     return Promise.resolve();
   } catch (error) {
     return Promise.reject();

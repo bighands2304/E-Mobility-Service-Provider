@@ -16,15 +16,21 @@ const Map = styled(MapView)`
 export const MapScreen = ({ navigation }) => {
   const { location } = useContext(LocationContext);
   const { restaurants = [] } = useContext(RestaurantsContext);
-  const { favVehicle } = useContext(FavouritesContext);
+  const { socketF, favourite } = useContext(FavouritesContext);
   const [latDelta, setLatDelta] = useState(0);
   let socketTypeFav = "FAST";
-  if (favVehicle) {
-    socketTypeFav = favVehicle[0].SocketType;
+  if (favourite) {
+    socketTypeFav = socketF;
   }
 
   //console.log("fav =======>=>=>" + JSON.stringify(socketTypeFav));
   //console.log("cps =======>=>=>" + JSON.stringify(restaurants));
+
+  console.log("IN map screen screen " + JSON.stringify(socketTypeFav));
+  console.log("IN map screen screen " + JSON.stringify(socketTypeFav));
+  console.log("IN map screen screen " + JSON.stringify(socketTypeFav));
+  console.log("IN map screen screen " + JSON.stringify(socketTypeFav));
+  console.log("IN map screen screen " + JSON.stringify(socketTypeFav));
   const colorDarkMap = "#000000";
   const colorRedMap = "#CF1827";
   const colorGreenMap = "#0064ff";
@@ -49,17 +55,19 @@ export const MapScreen = ({ navigation }) => {
       >
         {restaurants.map((restaurant) => {
           let pinColor = colorDarkMap;
+
+          console.log(JSON.stringify(restaurant.name));
           for (let i = 0; i < restaurant.sockets.length; i++) {
             if (
               restaurant.sockets[i].type === socketTypeFav &&
-              restaurant.sockets[i].availability === "available" &&
-              restaurant.sockets[i].status === "free"
+              restaurant.sockets[i].availability === "AVAILABLE" &&
+              restaurant.sockets[i].status === "AVAILABLE"
             ) {
               pinColor = colorGreenMap;
               break;
             } else if (
               restaurant.sockets[i].type === socketTypeFav &&
-              restaurant.sockets[i].availability === "available"
+              restaurant.sockets[i].availability === "AVAILABLE"
             ) {
               pinColor = colorRedMap;
             }
