@@ -102,7 +102,7 @@ Trying to reconnect (reconnect = {self.reconnect})
 ==========================================================================================
         ''')
         if self.reconnect:
-            time.sleep(180)
+            time.sleep(120)
             self.create_connection()
 
     def on_error(self, ws, message):

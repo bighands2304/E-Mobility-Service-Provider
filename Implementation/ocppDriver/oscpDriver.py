@@ -45,6 +45,9 @@ class OscpConnection:
         Connected to cp with id = {self.cp_id} with the oscp protocol
         The status code of the registration is {resp.status_code}
         """)
+        if resp.status_code == 503:
+            time.sleep(60)
+            return self.send_register()
         return resp.status_code
 
     def loop(self):
