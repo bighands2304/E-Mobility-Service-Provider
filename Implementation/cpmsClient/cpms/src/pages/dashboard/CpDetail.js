@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaLocationArrow } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
 import Wrapper from "../../assets/wrappers/Job";
-import { JobInfo } from "../../components/JobInfo";
+import { CPInfo } from "../../components/CPInfo";
 import Switch from "react-switch";
 import { useDispatch } from "react-redux";
 import Socket from "../../components/Socket";
@@ -108,7 +108,7 @@ const CpDetail = (props) => {
       </header>
       <div className="content">
         <div className="content-center">
-          <JobInfo icon={<FaLocationArrow />} text={cp.address} />
+          <CPInfo icon={<FaLocationArrow />} text={cp.address} />
           <ul>
             <li>
               Price Optimizer{" "}
@@ -120,7 +120,7 @@ const CpDetail = (props) => {
               />
               {!togglePriceOptimizer && (
                 <Link to="/opt-tariff" state={cp}>
-                  Price Optimizer
+                  Tariff Management
                 </Link>
               )}
             </li>
@@ -132,9 +132,6 @@ const CpDetail = (props) => {
                   ToggleTrigger("energy");
                 }}
               />
-              {!toggleEnergyMixOptimizer && (
-                <Link to="/opt-battery">Energy Mix Optimizer</Link>
-              )}
             </li>
             <li>
               DSO Selection Optimizer

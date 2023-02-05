@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
-import { getAllCPsThunk } from "./allJobsThunk";
+import { getAllCPsThunk } from "./allCPsThunk";
 
 const initialState = {
   isLoading: true,
@@ -15,8 +15,8 @@ export const getAllJobs = createAsyncThunk("/charingPoints", getAllCPsThunk);
 
 //export const showStats = createAsyncThunk('allJobs/showStats', showStatsThunk);
 
-const allJobsSlice = createSlice({
-  name: "allJobs",
+const allCPsSlice = createSlice({
+  name: "allCPs",
   initialState,
   reducers: {
     showLoading: (state) => {
@@ -61,9 +61,9 @@ export const {
   clearFilters,
   changePage,
   clearAllJobsState,
-} = allJobsSlice.actions;
+} = allCPsSlice.actions;
 
-export default allJobsSlice.reducer;
+export default allCPsSlice.reducer;
 
 /*
   .addCase(showStats.pending, (state) => {

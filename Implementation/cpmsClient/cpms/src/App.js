@@ -27,7 +27,6 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<Stats />} />
           <Route path="all-cps" element={<AllCps />} />
           <Route path="add-cp" element={<AddCp />} />
           <Route path="profile" element={<Profile />} />

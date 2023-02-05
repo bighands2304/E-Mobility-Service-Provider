@@ -1,6 +1,6 @@
 import customFetch from "../../utils/axios";
-import { clearAllJobsState } from "../allJobs/allJobsSlice";
-import { clearValues } from "../job/jobSlice";
+import { clearAllJobsState } from "../allCPs/allCPsSlice";
+import { clearValues } from "../cp/cpSlice";
 import { logoutUser } from "./userSlice";
 export const registerUserThunk = async (url, user, thunkAPI) => {
   try {

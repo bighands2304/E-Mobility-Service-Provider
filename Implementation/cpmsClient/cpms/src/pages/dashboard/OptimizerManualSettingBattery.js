@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Wrapper from "../../assets/wrappers/DashboardFormPage";
 import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
@@ -7,13 +7,13 @@ import { settingBattery } from "../../features/battery/batteryThunk";
 
 const OptimizerManualSettingsBattery = () => {
   const location = useLocation();
+
   const battery = location.state.battery;
   const cp = location.state.cp;
   console.log("battery obtained" + JSON.stringify(battery));
   console.log("cp obtained" + JSON.stringify(cp));
   const [values, setValues] = useState({ battery });
   console.log("values obtained" + JSON.stringify(values));
-
   const handleInputChange = (e) => {
     const name = e.target.name;
     let value = e.target.value;
@@ -40,6 +40,10 @@ const OptimizerManualSettingsBattery = () => {
       delete batterySetting["batteryId"];
       console.log("battery settings" + JSON.stringify(batterySetting));
 
+      if (!values.battery) {
+        const url = "";
+      }
+
       const url = `chargingPoints/${cp.id}/energySources/battery/${values.battery.batteryId}`;
       try {
         await settingBattery(batterySetting, url);
@@ -49,6 +53,10 @@ const OptimizerManualSettingsBattery = () => {
       }
     }
   };
+
+  if (!values.battery) {
+    return <h1>This CP has no Battery</h1>;
+  }
 
   return (
     <Wrapper>

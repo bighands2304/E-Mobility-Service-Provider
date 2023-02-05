@@ -2,15 +2,15 @@ import { useState } from "react";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import { getUserFromLocalStorage } from "../../utils/localStorage";
-import { addCpThunk } from "./jobThunk";
+import { addCpThunk } from "./cpThunk";
 const initialState = {
   isLoading: false,
 };
 
 export const addCpT = createAsyncThunk("cpo/addCp", addCpThunk);
 
-const jobSlice = createSlice({
-  name: "job",
+const cpSlice = createSlice({
+  name: "cp",
   initialState,
 
   extraReducers: (builder) => {
@@ -30,6 +30,6 @@ const jobSlice = createSlice({
   },
 });
 
-export const {} = jobSlice.actions;
+export const {} = cpSlice.actions;
 
-export default jobSlice.reducer;
+export default cpSlice.reducer;

@@ -3,10 +3,10 @@ import { FormRow } from "../../components";
 import Wrapper from "../../assets/wrappers/DashboardFormPage";
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
-import { FormRowSelect2, FormRowSelect } from "../../components/FormRowSelect";
-import { addCpT } from "../../features/job/jobSlice";
+import { FormRowSelect } from "../../components/FormRowSelect";
+import { addCpT } from "../../features/cp/cpSlice";
 
-const AddJob = () => {
+function AddCp() {
   const initialState = {
     // general info for the CP
     cpId: "",
@@ -38,7 +38,6 @@ const AddJob = () => {
     isSpecialOffer: false,
 
     // what to return
-
     sockets: [],
     batteries: [],
     tariffs: [],
@@ -393,5 +392,5 @@ const AddJob = () => {
       </form>
     </Wrapper>
   );
-};
-export default AddJob;
+}
+export default AddCp;
