@@ -14,13 +14,6 @@ export const FavouritesContextProvider = ({ children }) => {
   const SetNewF = () => {
     vehicles.forEach((vehicle) => {
       if (vehicle.isFavourite) {
-        console.log("FAVAFAAAVA");
-        console.log("FAVAFAAAVA");
-        console.log("FAVAFAAAVA");
-        console.log("FAVAFAAAVA");
-        console.log("FAVAFAAAVA");
-        console.log("FAVAFAAAVA");
-        console.log("FAVAFAAAVA");
         console.log(vehicle.SocketType);
         setsocketF(vehicle.SocketType);
         setFavourite(vehicle);
