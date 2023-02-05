@@ -14,6 +14,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class RegistrationManagerTest {
     @Autowired
     RegistrationManager registrationManager;
+    @Autowired
+    CPOService cpoService;
 
     @Test
     void loadContextTest() {
@@ -28,5 +30,6 @@ class RegistrationManagerTest {
         cpoRegistrationDTO.setPassword("test password");
         ResponseEntity<?> response = registrationManager.registerCPO(cpoRegistrationDTO);
         Assertions.assertEquals(201, response.getStatusCode().value());
+        cpoService.deleteCpoByCode("test cpo");
     }
 }

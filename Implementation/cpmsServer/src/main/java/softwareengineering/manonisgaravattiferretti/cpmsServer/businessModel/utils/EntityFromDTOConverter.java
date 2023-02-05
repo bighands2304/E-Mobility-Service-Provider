@@ -105,6 +105,7 @@ public class EntityFromDTOConverter {
         DSOOfferDTO dsoOfferDTO = new DSOOfferDTO();
         BeanUtils.copyProperties(dsoOffer, dsoOfferDTO);
         dsoOfferDTO.setOfferId(dsoOffer.getId());
+        dsoOfferDTO.setInUse(dsoOffer.isInUse());
         return dsoOfferDTO;
     }
 }

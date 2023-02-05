@@ -49,6 +49,7 @@ public class PriceManager implements ApplicationListener<TogglePriceOptimizerEve
     }
 
     public Tariff addTariff(AddTariffDTO addTariffDTO, String cpId) {
+        chargingPointService.updateToggleOptimizer(cpId, "Price", false);
         priceOptimizer.switchOptimizer(cpId, false);
         String id = UUID.randomUUID().toString();
         Tariff tariff = (addTariffDTO.getIsSpecialOffer()) ?
@@ -66,6 +67,7 @@ public class PriceManager implements ApplicationListener<TogglePriceOptimizerEve
     }
 
     public Tariff putTariff(AddTariffDTO addTariffDTO, String cpId, String tariffId) {
+        chargingPointService.updateToggleOptimizer(cpId, "Price", false);
         priceOptimizer.switchOptimizer(cpId, false);
         Tariff tariff = (addTariffDTO.getIsSpecialOffer()) ?
                 EntityFromDTOConverter.fromAddTariffDTOToSpecialOffer(addTariffDTO, tariffId) :
@@ -83,6 +85,7 @@ public class PriceManager implements ApplicationListener<TogglePriceOptimizerEve
     }
 
     public void removeTariff(String cpId, String tariffId) {
+        chargingPointService.updateToggleOptimizer(cpId, "Price", false);
         priceOptimizer.switchOptimizer(cpId, false);
         chargingPointService.removeTariff(cpId, tariffId);
         List<EmspDetails> emspDetailsList = emspDetailsService.findAll();

@@ -24,8 +24,8 @@ public class ChargingPointService {
         this.chargingPointRepository = chargingPointRepository;
     }
 
-    public ChargingPoint addChargingPoint(ChargingPoint chargingPoint) {
-        return chargingPointRepository.insert(chargingPoint);
+    public void addChargingPoint(ChargingPoint chargingPoint) {
+        chargingPointRepository.save(chargingPoint);
     }
 
     public Page<ChargingPoint> getChargingPointsOfCpo(String cpoCode, int offset, int limit) {

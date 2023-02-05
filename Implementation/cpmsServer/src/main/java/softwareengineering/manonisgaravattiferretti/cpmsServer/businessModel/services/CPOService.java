@@ -21,4 +21,11 @@ public class CPOService {
     public void insertCPO(CPO cpo) {
         cpoRepository.save(cpo);
     }
+
+    public void deleteCpoByCode(String cpoCode) {
+        CPO cpo = cpoRepository.findCPOByCpoCode(cpoCode);
+        if (cpo != null) {
+            cpoRepository.delete(cpo);
+        }
+    }
 }
