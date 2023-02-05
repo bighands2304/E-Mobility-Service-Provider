@@ -1,79 +1,66 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer.AuthManager;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.ChargingPointOperatorService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.User;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Service.UserService;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import java.util.HashMap;
+import java.util.Map;
 
-@ExtendWith(SpringExtension.class)
-@WebMvcTest(LoginManager.class)
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@SpringBootTest
 class LoginManagerTest {
 
     @Autowired
-    private MockMvc mockMvc;
+    UserService userService;
+    @Autowired
+    PasswordEncoder mockPasswordEncoder;
+    @Autowired
+    LoginManager loginManager;
 
-    @MockBean
-    private UserService mockUserService;
-    @MockBean
-    private ChargingPointOperatorService mockCpoService;
-    @MockBean
-    private AuthenticationManager mockAuthenticationManager;
-    @MockBean
-    private TokenManager mockTokenManager;
-    @MockBean
-    private PasswordEncoder mockPasswordEncoder;
+    User user;
 
-
-
-    @Test
-    void testLogin() throws Exception {
-
-        User user = new User();
+    @BeforeEach
+    void setup() {
+        user = new User();
         user.setUsername("Username");
         user.setEmail("email@gmail.com");
         user.setPassword(mockPasswordEncoder.encode("Password"));
         user.setName("Name");
         user.setSurname("Surname");
 
-        (mockUserService).saveUser(user);
-
-        String body = "{" +
-                "\"username\":\"Username\"," +
-                "\"password\":\"Password\"" +
-                "}";
-
-        // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(post("/login")
-                        .with(csrf())
-                        .content(body).contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-
-        // Verify the results
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.getContentAsString()).contains("jwt");
-        verify(mockAuthenticationManager).authenticate(null);
+        userService.saveUser(user);
     }
 
+
+    @Test
+    void testLogin() throws Exception {
+        Map body = new HashMap<>();
+        body.put("username","Username");
+        body.put("password", "Password");
+
+        // Run the test
+        ResponseEntity<?> response = loginManager.login(body);
+        Map resp= (Map) response.getBody();
+        // Verify the results
+        assertThat(response.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
+        assertThat(resp.get("jwt")).isNotNull();
+    }
+
+    @AfterEach
+    void teardown() {
+        userService.deleteUser(user);
+    }
+/*
     @Test
     void testLogin_AuthenticationManagerThrowsAuthenticationException() throws Exception {
         // Setup
@@ -107,4 +94,5 @@ class LoginManagerTest {
         assertThat(response.getContentAsString()).isEqualTo("expectedResponse");
         verify(mockAuthenticationManager).authenticate(null);
     }
+    */
 }

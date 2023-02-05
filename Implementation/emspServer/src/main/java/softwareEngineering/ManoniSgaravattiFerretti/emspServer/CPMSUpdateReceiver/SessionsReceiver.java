@@ -27,11 +27,11 @@ public class SessionsReceiver {
     }
 
     @PatchMapping("/{session_id}")
-    public ResponseEntity<?> patchSession(@PathVariable String session_id, @RequestBody SessionDTO session){
-        Reservation reservation = reservationService.getReservationById(session.getReservationId());
+    public ResponseEntity<?> patchSession(@PathVariable Long session_id, @RequestBody SessionDTO session){
+        Reservation reservation = reservationService.getSessionById(session_id);
         if (session.getStatus().equals("ACTIVE")) {
 
-            reservation.setSessionId(Long.parseLong(session_id));
+            reservation.setSessionId(session_id);
             reservation.setBatteryPercentage(session.getBatteryPercentage());
 
             reservationService.save(reservation);

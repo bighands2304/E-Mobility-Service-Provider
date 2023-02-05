@@ -6,7 +6,9 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.ChargingPoint;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.ChargingPointOperator;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.ChargingPointService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.RestResponsePage;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.SessionDTO;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.Reservation;
@@ -19,6 +21,8 @@ import java.util.Objects;
 public class SessionSender {
     @Autowired
     ReservationService reservationService;
+    @Autowired
+    ChargingPointService cpService;
     private final String ocpiPath="/ocpi/cpo";
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -66,13 +70,14 @@ public class SessionSender {
         }
     }
 
-    public void getSession(ChargingPointOperator cpo, Reservation reservation) {
+    public void getSession(Reservation reservation) {
+        ChargingPoint cp = cpService.getCPById(reservation.getCpId());
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
-        headers.set("Authorization", cpo.getTokenEmsp());
+        headers.set("Authorization", cp.getCpo().getTokenEmsp());
         HttpEntity<?> entity = new HttpEntity<>(headers);
 
-        String urlTemplate = UriComponentsBuilder.fromHttpUrl(cpo.getCpmsUrl() + ocpiPath + "/sessions/" + reservation.getSessionId()).encode().toUriString();
+        String urlTemplate = UriComponentsBuilder.fromHttpUrl(cp.getCpo().getCpmsUrl() + ocpiPath + "/sessions/" + reservation.getSessionId()).encode().toUriString();
 
         ParameterizedTypeReference<RestResponsePage<SessionDTO>> typo = new ParameterizedTypeReference<>() {};
         ResponseEntity<RestResponsePage<SessionDTO>> response = restTemplate.exchange(

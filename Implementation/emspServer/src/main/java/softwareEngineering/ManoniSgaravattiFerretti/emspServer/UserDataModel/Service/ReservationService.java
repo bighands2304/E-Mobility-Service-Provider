@@ -13,6 +13,7 @@ public class ReservationService {
 
     public List<Reservation> getReservationsByUserId(Long userId){return reservationRepository.findAllByUserId(userId);}
     public Reservation getReservationById(Long reservationId){return reservationRepository.findReservationById(reservationId);}
+    public Reservation getSessionById(Long sessiondId){return reservationRepository.findReservationBySessionId(sessiondId);}
     public Reservation save(Reservation reservation){return reservationRepository.save(reservation);}
     public void delete(Reservation reservation){reservationRepository.delete(reservation);}
 

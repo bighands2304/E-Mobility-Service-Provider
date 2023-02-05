@@ -34,6 +34,7 @@ public class LocationsReceiver {
         newCp.setLongitude(cp.getLongitude());
         newCp.setLastUpdate(cp.getLastUpdated());
 
+        newCp.setSockets(new ArrayList<>());
         for (SocketDTO s : cp.getSockets()) {
             Socket newSocket = new Socket();
             newSocket.setSocketId(s.getSocketId().toString());
@@ -74,6 +75,8 @@ public class LocationsReceiver {
         cp.setLatitude(updatedCp.getLatitude());
         cp.setLongitude(updatedCp.getLongitude());
         cp.setLastUpdate(updatedCp.getLastUpdated());
+
+        cp.setSockets(new ArrayList<>());
         for (SocketDTO sDTO: updatedCp.getSockets()) {
             Socket s = new Socket();
             s.setSocketId(sDTO.getSocketId().toString());

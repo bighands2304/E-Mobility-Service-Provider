@@ -29,10 +29,10 @@ public class CommandsReceiver {
     //• UNLOCK_CONNECTOR:
     @PostMapping("/{command}/{uid}")
     public ResponseEntity<?> cancelReservation(@PathVariable String command, @PathVariable String uid, @RequestBody Map<String,String> commandResult){
+        Reservation reservation = reservationService.getReservationById(Long.parseLong(uid));
         if (command.equals("CANCEL_RESERVATION")){
             if(commandResult.get("result").equals("ACCEPTED")) {
                 //Get the reservation to delete
-                Reservation reservation = reservationService.getReservationById(Long.parseLong(uid));
                 if (reservation.getType().equals("RESERVED")) {
                     //Set the reservation as deleted and set the deletion time to now
                     reservation.setDeletionTime(LocalDateTime.now());
@@ -44,9 +44,7 @@ public class CommandsReceiver {
         }
 
         if (command.equals("RESERVE_NOW")){
-            Reservation reservation = reservationService.getReservationById(Long.parseLong(uid));
             if(commandResult.get("result").equals("ACCEPTED")){
-
                 reservation.setStartTime(LocalDateTime.now());
 
                 reservationService.save(reservation);
@@ -61,8 +59,7 @@ public class CommandsReceiver {
 
         if (command.equals("STOP_SESSION")){
             if(commandResult.get("result").equals("ACCEPTED")){
-                Reservation reservation = reservationService.getReservationById(Long.parseLong(uid));
-
+                /*
                 //Create a notification to send when the session ends
                 NotificationGenerator notification= new NotificationGenerator();
                 notification.setTo(reservation.getUser().getId());
@@ -75,7 +72,7 @@ public class CommandsReceiver {
                 } catch (FirebaseMessagingException e) {}
 
 
-                reservationService.save(reservation);
+                reservationService.save(reservation);*/
             }
         }
 
