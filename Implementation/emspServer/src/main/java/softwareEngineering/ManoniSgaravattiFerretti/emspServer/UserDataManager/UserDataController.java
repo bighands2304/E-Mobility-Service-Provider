@@ -78,6 +78,8 @@ public class UserDataController {
                 oldFavourite.setFavourite(false);
                 userVehicleService.saveUserVehicle(oldFavourite);
             }
+        }else {
+            uv.setFavourite(false);
         }
 
         //Save the connection between user and vehicle
