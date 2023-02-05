@@ -58,7 +58,7 @@ class EnergyMixOptimizerTest {
         final Optional<ChargingPoint> chargingPointOptional = Optional.of(chargingPoint);
         when(mockChargingPointService.findChargingPointByInternalId("id")).thenReturn(chargingPointOptional);
 
-        when(mockEnergyConsumptionService.findMeanConsumption(eq("id"), any(LocalDateTime.class),
+        when(mockEnergyConsumptionService.findMeanConsumption(eq("cpId"), any(LocalDateTime.class),
                 any(LocalDateTime.class))).thenReturn(100.0);
 
         final DSOOffer dsoOffer = new DSOOffer();

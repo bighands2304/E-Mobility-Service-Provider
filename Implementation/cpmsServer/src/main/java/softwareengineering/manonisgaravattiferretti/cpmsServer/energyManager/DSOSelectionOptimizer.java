@@ -54,11 +54,11 @@ public class DSOSelectionOptimizer {
     @Async
     void optimizeCp(String cpId, LocalDateTime now, LocalDateTime oneWeekAgo) {
         logger.info("Optimizing Dso selection for cp with id = " + cpId);
-        double meanConsumption = energyConsumptionService.findMeanConsumption(cpId, oneWeekAgo, now);
+        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(cpId);
+        if (chargingPointOptional.isEmpty()) return;
+        double meanConsumption = energyConsumptionService.findMeanConsumption(chargingPointOptional.get().getCpId(), oneWeekAgo, now);
         List<DSOOffer> dsoOffers = dsoOfferService.findOffersOfCp(cpId);
-        if (dsoOffers.size() <= 1) {
-            return;
-        }
+        if (dsoOffers.size() <= 1) return;
         List<OfferTimeSlot> timeSlots = dsoOffers.stream().map(DSOOffer::getAvailableTimeSlot).distinct().toList();
         for (OfferTimeSlot offerTimeSlot: timeSlots) {
             List<DSOOffer> offers = dsoOffers.stream().filter(offer -> offer.getCapacity() >= meanConsumption)
