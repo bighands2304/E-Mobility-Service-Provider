@@ -120,7 +120,7 @@ const CpDetail = (props) => {
               />
               {!togglePriceOptimizer && (
                 <Link to="/opt-tariff" state={cp}>
-                  Price Optimizer
+                  Tariff Management
                 </Link>
               )}
             </li>
@@ -132,9 +132,6 @@ const CpDetail = (props) => {
                   ToggleTrigger("energy");
                 }}
               />
-              {!toggleEnergyMixOptimizer && (
-                <Link to="/opt-battery">Energy Mix Optimizer</Link>
-              )}
             </li>
             <li>
               DSO Selection Optimizer
