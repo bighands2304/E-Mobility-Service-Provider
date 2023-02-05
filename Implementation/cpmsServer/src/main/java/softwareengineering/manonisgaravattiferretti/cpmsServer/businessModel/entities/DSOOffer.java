@@ -29,5 +29,5 @@ public class DSOOffer {
     private String dsoUrl;
     private OfferTimeSlot usedTimeSlot;
     private OfferTimeSlot availableTimeSlot;
-    private boolean isInUse;
+    private boolean inUse;
 }

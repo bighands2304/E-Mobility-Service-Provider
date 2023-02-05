@@ -32,6 +32,7 @@ class ChargingPointRepositoryTest {
     @BeforeEach
     void setUp() {
         chargingPoint.setId("abcd");
+        chargingPoint.setCpId("cpId");
         battery.setBatteryId(1);
         battery.setMinLevel(10.0);
         battery.setMaxLevel(20.0);
@@ -80,6 +81,7 @@ class ChargingPointRepositoryTest {
     void tariffUnwindAggregationTest() {
         ChargingPoint chargingPoint2 = new ChargingPoint();
         chargingPoint2.setId("ABCD");
+        chargingPoint2.setCpId("CpID");
         List<Tariff> tariffs = new ArrayList<>();
         List<Tariff> tariffs2 = new ArrayList<>();
         for (int i = 0; i < 2; i++) {

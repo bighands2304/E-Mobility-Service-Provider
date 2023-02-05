@@ -15,6 +15,7 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.dsoHandler.openAd
 import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.events.EnergyChangeEvent;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.events.ToggleDsoSelectionOptimizerEvent;
 
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -45,11 +46,13 @@ public class DSOManager implements ApplicationListener<ToggleDsoSelectionOptimiz
     public boolean changeDsoProviderManual(String cpInternalId, String cpId, String offerId, OfferTimeSlot offerTimeSlot) {
         Optional<DSOOffer> dsoOfferOptional = dsoOfferService.findOfferById(offerId);
         if (dsoOfferOptional.isEmpty() || !dsoOfferOptional.get().getChargingPointId().equals(cpId) ||
-                dsoOfferOptional.get().getAvailableTimeSlot().getStartTime().isAfter(offerTimeSlot.getStartTime()) ||
-                dsoOfferOptional.get().getAvailableTimeSlot().getEndTime().isBefore(offerTimeSlot.getEndTime())) {
+                dsoOfferOptional.get().getAvailableTimeSlot().getStartTime().isAfter(offerTimeSlot.getStartTime().plus(1, ChronoUnit.MINUTES)) ||
+                dsoOfferOptional.get().getAvailableTimeSlot().getEndTime().isBefore(offerTimeSlot.getEndTime().minus(1, ChronoUnit.MINUTES))) {
             return false;
         }
         dsoSelectionOptimizer.switchOptimizer(cpInternalId, false);
+        chargingPointService.updateToggleOptimizer(dsoOfferOptional.get().getChargingPointInternalId(),
+                "DSOSelection", false);
         DSOOffer dsoOffer = dsoOfferOptional.get();
         if (dsoOffer.isInUse()) {
             return true;

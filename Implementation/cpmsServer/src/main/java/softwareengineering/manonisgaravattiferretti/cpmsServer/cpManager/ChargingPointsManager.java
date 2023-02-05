@@ -113,6 +113,9 @@ public class ChargingPointsManager {
         if (chargingPointOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Charging point not found");
         }
+        for (Socket socket: chargingPointOptional.get().getSockets()) {
+            socketService.removeSocket(socket.getId());
+        }
         chargingPointService.deleteChargingPoint(id);
         return new ResponseEntity<>(chargingPointOptional.get(), HttpStatus.OK);
     }
@@ -182,7 +185,13 @@ public class ChargingPointsManager {
         if (chargingPointOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Charging point not found");
         }
-        return new ResponseEntity<>(priceManager.putTariff(addTariffDTO, id, tariffId), HttpStatus.CREATED);
+        Tariff tariff;
+        try {
+            tariff = priceManager.putTariff(addTariffDTO, id, tariffId);
+        } catch (NullPointerException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "wrong parameters format");
+        }
+        return new ResponseEntity<>(tariff, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/api/CPO/chargingPoints/{id}/tariffs/{tariffId}")
@@ -207,14 +216,17 @@ public class ChargingPointsManager {
             case "dsoSelection" -> {
                 ToggleDsoSelectionOptimizerEvent event = new ToggleDsoSelectionOptimizerEvent(this, automaticMode, id);
                 applicationEventPublisher.publishEvent(event);
+                chargingPointService.updateToggleOptimizer(id, "DSOSelection", automaticMode);
             }
             case "energyMix" -> {
                 ToggleEnergyMixOptimizerEvent event = new ToggleEnergyMixOptimizerEvent(this, id, automaticMode);
                 applicationEventPublisher.publishEvent(event);
+                chargingPointService.updateToggleOptimizer(id, "EnergyMix", automaticMode);
             }
             case "price" -> {
                 TogglePriceOptimizerEvent event = new TogglePriceOptimizerEvent(this, automaticMode, id);
                 applicationEventPublisher.publishEvent(event);
+                chargingPointService.updateToggleOptimizer(id, "Price", automaticMode);
             }
             default -> throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the optimizer type is not recognized");
         }

@@ -9,11 +9,12 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.authManager.Login
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.*;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.*;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.repositories.CPORepository;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.CPOService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.ChargingPointService;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.DSOOfferService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.SocketService;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -31,13 +32,18 @@ class ChargingPointsManagerTest {
     SocketService socketService;
     @Autowired
     CPORepository cpoRepository;
+    @Autowired
+    DSOOfferService dsoOfferService;
     private CPO cpo;
     private ChargingPoint chargingPoint;
     private Socket socket;
     private Tariff tariff;
+    private DSOOffer dsoOffer;
 
     @BeforeEach
     void setup() {
+        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByExternalId("prova");
+        chargingPointOptional.ifPresent(chargingPoint1 -> chargingPointService.deleteChargingPoint(chargingPoint1.getId()));
         cpo = new CPO();
         cpo.setCpoCode("test login");
         cpo.setPassword("test");
@@ -47,6 +53,8 @@ class ChargingPointsManagerTest {
         this.chargingPoint.setCpId("prova");
         this.chargingPoint.setCpoCode("test login");
         this.chargingPoint.setToggleEnergyMixOptimizer(true);
+        this.chargingPoint.setToggleDSOSelectionOptimizer(true);
+        this.chargingPoint.setTogglePriceOptimizer(true);
         Battery battery = new Battery();
         battery.setBatteryId(1);
         this.chargingPoint.setBatteries(List.of(battery));
@@ -66,6 +74,16 @@ class ChargingPointsManagerTest {
         tariff.setPrice(10.0);
         chargingPoint.setTariffs(List.of(tariff));
         chargingPointService.addChargingPoint(this.chargingPoint);
+
+        dsoOffer = new DSOOffer();
+        dsoOffer.setChargingPointId("prova");
+        dsoOffer.setChargingPointInternalId(chargingPoint.getId());
+        dsoOffer.setDsoId("abc");
+        dsoOffer.setInUse(false);
+        dsoOffer.setValid(true);
+        dsoOffer.setPrice(5.0);
+        dsoOffer.setAvailableTimeSlot(new OfferTimeSlot(LocalTime.MIN, LocalTime.MAX));
+        dsoOffer = dsoOfferService.insertOffer(dsoOffer);
     }
 
     @Test
@@ -84,12 +102,12 @@ class ChargingPointsManagerTest {
     }
 
     @Test
-    void testToggleOptimizer() {
-        ResponseEntity<?> response = chargingPointsManager.toggleOptimizer(chargingPoint.getId(), "energyMix", false);
+    void getSocketTest() {
+        ResponseEntity<Socket> response = chargingPointsManager.getSocketInfo(cpo, chargingPoint.getId(), socket.getSocketId());
         Assertions.assertTrue(response.getStatusCode().is2xxSuccessful());
-        Optional<ChargingPoint> chargingPoint = chargingPointService.findChargingPointByInternalId(this.chargingPoint.getId());
-        Assertions.assertTrue(chargingPoint.isPresent());
-        Assertions.assertFalse(chargingPoint.get().isTogglePriceOptimizer());
+        Socket socket1 = response.getBody();
+        Assertions.assertNotNull(socket1);
+        Assertions.assertEquals(socket.getId(), socket1.getId());
     }
 
     @Test
@@ -106,6 +124,16 @@ class ChargingPointsManagerTest {
     }
 
     @Test
+    void deleteChargingPointTest() {
+        ResponseEntity<?> response = chargingPointsManager.deleteChargingPoint(cpo, chargingPoint.getId());
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful());
+        Optional<ChargingPoint> chargingPoint = chargingPointService.findChargingPointByExternalId("test add");
+        Assertions.assertTrue(chargingPoint.isEmpty());
+        List<Socket> socket = socketService.findCpSocketsById(this.chargingPoint.getCpId());
+        Assertions.assertEquals(0, socket.size());
+    }
+
+    @Test
     void includeBatteryTest() {
         IncludeBatteryDTO includeBatteryDTO = new IncludeBatteryDTO();
         includeBatteryDTO.setMinLevel(10.0);
@@ -119,6 +147,18 @@ class ChargingPointsManagerTest {
         Assertions.assertEquals(10.0, chargingPoint.get().getBatteries().get(0).getMinLevel());
         Assertions.assertEquals(80.0, chargingPoint.get().getBatteries().get(0).getMaxLevel());
         Assertions.assertEquals(30.0, chargingPoint.get().getBatteries().get(0).getPercent());
+        // energy mix optimizer should be switched off due to manual intervention
+        Assertions.assertFalse(chargingPoint.get().isToggleEnergyMixOptimizer());
+    }
+
+    @Test
+    void includeBatteryTest_wrongLevels() {
+        IncludeBatteryDTO includeBatteryDTO = new IncludeBatteryDTO();
+        includeBatteryDTO.setMinLevel(80.0);
+        includeBatteryDTO.setMaxLevel(10.0);
+        includeBatteryDTO.setPercent(30.0);
+        Assertions.assertThrows(ResponseStatusException.class, () -> chargingPointsManager.includeBattery(
+                chargingPoint.getId(), 1, includeBatteryDTO, cpo));
     }
 
     @Test
@@ -181,6 +221,7 @@ class ChargingPointsManagerTest {
         Optional<ChargingPoint> chargingPoint = chargingPointService.findChargingPointByExternalId("prova");
         Assertions.assertTrue(chargingPoint.isPresent());
         Assertions.assertEquals(0, chargingPoint.get().getTariffs().size());
+        Assertions.assertFalse(chargingPoint.get().isTogglePriceOptimizer());
     }
 
     @Test
@@ -195,6 +236,7 @@ class ChargingPointsManagerTest {
         Assertions.assertEquals(2, chargingPoint.get().getTariffs().size());
         Tariff insertedTariff = chargingPoint.get().getTariffs().get(1);
         Assertions.assertEquals("SLOW", insertedTariff.getSocketType());
+        Assertions.assertFalse(chargingPoint.get().isTogglePriceOptimizer());
     }
 
     @Test
@@ -212,6 +254,70 @@ class ChargingPointsManagerTest {
         Assertions.assertEquals(tariff.getTariffId(), tariff1.getTariffId());
         Assertions.assertEquals("SLOW", tariff1.getSocketType());
         Assertions.assertEquals(11.0, tariff1.getPrice());
+        Assertions.assertFalse(chargingPoint.get().isTogglePriceOptimizer());
+    }
+
+    @Test
+    void modifyTariff_wrongDto() {
+        Assertions.assertThrows(ResponseStatusException.class, () -> chargingPointsManager.putTariff(
+                chargingPoint.getId(), "test", new AddTariffDTO(), cpo));
+    }
+
+    @Test
+    void getDsoOffers() {
+        ResponseEntity<Iterable<DSOOfferDTO>> response = chargingPointsManager.getChargingPointDsoOffers(chargingPoint.getId(), cpo);
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful());
+        List<DSOOfferDTO> dsoOffers = (List<DSOOfferDTO>) response.getBody();
+        Assertions.assertNotNull(dsoOffers);
+        Assertions.assertEquals(1, dsoOffers.size());
+        Assertions.assertEquals("abc", dsoOffers.get(0).getDsoId());
+        Assertions.assertEquals(dsoOffer.getId(), dsoOffers.get(0).getOfferId());
+        Assertions.assertEquals(5.0, dsoOffers.get(0).getPrice());
+    }
+
+    @Test
+    void changeDsoProvider() {
+        OfferTimeSlot offerTimeSlot = new OfferTimeSlot(LocalTime.MIN, LocalTime.of(23, 59, 59));
+        ResponseEntity<?> response = chargingPointsManager.changeDsoProvider(chargingPoint.getId(),
+                dsoOffer.getId(), offerTimeSlot, cpo);
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful());
+        Optional<DSOOffer> dsoOffer1 = dsoOfferService.findOfferById(dsoOffer.getId());
+        Assertions.assertTrue(dsoOffer1.isPresent());
+        Assertions.assertEquals(dsoOffer.getDsoId(), dsoOffer1.get().getDsoId());
+        Assertions.assertEquals(dsoOffer.getPrice(), dsoOffer1.get().getPrice());
+        Assertions.assertTrue(dsoOffer1.get().isInUse());
+        Assertions.assertEquals(offerTimeSlot, dsoOffer1.get().getUsedTimeSlot());
+        Optional<ChargingPoint> chargingPoint = chargingPointService.findChargingPointByExternalId("prova");
+        Assertions.assertTrue(chargingPoint.isPresent());
+        // dso selection optimizer should be switched off due to manual intervention
+        Assertions.assertFalse(chargingPoint.get().isToggleDSOSelectionOptimizer());
+    }
+
+    @Test
+    void testTogglePriceOptimizer() {
+        ResponseEntity<?> response = chargingPointsManager.toggleOptimizer(chargingPoint.getId(), "price", false);
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful());
+        Optional<ChargingPoint> chargingPoint = chargingPointService.findChargingPointByInternalId(this.chargingPoint.getId());
+        Assertions.assertTrue(chargingPoint.isPresent());
+        Assertions.assertFalse(chargingPoint.get().isTogglePriceOptimizer());
+    }
+
+    @Test
+    void testToggleDsoOptimizer() {
+        ResponseEntity<?> response = chargingPointsManager.toggleOptimizer(chargingPoint.getId(), "dsoSelection", false);
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful());
+        Optional<ChargingPoint> chargingPoint = chargingPointService.findChargingPointByInternalId(this.chargingPoint.getId());
+        Assertions.assertTrue(chargingPoint.isPresent());
+        Assertions.assertFalse(chargingPoint.get().isToggleDSOSelectionOptimizer());
+    }
+
+    @Test
+    void testToggleEnergyMixOptimizer() {
+        ResponseEntity<?> response = chargingPointsManager.toggleOptimizer(chargingPoint.getId(), "energyMix", false);
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful());
+        Optional<ChargingPoint> chargingPoint = chargingPointService.findChargingPointByInternalId(this.chargingPoint.getId());
+        Assertions.assertTrue(chargingPoint.isPresent());
+        Assertions.assertFalse(chargingPoint.get().isToggleEnergyMixOptimizer());
     }
 
     @AfterEach
@@ -219,6 +325,7 @@ class ChargingPointsManagerTest {
         chargingPointService.deleteChargingPoint(chargingPoint.getId());
         socketService.removeSocket(socket.getId());
         cpoRepository.deleteById(cpo.getId());
+        dsoOfferService.removeOffer(List.of(dsoOffer));
     }
 
 }
