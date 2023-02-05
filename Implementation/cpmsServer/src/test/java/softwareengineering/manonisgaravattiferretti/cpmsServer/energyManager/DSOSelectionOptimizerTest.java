@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -52,8 +53,13 @@ class DSOSelectionOptimizerTest {
 
     @Test
     void testOptimizeCp_oneOfferNotFulfillConsumption() {
-        when(mockEnergyConsumptionService.findMeanConsumption(eq("cpId"), any(LocalDateTime.class),
+        when(mockEnergyConsumptionService.findMeanConsumption(eq("cpIdExternal"), any(LocalDateTime.class),
                 any(LocalDateTime.class))).thenReturn(100.0);
+
+        ChargingPoint chargingPoint = new ChargingPoint();
+        chargingPoint.setId("cpId");
+        chargingPoint.setCpId("cpIdExternal");
+        when(mockChargingPointService.findChargingPointByInternalId("cpId")).thenReturn(Optional.of(chargingPoint));
 
         DSOOffer dsoOffer1 = new DSOOffer();
         dsoOffer1.setId("id1");
@@ -76,8 +82,7 @@ class DSOSelectionOptimizerTest {
         dsoOffer2.setChargingPointInternalId("cpId");
         dsoOffer2.setAvailableTimeSlot(availableTimeSlot);
         dsoOffer2.setInUse(false);
-        List<DSOOffer> dsoOffers = List.of(dsoOffer1, dsoOffer2);
-        when(mockDsoOfferService.findOffersOfCp("cpId")).thenReturn(dsoOffers);
+        when(mockDsoOfferService.findOffersOfCp("cpId")).thenReturn(List.of(dsoOffer1, dsoOffer2));
 
         dsoSelectionOptimizerUnderTest.optimizeCp("cpId", LocalDateTime.of(2020, 1, 1, 0, 0, 0),
                 LocalDateTime.of(2020, 1, 1, 1, 0, 0));
@@ -91,8 +96,13 @@ class DSOSelectionOptimizerTest {
 
     @Test
     void testOptimizeCp_priceComparison() {
-        when(mockEnergyConsumptionService.findMeanConsumption(eq("cpId"), any(LocalDateTime.class),
+        when(mockEnergyConsumptionService.findMeanConsumption(eq("cpIdExternal"), any(LocalDateTime.class),
                 any(LocalDateTime.class))).thenReturn(100.0);
+
+        ChargingPoint chargingPoint = new ChargingPoint();
+        chargingPoint.setId("cpId");
+        chargingPoint.setCpId("cpIdExternal");
+        when(mockChargingPointService.findChargingPointByInternalId("cpId")).thenReturn(Optional.of(chargingPoint));
 
         DSOOffer dsoOffer1 = new DSOOffer();
         dsoOffer1.setId("id1");
@@ -115,8 +125,7 @@ class DSOSelectionOptimizerTest {
         dsoOffer2.setChargingPointInternalId("cpId");
         dsoOffer2.setAvailableTimeSlot(availableTimeSlot);
         dsoOffer2.setInUse(false);
-        List<DSOOffer> dsoOffers = List.of(dsoOffer1, dsoOffer2);
-        when(mockDsoOfferService.findOffersOfCp("cpId")).thenReturn(dsoOffers);
+        when(mockDsoOfferService.findOffersOfCp("cpId")).thenReturn(List.of(dsoOffer1, dsoOffer2));
 
         dsoSelectionOptimizerUnderTest.optimizeCp("cpId", LocalDateTime.of(2020, 1, 1, 0, 0, 0),
                 LocalDateTime.of(2020, 1, 1, 0, 0, 0));

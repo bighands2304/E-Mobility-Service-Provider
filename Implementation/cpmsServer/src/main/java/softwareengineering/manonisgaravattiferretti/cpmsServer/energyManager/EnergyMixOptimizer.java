@@ -56,10 +56,11 @@ public class EnergyMixOptimizer {
 
     @Async
     void optimizeCp(String cpId, LocalDateTime oneWeekAgo, LocalDateTime now) {
+        logger.info("Starting energy mix optimization process for cp with id = " + cpId);
         Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(cpId);
         if (chargingPointOptional.isEmpty() || chargingPointOptional.get().getBatteries().size() == 0) return;
         List<Battery> batteries = chargingPointOptional.get().getBatteries();
-        double meanConsumption = energyConsumptionService.findMeanConsumption(cpId, oneWeekAgo, now);
+        double meanConsumption = energyConsumptionService.findMeanConsumption(chargingPointOptional.get().getCpId(), oneWeekAgo, now);
         LocalTime currentTime = LocalTime.now();
         List<DSOOffer> currentOffers = dsoOfferService.findCurrentCpOffers(cpId)
                 .stream().filter(dsoOffer -> dsoOffer.getAvailableTimeSlot().getStartTime().isBefore(currentTime) &&
