@@ -7,7 +7,6 @@ export const getAllOffersThunk = async (url, thunkAPI) => {
     const resp = await customFetch.get(url, thunkAPI);
     console.log(JSON.stringify(resp.data));
     return resp.data;
-    return thunkAPI.full(error.body.message);
   } catch (error) {
     console.log("failed");
     return thunkAPI.rejectWithValue(error.body.message);
