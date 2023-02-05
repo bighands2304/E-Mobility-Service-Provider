@@ -16,26 +16,23 @@ const Map = styled(MapView)`
 export const MapScreen = ({ navigation }) => {
   const { location } = useContext(LocationContext);
   const { restaurants = [] } = useContext(RestaurantsContext);
-  const { favVehicle } = useContext(FavouritesContext);
+  const { socketF, favourite } = useContext(FavouritesContext);
   const [latDelta, setLatDelta] = useState(0);
   let socketTypeFav = "FAST";
-  if (favVehicle) {
-    socketTypeFav = favVehicle[0].SocketType;
+  if (favourite) {
+    socketTypeFav = socketF;
   }
 
-  //console.log("fav =======>=>=>" + JSON.stringify(socketTypeFav));
-  //console.log("cps =======>=>=>" + JSON.stringify(restaurants));
   const colorDarkMap = "#000000";
   const colorRedMap = "#CF1827";
   const colorGreenMap = "#0064ff";
-  console.log("location structure " + JSON.stringify(location));
 
   useEffect(() => {
     const northeastLat = location.result.viewport.northeast.lat;
     const southwestLat = location.result.viewport.southwest.lat;
     setLatDelta(northeastLat - southwestLat);
   }, [location]);
-  console.log("location" + location);
+
   return (
     <>
       <Search />
@@ -49,17 +46,18 @@ export const MapScreen = ({ navigation }) => {
       >
         {restaurants.map((restaurant) => {
           let pinColor = colorDarkMap;
+
           for (let i = 0; i < restaurant.sockets.length; i++) {
             if (
               restaurant.sockets[i].type === socketTypeFav &&
-              restaurant.sockets[i].availability === "available" &&
-              restaurant.sockets[i].status === "free"
+              restaurant.sockets[i].availability === "AVAILABLE" &&
+              restaurant.sockets[i].status === "AVAILABLE"
             ) {
               pinColor = colorGreenMap;
               break;
             } else if (
               restaurant.sockets[i].type === socketTypeFav &&
-              restaurant.sockets[i].availability === "available"
+              restaurant.sockets[i].availability === "AVAILABLE"
             ) {
               pinColor = colorRedMap;
             }

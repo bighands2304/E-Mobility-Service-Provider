@@ -20,7 +20,8 @@ public class DSOOfferService {
     }
 
     public List<DSOOffer> findOffersOfCp(String cpInternalId) {
-        return dsoOfferRepository.findDSOOffersByChargingPointId(cpInternalId).stream().filter(DSOOffer::isValid).toList();
+        return dsoOfferRepository.findDSOOffersByChargingPointInternalId(cpInternalId)
+                .stream().filter(DSOOffer::isValid).toList();
     }
 
     public Optional<DSOOffer> findOfferById(String id) {
@@ -45,8 +46,8 @@ public class DSOOfferService {
         dsoOfferRepository.updateCapacityFromDsoTokenCpId(dsoToken, cpId, capacity);
     }
 
-    public void insertOffer(DSOOffer dsoOffer) {
-        dsoOfferRepository.save(dsoOffer);
+    public DSOOffer insertOffer(DSOOffer dsoOffer) {
+        return dsoOfferRepository.save(dsoOffer);
     }
 
     public void removeOffer(List<DSOOffer> offers) {
@@ -74,6 +75,7 @@ public class DSOOfferService {
         dsoOffer.setCompanyName(companyName);
         dsoOffer.setChargingPointId(cpId);
         dsoOffer.setValid(false);
+        dsoOffer.setInUse(false);
         dsoOffer.setAvailableTimeSlot(new OfferTimeSlot(LocalTime.MIN, LocalTime.MAX));
         insertOffer(dsoOffer);
     }

@@ -31,7 +31,6 @@ const tariffSlice = createSlice({
     builder
       .addCase(setTariffStandard.pending, (state) => {
         state.isLoading = true;
-        console.log("pending");
       })
       .addCase(setTariffStandard.fulfilled, (state, { payload }) => {
         state.isLoading = false;
@@ -44,7 +43,6 @@ const tariffSlice = createSlice({
       })
       .addCase(setTariffSpecial.pending, (state) => {
         state.isLoading = true;
-        console.log("pending");
       })
       .addCase(setTariffSpecial.fulfilled, (state, { payload }) => {
         state.isLoading = false;

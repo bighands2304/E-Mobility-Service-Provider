@@ -38,7 +38,6 @@ const allJobsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(getAllJobs.pending, (state) => {
-        console.log("Pending");
         state.isLoading = true;
       })
       .addCase(getAllJobs.fulfilled, (state, { payload }) => {

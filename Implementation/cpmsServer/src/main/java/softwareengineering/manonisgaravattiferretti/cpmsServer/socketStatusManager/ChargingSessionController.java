@@ -51,7 +51,6 @@ public class ChargingSessionController {
                 !reservationOptional.get().getSocket().getSocketId().equals(startSessionDTO.getSocketId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "reservation status error");
         }
-        // Todo: select a charging profile?
         CompletableFuture<ConfMessage> responseFuture = ocppSender.sendRemoteStartTransaction(
                 startSessionDTO.getChargingPointId(), startSessionDTO.getSocketId(),
                 null, reservationOptional.get().getInternalReservationId());

@@ -25,7 +25,7 @@ public class ChargingPointService {
     }
 
     public void addChargingPoint(ChargingPoint chargingPoint) {
-        chargingPointRepository.insert(chargingPoint);
+        chargingPointRepository.save(chargingPoint);
     }
 
     public Page<ChargingPoint> getChargingPointsOfCpo(String cpoCode, int offset, int limit) {
@@ -73,7 +73,7 @@ public class ChargingPointService {
         if (chargingPoint.isPresent()) {
             for (Battery battery: chargingPoint.get().getBatteries()) {
                 if (battery.getBatteryId().equals(batteryId)
-                        && battery.getStatus().equals("UNAVAILABLE")) {
+                        && (battery.getStatus() == null || battery.getStatus().equals("UNAVAILABLE"))) {
                     chargingPointRepository.updateBatteryAvailability(cpId, batteryId, true);
                 }
             }

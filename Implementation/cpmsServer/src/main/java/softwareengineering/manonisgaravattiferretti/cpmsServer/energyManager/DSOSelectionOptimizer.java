@@ -40,7 +40,7 @@ public class DSOSelectionOptimizer {
         this.applicationEventPublisher = applicationEventPublisher;
     }
 
-    @Scheduled(fixedRate = 60000000)
+    @Scheduled(fixedRate = 1800000)
     public void optimize() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime oneWeekAgo = now.minus(1, ChronoUnit.WEEKS);
@@ -82,7 +82,7 @@ public class DSOSelectionOptimizer {
         }
     }
 
-    @Scheduled(fixedRate = 600000000)
+    @Scheduled(fixedRate = 7200000)
     public void fetchChargingPointsPeriodically() {
         List<ChargingPoint> chargingPoints = chargingPointService.findAll();
         for (ChargingPoint chargingPoint: chargingPoints) {

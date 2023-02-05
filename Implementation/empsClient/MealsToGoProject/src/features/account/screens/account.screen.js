@@ -13,7 +13,7 @@ export const AccountScreen = ({ navigation }) => {
   return (
     <AccountBackground>
       <AccountCover />
-      <Title>E-MAll</Title>
+      <Title>E - MALL</Title>
       <AccountContainer>
         <AuthButton
           icon="lock-open-outline"

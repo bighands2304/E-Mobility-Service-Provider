@@ -15,6 +15,7 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.ent
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.ChargingPointService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.DSOOfferService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.EmspDetailsService;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.SocketService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.utils.EntityFromDTOConverter;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.OcppConnectionTrigger;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.cpManager.events.TogglePriceOptimizerEvent;
@@ -25,6 +26,7 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.eve
 import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.events.ToggleEnergyMixOptimizerEvent;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.socketStatusManager.events.SocketAvailabilityEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -40,6 +42,7 @@ public class ChargingPointsManager {
     private final OcppConnectionTrigger ocppConnectionTrigger;
     private final OcpiLocationsSender ocpiLocationsSender;
     private final EmspDetailsService emspDetailsService;
+    private final SocketService socketService;
     private final Logger logger = LoggerFactory.getLogger(ChargingPointsManager.class);
 
     @Autowired
@@ -49,7 +52,7 @@ public class ChargingPointsManager {
                                  DSOOfferService dsoOfferService, PriceManager priceManager,
                                  OcppConnectionTrigger ocppConnectionTrigger,
                                  OcpiLocationsSender ocpiLocationsSender,
-                                 EmspDetailsService emspDetailsService) {
+                                 EmspDetailsService emspDetailsService, SocketService socketService) {
         this.chargingPointService = chargingPointService;
         this.applicationEventPublisher = applicationEventPublisher;
         this.energyMixManager = energyMixManager;
@@ -59,6 +62,7 @@ public class ChargingPointsManager {
         this.ocppConnectionTrigger = ocppConnectionTrigger;
         this.ocpiLocationsSender = ocpiLocationsSender;
         this.emspDetailsService = emspDetailsService;
+        this.socketService = socketService;
     }
 
     @GetMapping("/api/CPO/chargingPoints")
@@ -89,6 +93,11 @@ public class ChargingPointsManager {
         if (response == null) {
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Wasn't able to connect to the charging point");
         }
+        List<Socket> socketsWithId = new ArrayList<>();
+        for (Socket socket: chargingPoint.getSockets()) {
+            socketsWithId.add(socketService.save(socket));
+        }
+        chargingPoint.setSockets(socketsWithId);
         chargingPointService.addChargingPoint(chargingPoint);
         List<EmspDetails> emspDetailsList = emspDetailsService.findAll();
         for (EmspDetails emspDetails: emspDetailsList) {
@@ -103,6 +112,9 @@ public class ChargingPointsManager {
         Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(id, cpo.getCpoCode());
         if (chargingPointOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Charging point not found");
+        }
+        for (Socket socket: chargingPointOptional.get().getSockets()) {
+            socketService.removeSocket(socket.getId());
         }
         chargingPointService.deleteChargingPoint(id);
         return new ResponseEntity<>(chargingPointOptional.get(), HttpStatus.OK);
@@ -173,12 +185,22 @@ public class ChargingPointsManager {
         if (chargingPointOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Charging point not found");
         }
-        return new ResponseEntity<>(priceManager.putTariff(addTariffDTO, id, tariffId), HttpStatus.CREATED);
+        Tariff tariff;
+        try {
+            tariff = priceManager.putTariff(addTariffDTO, id, tariffId);
+        } catch (NullPointerException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "wrong parameters format");
+        }
+        return new ResponseEntity<>(tariff, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/api/CPO/chargingPoints/{id}/tariffs/{tariffId}")
     public ResponseEntity<?> deleteTariff(@PathVariable String id, @PathVariable String tariffId,
                                           @AuthenticationPrincipal CPO cpo) {
+        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(id, cpo.getCpoCode());
+        if (chargingPointOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Charging point not found");
+        }
         priceManager.removeTariff(id, tariffId);
         return ResponseEntity.ok().build();
     }
@@ -186,18 +208,25 @@ public class ChargingPointsManager {
     @PostMapping("/api/CPO/chargingPoints/{id}/optimizer/{type}")
     public ResponseEntity<?> toggleOptimizer(@PathVariable String id, @PathVariable String type,
                                              @RequestParam boolean automaticMode) {
+        Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(id);
+        if (chargingPointOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "charging point not found");
+        }
         switch (type) {
             case "dsoSelection" -> {
                 ToggleDsoSelectionOptimizerEvent event = new ToggleDsoSelectionOptimizerEvent(this, automaticMode, id);
                 applicationEventPublisher.publishEvent(event);
+                chargingPointService.updateToggleOptimizer(id, "DSOSelection", automaticMode);
             }
             case "energyMix" -> {
                 ToggleEnergyMixOptimizerEvent event = new ToggleEnergyMixOptimizerEvent(this, id, automaticMode);
                 applicationEventPublisher.publishEvent(event);
+                chargingPointService.updateToggleOptimizer(id, "EnergyMix", automaticMode);
             }
             case "price" -> {
                 TogglePriceOptimizerEvent event = new TogglePriceOptimizerEvent(this, automaticMode, id);
                 applicationEventPublisher.publishEvent(event);
+                chargingPointService.updateToggleOptimizer(id, "Price", automaticMode);
             }
             default -> throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the optimizer type is not recognized");
         }
@@ -213,7 +242,7 @@ public class ChargingPointsManager {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "socket not found");
         }
         SocketAvailabilityEvent socketAvailabilityEvent = new SocketAvailabilityEvent(this,
-                socketAvailabilityDTO, id, socketId);
+                socketAvailabilityDTO, chargingPointOptional.get().getCpId(), socketId);
         applicationEventPublisher.publishEvent(socketAvailabilityEvent);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

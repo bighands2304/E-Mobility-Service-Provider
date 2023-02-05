@@ -120,7 +120,6 @@ export const MyList3Button = ({
   p2gen,
 }) => {
   let sortedData;
-  console.log("onS " + onSubmit);
 
   if (sortByFavourite) {
     sortedData = data.sort((a, b) => {

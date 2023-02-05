@@ -1,11 +1,13 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.authManager;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.server.ResponseStatusException;
@@ -13,6 +15,7 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dto
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.CPORegistrationDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.ChangePasswordDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.CPO;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.CPOService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.registrationManager.RegistrationManager;
 
 import java.util.Map;
@@ -26,21 +29,17 @@ class LoginManagerTest {
     LoginManager loginManager;
     @Autowired
     RegistrationManager registrationManager;
+    @Autowired
+    CPOService cpoService;
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void setup() {
-        try {
-            CPORegistrationDTO cpoRegistrationDTO = new CPORegistrationDTO();
-            cpoRegistrationDTO.setCpoCode("test login");
-            cpoRegistrationDTO.setIban("test iban");
-            cpoRegistrationDTO.setPassword("test");
-            registrationManager.registerCPO(cpoRegistrationDTO);
-        } catch (ResponseStatusException e) {
-            // 400 = cpo already present
-            if (e.getStatusCode().value() != 400) {
-                Assertions.fail();
-            }
-        }
+        CPO cpo = new CPO();
+        cpo.setCpoCode("test login");
+        cpo.setPassword(passwordEncoder.encode("test"));
+        cpoService.insertCPO(cpo);
     }
 
     @Test
@@ -51,5 +50,10 @@ class LoginManagerTest {
         ResponseEntity<Map<String, Object>> response = loginManager.login(cpoLoginDTO);
         Assertions.assertEquals(201, response.getStatusCode().value());
         Assertions.assertNotNull(Objects.requireNonNull(response.getBody()).get("jwt"));
+    }
+
+    @AfterEach
+    void teardown() {
+        cpoService.deleteCpoByCode("test login");
     }
 }
