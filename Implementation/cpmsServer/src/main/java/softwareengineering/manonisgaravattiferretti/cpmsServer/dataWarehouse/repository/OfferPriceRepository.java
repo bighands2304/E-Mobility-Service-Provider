@@ -32,7 +32,7 @@ public interface OfferPriceRepository extends CassandraRepository<OfferPrice, Di
             "ALLOW FILTERING")
     List<OfferPriceByYearMonth> findBetweenGroupByYearAndMonth(String cpId, String dsoId, LocalDateTime dateFrom, LocalDateTime dateTo);
 
-    @Query("SELECT AVG(price) AS mean_price FROM energy_consumption " +
+    @Query("SELECT AVG(price) AS mean_price FROM offer_price " +
             "WHERE cp_id = ?0 AND dso_id = ?1 AND datetime >= ?2 AND datetime <= ?3" +
             "ALLOW FILTERING")
     double getMeanPrice(String cpId, String dsoId, LocalDateTime dateFrom, LocalDateTime dateTo);

@@ -66,7 +66,8 @@ public class DSOOfferService {
         dsoOfferRepository.insert(offers);
     }
 
-    public void registerDso(String dsoId, String cpId, String dsoToken, String dsoUrl, String companyName, String cpoToken) {
+    public void registerDso(String dsoId, String cpId, String dsoToken, String dsoUrl, String companyName,
+                            String cpoToken, String chargingPointInternalId) {
         DSOOffer dsoOffer = new DSOOffer();
         dsoOffer.setDsoId(dsoId);
         dsoOffer.setDsoUrl(dsoUrl);
@@ -74,6 +75,7 @@ public class DSOOfferService {
         dsoOffer.setCpoToken(cpoToken);
         dsoOffer.setCompanyName(companyName);
         dsoOffer.setChargingPointId(cpId);
+        dsoOffer.setChargingPointInternalId(chargingPointInternalId);
         dsoOffer.setValid(false);
         dsoOffer.setInUse(false);
         dsoOffer.setAvailableTimeSlot(new OfferTimeSlot(LocalTime.MIN, LocalTime.MAX));
