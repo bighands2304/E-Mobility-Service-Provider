@@ -44,7 +44,9 @@ public class Reservation {
             return "ENDED";
         }else if (sessionId!=null){
             return "ACTIVE";
-        }else{
+        }else if(expiryDate.isBefore(LocalDateTime.now())){
+            return "EXPIRED";
+        }else {
             return "RESERVED";
         }
     }
