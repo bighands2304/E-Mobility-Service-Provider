@@ -3,7 +3,6 @@ package softwareEngineering.ManoniSgaravattiFerretti.emspServer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -13,7 +12,6 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.AuthManager.LoginManager;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Model.User;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Service.UserService;
 
@@ -25,20 +23,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = RegistrationManager.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class})
 class RegistrationManagerTest {
-
     @Autowired
     private MockMvc mockMvc;
-
-    @MockBean
-    private LoginManager mockLoginManager;
-
     @MockBean
     private UserService mockUserService;
     @MockBean
     private PasswordEncoder mockPasswordEncoder;
-
-    @Value("${emsp.path}")
-    private String emspPath;
 
     @Test
     void testRegister() throws Exception {
