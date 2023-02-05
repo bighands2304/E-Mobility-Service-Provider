@@ -7,13 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.server.ResponseStatusException;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.CPOLoginDTO;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.CPORegistrationDTO;
-import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.ChangePasswordDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.CPO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.CPOService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.registrationManager.RegistrationManager;
@@ -50,6 +46,14 @@ class LoginManagerTest {
         ResponseEntity<Map<String, Object>> response = loginManager.login(cpoLoginDTO);
         Assertions.assertEquals(201, response.getStatusCode().value());
         Assertions.assertNotNull(Objects.requireNonNull(response.getBody()).get("jwt"));
+    }
+
+    @Test
+    void login_invalid() {
+        CPOLoginDTO cpoLoginDTO = new CPOLoginDTO();
+        cpoLoginDTO.setCpoCode("test login");
+        cpoLoginDTO.setPassword("wrong password");
+        Assertions.assertThrows(AccessDeniedException.class, () -> loginManager.login(cpoLoginDTO));
     }
 
     @AfterEach

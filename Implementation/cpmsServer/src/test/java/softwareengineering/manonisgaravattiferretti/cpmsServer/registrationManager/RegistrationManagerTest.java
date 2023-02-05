@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.CPORegistrationDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.CPOService;
 
+import java.lang.module.ResolutionException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -31,5 +33,14 @@ class RegistrationManagerTest {
         ResponseEntity<?> response = registrationManager.registerCPO(cpoRegistrationDTO);
         Assertions.assertEquals(201, response.getStatusCode().value());
         cpoService.deleteCpoByCode("test cpo");
+    }
+
+    @Test
+    void registerCPO_invalid() {
+        CPORegistrationDTO cpoRegistrationDTO = new CPORegistrationDTO();
+        cpoRegistrationDTO.setCpoCode("test cpo");
+        cpoRegistrationDTO.setIban("test iban");
+        cpoRegistrationDTO.setPassword(null);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> registrationManager.registerCPO(cpoRegistrationDTO));
     }
 }
