@@ -43,7 +43,7 @@ public class EnergyMixOptimizer {
         this.applicationEventPublisher = applicationEventPublisher;
     }
 
-    @Scheduled(fixedRate = 14400000)
+    @Scheduled(fixedRate = 1800000)
     public void optimize() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime oneWeekAgo = now.minus(1, ChronoUnit.WEEKS);
@@ -82,7 +82,7 @@ public class EnergyMixOptimizer {
         logger.info("Optimized cp with id = {} with batteryPercent = {}", cpId, batteriesPercent);
     }
 
-    @Scheduled(fixedRate = 600000000)
+    @Scheduled(fixedRate = 7200000)
     public void fetchChargingPointsPeriodically() {
         List<ChargingPoint> chargingPoints = chargingPointService.findAll();
         for (ChargingPoint chargingPoint: chargingPoints) {

@@ -42,7 +42,7 @@ public class PriceOptimizer {
         this.applicationEventPublisher = applicationEventPublisher;
     }
 
-    @Scheduled(fixedRate = 14400000)
+    @Scheduled(fixedRate = 1800000)
     public void optimize() {
         for (String cpId: optimizerSet.keySet()) {
             if (optimizerSet.get(cpId)) {
@@ -117,7 +117,7 @@ public class PriceOptimizer {
         return addTariffDTO;
     }
 
-    @Scheduled(fixedRate = 600000000)
+    @Scheduled(fixedRate = 7200000)
     public void fetchChargingPointsPeriodically() {
         List<ChargingPoint> chargingPoints = chargingPointService.findAll();
         for (ChargingPoint chargingPoint: chargingPoints) {
