@@ -1,5 +1,7 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.emspUpdateSender;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -11,10 +13,13 @@ import java.time.Duration;
 
 @Component
 public class OcpiSessionSender {
+    private final Logger logger = LoggerFactory.getLogger(OcpiSessionSender.class);
+
     @Async
     public void putSession(ChargingSessionDTO chargingSessionDTO, EmspDetails emspDetails) {
         WebClient.RequestBodySpec requestBodySpec = OcpiHeaderBuilder.buildHeader(emspDetails,
                 HttpMethod.PUT, "sessions/" + chargingSessionDTO.getSessionId());
+
         sendSession(requestBodySpec, chargingSessionDTO);
     }
 

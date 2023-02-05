@@ -33,4 +33,12 @@ public class SocketService {
     public void updateSocketStatus(String cpInternalId, Integer socketId, String status) {
         socketRepository.updateSocketStatus(cpInternalId, socketId, status);
     }
+
+    public Socket save(Socket socket) {
+        return socketRepository.save(socket);
+    }
+
+    public void removeSocket(String id) {
+        socketRepository.deleteById(id);
+    }
 }

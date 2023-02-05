@@ -17,6 +17,7 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.dataWarehouse.ser
 import softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager.events.EnergyMixOptimizerEvent;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,7 @@ public class EnergyMixOptimizer {
         this.applicationEventPublisher = applicationEventPublisher;
     }
 
-    @Scheduled(fixedRate = 60000000)
+    @Scheduled(fixedRate = 14400000)
     public void optimize() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime oneWeekAgo = now.minus(1, ChronoUnit.WEEKS);
@@ -55,15 +56,21 @@ public class EnergyMixOptimizer {
 
     @Async
     void optimizeCp(String cpId, LocalDateTime oneWeekAgo, LocalDateTime now) {
+        logger.info("Starting energy mix optimization process for cp with id = " + cpId);
         Optional<ChargingPoint> chargingPointOptional = chargingPointService.findChargingPointByInternalId(cpId);
         if (chargingPointOptional.isEmpty() || chargingPointOptional.get().getBatteries().size() == 0) return;
         List<Battery> batteries = chargingPointOptional.get().getBatteries();
-        double meanConsumption = energyConsumptionService.findMeanConsumption(cpId, oneWeekAgo, now);
-        Optional<DSOOffer> currentOffer = dsoOfferService.findCurrentCpOffer(cpId, true);
-        if (currentOffer.isEmpty()) return;
-        double notFulfilledConsumption = meanConsumption - currentOffer.get().getCapacity();
-        if (notFulfilledConsumption <= 0.0) return;
-        double batteriesPercent = (notFulfilledConsumption / batteries.size()) / currentOffer.get().getCapacity();
+        double meanConsumption = energyConsumptionService.findMeanConsumption(chargingPointOptional.get().getCpId(), oneWeekAgo, now);
+        LocalTime currentTime = LocalTime.now();
+        List<DSOOffer> currentOffers = dsoOfferService.findCurrentCpOffers(cpId)
+                .stream().filter(dsoOffer -> dsoOffer.getAvailableTimeSlot().getStartTime().isBefore(currentTime) &&
+                        dsoOffer.getAvailableTimeSlot().getEndTime().isAfter(currentTime)).toList();
+        Optional<DSOOffer> bestConsumptionOffer = currentOffers.stream().reduce((offer1, offer2) ->
+                (offer1.getCapacity() < offer2.getCapacity()) ? offer2 : offer1);
+        if (bestConsumptionOffer.isEmpty()) return;
+        double notFulfilledConsumption = meanConsumption - bestConsumptionOffer.get().getCapacity();
+        if (notFulfilledConsumption < 0.0) return;
+        double batteriesPercent = notFulfilledConsumption / (meanConsumption * batteries.size());
         for (Battery battery: batteries) {
             IncludeBatteryDTO includeBatteryDTO = new IncludeBatteryDTO();
             includeBatteryDTO.setPercent(batteriesPercent);

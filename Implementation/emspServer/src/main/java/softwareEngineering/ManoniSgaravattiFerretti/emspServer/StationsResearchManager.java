@@ -1,6 +1,5 @@
 package softwareEngineering.ManoniSgaravattiFerretti.emspServer;
 
-import com.google.gson.*;
 import org.apache.catalina.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,16 +9,10 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointData
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Model.Tariff;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.ChargingPointService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.ChargingPointDataModel.Service.TariffService;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.ChargingPointDTO;
 import org.springframework.beans.BeanUtils;
-import softwareEngineering.ManoniSgaravattiFerretti.emspServer.OcpiDTOs.ChargingPointUserDTO;
+import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDTOs.ChargingPointUserDTO;
 
 
-import java.lang.reflect.Type;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 

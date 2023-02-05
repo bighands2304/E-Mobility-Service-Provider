@@ -12,11 +12,9 @@ import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Ser
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Service.UserVehicleService;
 import softwareEngineering.ManoniSgaravattiFerretti.emspServer.UserDataModel.Service.VehicleService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/user")
@@ -136,6 +134,7 @@ public class UserDataController {
     public ResponseEntity<?> getReservations(@PathVariable String userId){
         //Collect all the reservations(Active, Ended, and Deleted)
         List<Reservation> reservations = reservationService.getReservationsByUserId(Long.parseLong(userId));
+
         //Return the reservations in the response
         return ResponseEntity.ok(reservations);
     }

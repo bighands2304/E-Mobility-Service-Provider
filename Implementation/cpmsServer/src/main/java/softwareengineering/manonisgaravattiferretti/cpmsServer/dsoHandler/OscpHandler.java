@@ -49,16 +49,4 @@ public class OscpHandler {
         // todo: update cassandra when done
         return ResponseEntity.ok().build();
     }
-
-    public void sendAdjustCapacityForecast() {
-
-    }
-
-    public void sendGroupCapacityComplianceError() {
-
-    }
-
-    public void sendUpdateGroupMeasurements() {
-
-    }
 }

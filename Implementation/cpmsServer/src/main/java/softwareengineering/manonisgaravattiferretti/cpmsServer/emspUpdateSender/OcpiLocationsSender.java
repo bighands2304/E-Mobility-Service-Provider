@@ -50,8 +50,6 @@ public class OcpiLocationsSender {
         }
     }
 
-    //todo: put socket (if needed)
-
     @Async
     public void patchSocket(EmspDetails emspDetails, EmspSocketDTO socketDTO, String cpId, boolean retry) {
         try {

@@ -14,7 +14,7 @@ public class AddChargingPointDTO {
     private Double latitude;
     private Double longitude;
     private List<Tariff> tariffs;
-    private List<AddChargingPointSocketDTO> cpSockets;
+    private List<AddChargingPointSocketDTO> sockets;
     private List<Battery> batteries;
     private String authenticationKey;
     private String connectionUrl;

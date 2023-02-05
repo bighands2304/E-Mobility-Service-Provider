@@ -57,6 +57,9 @@ public class EntityFromDTOConverter {
         chargingSessionDTO.setReservationId(reservation.getReservationIdEmsp());
         chargingSessionDTO.setChargingPointId(reservation.getSocket().getCpId());
         chargingSessionDTO.setKwh(reservation.getEnergyAmount());
+        chargingSessionDTO.setSocketId(reservation.getSocket().getSocketId());
+        chargingSessionDTO.setStartDateTime(reservation.getStartTime());
+        chargingSessionDTO.setEndDateTime(reservation.getEndTime());
         return chargingSessionDTO;
     }
 
@@ -77,7 +80,7 @@ public class EntityFromDTOConverter {
     public static ChargingPoint fromAddCpDTOToCp(AddChargingPointDTO addChargingPointDTO, String cpoCode) {
         ChargingPoint chargingPoint = new ChargingPoint();
         BeanUtils.copyProperties(addChargingPointDTO, chargingPoint);
-        List<Socket> sockets = addChargingPointDTO.getCpSockets().stream()
+        List<Socket> sockets = addChargingPointDTO.getSockets().stream()
                 .map(socketDto -> {
                     Socket socket = new Socket();
                     BeanUtils.copyProperties(socketDto, socket);

@@ -51,6 +51,17 @@ class RegistrationManagerTest {
                         "\"surname\":\"Surname\"" +
                     "}";
 
+        // Run the test
+        final MockHttpServletResponse response = mockMvc.perform(post("/register")
+                        .with(csrf())
+                        .content(body).contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn().getResponse();
+
+        // Verify the results
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).contains("\"enabled\":true");
+
         User user = new User();
         user.setUsername("Username");
         user.setEmail("email@gmail.com");
@@ -58,16 +69,6 @@ class RegistrationManagerTest {
         user.setName("Name");
         user.setSurname("Surname");
 
-        // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(post("/register")
-                        .with(csrf())
-                        .content(body).contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-
-        // Verify the results
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.getContentAsString()).contains("\"enabled\":true");
 
         verify(mockUserService).saveUser(user);
 

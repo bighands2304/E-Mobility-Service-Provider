@@ -76,6 +76,17 @@ public class LocationsReceiver {
         cp.setLongitude(updatedCp.getLongitude());
         cp.setLastUpdate(updatedCp.getLastUpdated());
 
+        cp.setSockets(new ArrayList<>());
+        for (SocketDTO sDTO: updatedCp.getSockets()) {
+            Socket s = new Socket();
+            s.setSocketId(sDTO.getSocketId().toString());
+            s.setAvailability(sDTO.getAvailability());
+            s.setType(sDTO.getType());
+            s.setStatus(sDTO.getStatus());
+            s.setLastUpdate(sDTO.getLastUpdate());
+            cp.addSocket(s);
+        }
+
         cpService.save(cp);
 
         return ResponseEntity.noContent().build();
@@ -87,10 +98,12 @@ public class LocationsReceiver {
         Socket socket = chargingPoint.getSockets().stream().filter(socket1 -> socket1.getSocketId().equals(socket_id)).toList().get(0);
         chargingPoint.removeSocket(socket);
 
-        socket.setType(updatedSocket.getType());
-        socket.setStatus(updatedSocket.getStatus());
-        socket.setLastUpdate(updatedSocket.getLastUpdate());
-        socket.setAvailability(updatedSocket.getAvailability());
+        Socket newSocket = new Socket();
+        newSocket.setSocketId(socket_id);
+        newSocket.setType(updatedSocket.getType());
+        newSocket.setStatus(updatedSocket.getStatus());
+        newSocket.setLastUpdate(updatedSocket.getLastUpdate());
+        newSocket.setAvailability(updatedSocket.getAvailability());
 
         chargingPoint.addSocket(socket);
         cpService.save(chargingPoint);

@@ -120,8 +120,9 @@ public class PriceManager implements ApplicationListener<TogglePriceOptimizerEve
                          return fakeTariff;
                     });
         }
-        logger.info("The cost of the session is: " + bestTariff.getPrice() * reservation.get().getEnergyAmount());
-        return bestTariff.getPrice() * reservation.get().getEnergyAmount();
+        double energyAmount = (reservation.get().getEnergyAmount() == null) ? 0.0 : reservation.get().getEnergyAmount();
+        logger.info("The cost of the session is: " + bestTariff.getPrice() * energyAmount);
+        return bestTariff.getPrice() * energyAmount;
     }
 
     private boolean matches(SpecialOffer specialOffer, Reservation reservation, long sessionDuration) {

@@ -61,7 +61,7 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
-    private List<ActiveReservation> reservations = new ArrayList<>();
+    private List<Reservation> reservations = new ArrayList<>();
 
     private boolean enable;
     private boolean credentialNonExpired;

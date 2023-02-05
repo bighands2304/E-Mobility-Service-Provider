@@ -116,6 +116,8 @@ public class LocationsSender {
         newCp.setLongitude(cpResponse.getLongitude());
         newCp.setLastUpdate(cpResponse.getLastUpdated());
         newCp.setCpo(cp.getCpo());
+
+        newCp.setSockets(new ArrayList<>());
         for (SocketDTO s: cpResponse.getSockets()) {
             Socket newSocket = new Socket();
 

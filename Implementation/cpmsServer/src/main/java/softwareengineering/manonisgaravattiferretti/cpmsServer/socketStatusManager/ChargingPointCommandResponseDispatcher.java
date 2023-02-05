@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.CommandResultType;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.dtos.ReserveNowDTO;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.EmspDetails;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.Reservation;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.Socket;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.ReservationService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.SocketService;
@@ -16,6 +17,11 @@ import softwareengineering.manonisgaravattiferretti.cpmsServer.cpHandler.message
 import softwareengineering.manonisgaravattiferretti.cpmsServer.emspUpdateSender.OcpiCommandSender;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.Optional;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -53,6 +59,26 @@ public class ChargingPointCommandResponseDispatcher {
             commandResultType = CommandResultType.TIMEOUT;
         }
         ocpiCommandSender.sendCommandResult(emspDetails, reserveNowDTO.getReservationId(), commandResultType, "RESERVE_NOW");
+        if (commandResultType == CommandResultType.ACCEPTED) {
+            checkExpirationTime(internalReservationId, reserveNowDTO.getExpiryDate());
+        }
+    }
+
+    private void checkExpirationTime(Long reservationInternalId, LocalDateTime expiryTime) {
+        Date expiryDate = Date.from(expiryTime.atZone(ZoneId.systemDefault()).toInstant());
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Optional<Reservation> reservation = reservationService.findReservationByInternalId(reservationInternalId);
+                reservation.ifPresent(res -> {
+                    // expiry date is reached, if the status is reserved then the reservation
+                    // is invalid since it has not already started
+                    if (res.getStatus().equals("RESERVED")) {
+                        reservationService.updateReservationStatus(reservationInternalId, "INVALID", LocalDateTime.now());
+                    }
+                });
+            }
+        }, expiryDate);
     }
 
     @Async
