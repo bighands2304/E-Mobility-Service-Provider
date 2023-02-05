@@ -1,14 +1,14 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
-import { RestaurantsNavigator } from "./restaurants.navigator";
+import { CPsNavigator } from "./cps.navigator";
 import { MapScreen } from "../../features/map/screen/map.screen";
 import { SettingsNavigator } from "./settings.navigator";
 import { VehicleNavigator } from "./vehicle.navigator";
 import { SessionsScreen } from "../../features/sessions/screen/session.screen";
 
 import { FavouritesContextProvider } from "../../services/favourites/favourites.context";
-import { RestaurantsContextProvider } from "../../services/restaurants/restaurants.context";
+import { CPsContextProvider } from "../../services/cps/cps.context";
 import { LocationContextProvider } from "../../services/location/location.context";
 import { VehicleContextProvider } from "../../services/vehicles/mock/vehcile.context";
 import { ReservationContextProvider } from "../../services/reservation/reservation.context";
@@ -40,17 +40,17 @@ export const AppNavigator = () => (
   <VehicleContextProvider>
     <FavouritesContextProvider>
       <LocationContextProvider>
-        <RestaurantsContextProvider>
+        <CPsContextProvider>
           <ReservationContextProvider>
             <Tab.Navigator screenOptions={createScreenOptions}>
               <Tab.Screen name="Vehicles" component={VehicleNavigator} />
-              <Tab.Screen name="Stations" component={RestaurantsNavigator} />
+              <Tab.Screen name="Stations" component={CPsNavigator} />
               <Tab.Screen name="Map" component={MapScreen} />
               <Tab.Screen name="Sessions" component={SessionsScreen} />
               <Tab.Screen name="Settings" component={SettingsNavigator} />
             </Tab.Navigator>
           </ReservationContextProvider>
-        </RestaurantsContextProvider>
+        </CPsContextProvider>
       </LocationContextProvider>
     </FavouritesContextProvider>
   </VehicleContextProvider>

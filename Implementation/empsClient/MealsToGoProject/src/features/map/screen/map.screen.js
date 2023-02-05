@@ -3,7 +3,7 @@ import { LocationContext } from "../../../services/location/location.context";
 import MapView from "react-native-maps";
 import { View } from "react-native";
 import styled from "styled-components/native";
-import { RestaurantsContext } from "../../../services/restaurants/restaurants.context";
+import { CPsContext } from "../../../services/cps/cps.context";
 import { Search } from "../components/search.component";
 import { Marker, Callout } from "react-native-maps";
 import { FavouritesContext } from "../../../services/favourites/favourites.context";
@@ -15,7 +15,7 @@ const Map = styled(MapView)`
 `;
 export const MapScreen = ({ navigation }) => {
   const { location } = useContext(LocationContext);
-  const { restaurants = [] } = useContext(RestaurantsContext);
+  const { cps } = useContext(CPsContext);
   const { socketF, favourite } = useContext(FavouritesContext);
   const [latDelta, setLatDelta] = useState(0);
   let socketTypeFav = "FAST";
@@ -44,42 +44,51 @@ export const MapScreen = ({ navigation }) => {
           longitudeDelta: 0.02,
         }}
       >
-        {restaurants.map((restaurant) => {
+        {cps.map((cp) => {
           let pinColor = colorDarkMap;
+          console.log("AAAA");
 
-          for (let i = 0; i < restaurant.sockets.length; i++) {
+          console.log("AAAA");
+          console.log("AAAA");
+          console.log("AAAA");
+          console.log("AAAA");
+          console.log("AAAA");
+          console.log("AAAA");
+          console.log(JSON.stringify(cp));
+
+          for (let i = 0; i < cp.sockets.length; i++) {
             if (
-              restaurant.sockets[i].type === socketTypeFav &&
-              restaurant.sockets[i].availability === "AVAILABLE" &&
-              restaurant.sockets[i].status === "AVAILABLE"
+              cp.sockets[i].type === socketTypeFav &&
+              cp.sockets[i].availability === "AVAILABLE" &&
+              cp.sockets[i].status === "AVAILABLE"
             ) {
               pinColor = colorGreenMap;
               break;
             } else if (
-              restaurant.sockets[i].type === socketTypeFav &&
-              restaurant.sockets[i].availability === "AVAILABLE"
+              cp.sockets[i].type === socketTypeFav &&
+              cp.sockets[i].availability === "AVAILABLE"
             ) {
               pinColor = colorRedMap;
             }
           }
           return (
             <Marker
-              key={restaurant.name}
-              title={restaurant.name}
+              key={cp.name}
+              title={cp.name}
               pinColor={pinColor}
               coordinate={{
-                latitude: restaurant.latitude,
-                longitude: restaurant.longitude,
+                latitude: cp.latitude,
+                longitude: cp.longitude,
               }}
             >
               <Callout
                 onPress={() =>
-                  navigation.navigate("RestaurantDetail", {
-                    restaurant,
+                  navigation.navigate("CPDetail", {
+                    cp,
                   })
                 }
               >
-                <MapCallout restaurant={restaurant} />
+                <MapCallout cp={cp} />
               </Callout>
             </Marker>
           );

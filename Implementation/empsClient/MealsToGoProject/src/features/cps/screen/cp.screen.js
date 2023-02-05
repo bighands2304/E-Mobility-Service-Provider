@@ -4,13 +4,13 @@ import { TouchableOpacity } from "react-native";
 import styled from "styled-components/native";
 import { Spacer } from "../../../components/spacer/spacer.component";
 import { SafeArea } from "../../../components/utility/safe-area.component";
-import { RestaurantsContext } from "../../../services/restaurants/restaurants.context";
+import { CPsContext } from "../../../services/cps/cps.context";
 import { FavouritesContext } from "../../../services/favourites/favourites.context";
 import { FadeInView } from "../../../components/animations/fade.animation";
 import { Search } from "../component/search.component";
-import { RestaurantInfoCard } from "../component/restaurant-info-card.component";
+import { CPInfoCard } from "../component/cp-info-card.component";
 import { FavouritesBar } from "../../../components/favorites/favourites-bar.component";
-import { RestaurantList } from "../component/reastaurant-list,styles";
+import { CPList } from "../component/cp-list,styles";
 
 const Loading = styled(ActivityIndicator)`
   margin-left: -25px;
@@ -20,8 +20,8 @@ const LoadingContainer = styled.View`
   top: 50%;
   left: 50%;
 `;
-export const RestaurantsScreen = ({ navigation }) => {
-  const { isLoading, restaurants } = useContext(RestaurantsContext);
+export const CPScreen = ({ navigation }) => {
+  const { isLoading, cps } = useContext(CPsContext);
   const [isToggled, setIsToggled] = useState(false);
   const { favourites } = useContext(FavouritesContext);
 
@@ -42,20 +42,20 @@ export const RestaurantsScreen = ({ navigation }) => {
           onNavigate={navigation.navigate}
         />
       )}
-      <RestaurantList
-        data={restaurants}
+      <CPList
+        data={cps}
         renderItem={({ item }) => {
           return (
             <TouchableOpacity
               onPress={() =>
-                navigation.navigate("RestaurantDetail", {
-                  restaurant: item,
+                navigation.navigate("CPDetail", {
+                  cp: item,
                 })
               }
             >
               <Spacer position="bottom" size="large">
                 <FadeInView>
-                  <RestaurantInfoCard restaurant={item} />
+                  <CPInfoCard cp={item} />
                 </FadeInView>
               </Spacer>
             </TouchableOpacity>

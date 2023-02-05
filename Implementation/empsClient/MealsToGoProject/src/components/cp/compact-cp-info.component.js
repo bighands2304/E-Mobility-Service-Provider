@@ -25,17 +25,20 @@ const Item = styled.View`
 
 const isAndroid = Platform.OS === "android";
 
-export const CompactRestaurantInfo = ({ restaurant, isMap }) => {
+export const CPInfo = ({ cp, isMap }) => {
   const Image = isAndroid && isMap ? CompactWebview : CompactImage;
+
+  console.log("cp in cp info card" + JSON.stringify(cp));
+  console.log("lfsekmfsl");
 
   return (
     <Item>
-      <Image source={{ uri: restaurant.photo[0] }} />
+      <Image source={{ uri: cp.photo[0] }} />
       <Text center variant="label" numberOfLines={3}>
-        {restaurant.name}
+        {cp.name}
       </Text>
       <Text center variant="caption" numberOfLines={3}>
-        {restaurant.address}
+        {cp.address}
       </Text>
     </Item>
   );

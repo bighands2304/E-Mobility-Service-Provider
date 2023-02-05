@@ -1,7 +1,7 @@
 import React from "react";
 import customFetch from "../../utils/axios";
 
-export const restaurantsRequest = async (location, jwt) => {
+export const cpsRequest = async (location, jwt) => {
   const latS = location.result.viewport.southwest.lat;
   const lonS = location.result.viewport.southwest.lng;
   const distS =

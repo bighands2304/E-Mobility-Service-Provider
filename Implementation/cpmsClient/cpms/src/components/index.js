@@ -1,13 +1,10 @@
 import BigSidebar from "./BigSidebar";
-import ChartsContainer from "./ChartsContainer";
 import FormRow from "./FormRow";
 import FormRowSelect from "./FormRowSelect";
 import CPsContainer from "./CPsContainer";
 import Logo from "./Logo";
 import Navbar from "./Navbar";
-import SearchContainer from "./SearchContainer";
 import SmallSidebar from "./SmallSidebar";
-import StatsContainer from "./StatsContainer";
 import FormRowSelectMultiple from "./FormRowMultiple";
 
 export {
@@ -18,8 +15,5 @@ export {
   BigSidebar,
   FormRowSelect,
   CPsContainer,
-  SearchContainer,
-  StatsContainer,
-  ChartsContainer,
   FormRowSelectMultiple,
 };

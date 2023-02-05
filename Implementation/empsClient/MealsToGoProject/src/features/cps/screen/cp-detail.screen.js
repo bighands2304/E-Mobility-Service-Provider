@@ -3,26 +3,26 @@ import { ScrollView } from "react-native";
 import { List } from "react-native-paper";
 import { MyList3Button } from "../../../components/smartList/smartlist.component";
 
-import { RestaurantInfoCard } from "../component/restaurant-info-card.component";
+import { CPInfoCard } from "../component/cp-info-card.component";
 
 import { SafeArea } from "../../../components/utility/safe-area.component";
 import { socketTariff } from "../../../components/utility/socketTariffextractor";
 import { ReservationContext } from "../../../services/reservation/reservation.context";
 
-export const RestaurantDetailScreen = ({ navigation, route }) => {
+export const CPDetailScreen = ({ navigation, route }) => {
   const { doReservation } = useContext(ReservationContext);
 
-  const { restaurant } = route.params;
+  const { cp } = route.params;
 
-  const newTariffSocket = socketTariff(restaurant);
+  const newTariffSocket = socketTariff(cp);
 
   return (
     <SafeArea>
-      <RestaurantInfoCard restaurant={restaurant} />
+      <CPInfoCard cp={cp} />
       <MyList3Button
         onSubmit={doReservation}
         p1spec="socketId"
-        p2gen={restaurant.cpId}
+        p2gen={cp.cpId}
         idField="socketId"
         navigation={navigation}
         onPressDestination="Reserve"

@@ -30,8 +30,6 @@ const Profile = () => {
   };
 
   const handleChange = (e) => {
-    console.log(e.target.name + "  target name ");
-    console.log(e.target.value + "  target value");
     const name = e.target.name;
     const value = e.target.value;
     setpassword({ ...password, [name]: value });

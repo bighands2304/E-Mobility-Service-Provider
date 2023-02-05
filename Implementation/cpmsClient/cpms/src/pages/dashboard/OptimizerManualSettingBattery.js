@@ -10,8 +10,7 @@ const OptimizerManualSettingsBattery = () => {
 
   const battery = location.state.battery;
   const cp = location.state.cp;
-  console.log("battery obtained" + JSON.stringify(battery));
-  console.log("cp obtained" + JSON.stringify(cp));
+
   const [values, setValues] = useState({ battery });
   console.log("values obtained" + JSON.stringify(values));
   const handleInputChange = (e) => {

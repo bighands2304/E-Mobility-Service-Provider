@@ -1,7 +1,5 @@
 import React from "react";
 
-import { CompactRestaurantInfo } from "../../../components/restaurant/compact-restaurant-info.component";
+import { CPInfo } from "../../../components/cp/compact-cp-info.component";
 
-export const MapCallout = ({ restaurant }) => (
-  <CompactRestaurantInfo isMap restaurant={restaurant} />
-);
+export const MapCallout = ({ cp }) => <CPInfo isMap cp={cp} />;
