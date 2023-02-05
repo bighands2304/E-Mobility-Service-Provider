@@ -30,7 +30,7 @@ const AddJob = () => {
 
     // tariff part
     tariffId: "",
-    socketTypeTariff: ["FAST"],
+    socketTypeTariff: "FAST",
     startDate: "",
     endDate: "",
     price: 0.0,
@@ -324,7 +324,7 @@ const AddJob = () => {
           <FormRowSelect
             name="socketTypeTariff"
             value={values.socketTypeTariff}
-            handleChange={handleMultiple}
+            handleChange={handleInput}
             list={["FAST", "RAPID", "SLOW"]}
             isMulti={true}
           />

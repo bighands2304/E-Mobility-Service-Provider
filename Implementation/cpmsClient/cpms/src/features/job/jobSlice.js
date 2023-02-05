@@ -20,7 +20,7 @@ const jobSlice = createSlice({
       })
       .addCase(addCpT.fulfilled, (state) => {
         state.isLoading = false;
-        toast.success("Job Created");
+        toast.success("CP Added");
       })
       .addCase(addCpT.rejected, (state, { payload }) => {
         state.isLoading = false;
