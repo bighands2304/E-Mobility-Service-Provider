@@ -1,5 +1,5 @@
 import { FlatList, View, StyleSheet, Button } from "react-native";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { SafeArea } from "../../../components/utility/safe-area.component";
 import { Text } from "../../../components/typography/text.component";
 import { ReservationContext } from "../../../services/reservation/reservation.context";
@@ -11,11 +11,19 @@ import {
 import { Spacer } from "../../../components/spacer/spacer.component";
 
 export const SessionsScreen = () => {
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  const fun = async () => {
+    await delay(5000);
+    RetrieveReservation();
+  };
+
   const {
     reservations,
     doReservationDelete,
     doStartChargingProcess,
     doEndSession,
+    RetrieveReservation,
   } = useContext(ReservationContext);
 
   const sortedReservations = reservations
@@ -85,18 +93,27 @@ export const SessionsScreen = () => {
               {item.type === "RESERVED" && (
                 <>
                   <RedButton
-                    onPress={() => doReservationDelete(item.id)}
+                    onPress={() => {
+                      doReservationDelete(item.id);
+                      fun();
+                    }}
                     title={"Delete"}
                   />
                   <GreenButton
-                    onPress={() => doStartChargingProcess(item.id)}
+                    onPress={() => {
+                      doStartChargingProcess(item.id);
+                      fun();
+                    }}
                     title={"Start Charging Process"}
                   />
                 </>
               )}
               {item.type === "ACTIVE" && (
                 <RedButton
-                  onPress={() => doEndSession(item.id)}
+                  onPress={() => {
+                    doEndSession(item.id);
+                    fun();
+                  }}
                   title={"End Session"}
                 />
               )}
