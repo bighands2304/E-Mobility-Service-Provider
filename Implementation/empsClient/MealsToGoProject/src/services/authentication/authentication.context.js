@@ -50,8 +50,6 @@ export const AuthenticationContextProvider = ({ children }) => {
   ) => {
     setIsLoading(true);
     if (password !== repeatedPassword) {
-      console.log("password" + password);
-      console.log("rep" + repeatedPassword);
       setError("Error: Passwords do not match");
       return;
     }

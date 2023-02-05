@@ -18,12 +18,12 @@ export const ReservationContextProvider = ({ children }) => {
   // is just for try
   const { id, token } = useContext(AuthenticationContext);
 
-  const RetrieveReservation = (uid) => {
-    console.log("reservation r for uid ==> " + uid);
+  const RetrieveReservation = () => {
+    console.log("retrieve");
     setIsLoading(true);
     setReservations([]);
 
-    getReservationRequest(uid, token)
+    getReservationRequest(id, token)
       .then((results) => {
         setIsLoading(false);
         setReservations(results);
@@ -42,7 +42,7 @@ export const ReservationContextProvider = ({ children }) => {
       .then((results) => {
         createOnButtonAlert("Suchess", "Reservation created");
         try {
-          RetrieveReservation(id);
+          RetrieveReservation();
         } catch (error) {
           console.log(JSON.stringify(error));
         }
@@ -62,7 +62,7 @@ export const ReservationContextProvider = ({ children }) => {
       .then((results) => {
         createOnButtonAlert("Suchess", "Reservation deleted");
         try {
-          RetrieveReservation(id);
+          RetrieveReservation();
         } catch (error) {
           console.log(JSON.stringify(error));
         }
@@ -82,14 +82,14 @@ export const ReservationContextProvider = ({ children }) => {
       .then((results) => {
         createOnButtonAlert("Suchess", "Session ended Correctly");
         try {
-          RetrieveReservation(id);
+          RetrieveReservation();
         } catch (error) {
           console.log(JSON.stringify(error));
         }
         setIsLoading(false);
       })
       .catch((err) => {
-        createOnButtonAlert("An Error Occurred =(", "Retry Later");
+        createOnButtonAlert("An Error Occurred ", "Retry Later");
         console.log(JSON.stringify(err));
         setIsLoading(false);
         setError(err);
@@ -98,16 +98,13 @@ export const ReservationContextProvider = ({ children }) => {
 
   const doStartChargingProcess = async (reservationId) => {
     console.log("starting");
-    console.log("starting");
-    console.log("starting");
-    console.log("starting");
-    console.log("starting");
+
     setIsLoading(true);
     startSessionRequest(reservationId, token)
       .then((results) => {
         createOnButtonAlert("Suchess", "Reservation Start");
         try {
-          RetrieveReservation(id);
+          RetrieveReservation();
         } catch (error) {
           console.log(JSON.stringify(error));
         }
@@ -123,12 +120,10 @@ export const ReservationContextProvider = ({ children }) => {
 
   useEffect(() => {
     if (id) {
+      console.log("use effect ID");
       RetrieveReservation(id);
     }
   }, [id]);
-
-  // console.log("auid " + id);
-  //console.log("vehicles " + vehicles);
 
   return (
     <ReservationContext.Provider
@@ -140,6 +135,7 @@ export const ReservationContextProvider = ({ children }) => {
         doReservationDelete,
         doStartChargingProcess,
         doEndSession,
+        RetrieveReservation,
       }}
     >
       {children}

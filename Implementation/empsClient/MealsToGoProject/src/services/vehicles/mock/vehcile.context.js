@@ -88,12 +88,8 @@ export const VehicleContextProvider = ({ children }) => {
   useEffect(() => {
     if (id) {
       RetrieveVehciles(id);
-      // console.log("finish Retrive vehicle");
     }
   }, [id]);
-
-  // console.log("auid " + id);
-  //console.log("vehicles " + vehicles);
 
   return (
     <VehicleContext.Provider

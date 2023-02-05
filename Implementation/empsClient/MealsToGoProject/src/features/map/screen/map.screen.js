@@ -23,25 +23,16 @@ export const MapScreen = ({ navigation }) => {
     socketTypeFav = socketF;
   }
 
-  //console.log("fav =======>=>=>" + JSON.stringify(socketTypeFav));
-  //console.log("cps =======>=>=>" + JSON.stringify(restaurants));
-
-  console.log("IN map screen screen " + JSON.stringify(socketTypeFav));
-  console.log("IN map screen screen " + JSON.stringify(socketTypeFav));
-  console.log("IN map screen screen " + JSON.stringify(socketTypeFav));
-  console.log("IN map screen screen " + JSON.stringify(socketTypeFav));
-  console.log("IN map screen screen " + JSON.stringify(socketTypeFav));
   const colorDarkMap = "#000000";
   const colorRedMap = "#CF1827";
   const colorGreenMap = "#0064ff";
-  console.log("location structure " + JSON.stringify(location));
 
   useEffect(() => {
     const northeastLat = location.result.viewport.northeast.lat;
     const southwestLat = location.result.viewport.southwest.lat;
     setLatDelta(northeastLat - southwestLat);
   }, [location]);
-  console.log("location" + location);
+
   return (
     <>
       <Search />
@@ -55,18 +46,8 @@ export const MapScreen = ({ navigation }) => {
       >
         {restaurants.map((restaurant) => {
           let pinColor = colorDarkMap;
-          console.log("____");
-          console.log("____");
-          console.log("____");
-          console.log("____");
-          console.log(JSON.stringify(restaurant.name));
+
           for (let i = 0; i < restaurant.sockets.length; i++) {
-            console.log("JJJJJJ");
-            console.log(socketTypeFav);
-            console.log(restaurant.sockets[i].type);
-            console.log(restaurant.sockets[i].availability);
-            console.log(restaurant.sockets[i].status);
-            console.log("JJJJJJ");
             if (
               restaurant.sockets[i].type === socketTypeFav &&
               restaurant.sockets[i].availability === "AVAILABLE" &&
