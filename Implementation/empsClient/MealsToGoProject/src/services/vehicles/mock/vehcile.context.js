@@ -16,7 +16,6 @@ export const VehicleContextProvider = ({ children }) => {
   const [vehicles, setVehicles] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const {}
 
   // is just for try
   const { id, token } = useContext(AuthenticationContext);

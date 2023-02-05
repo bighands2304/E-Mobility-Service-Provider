@@ -55,9 +55,18 @@ export const MapScreen = ({ navigation }) => {
       >
         {restaurants.map((restaurant) => {
           let pinColor = colorDarkMap;
-
+          console.log("____");
+          console.log("____");
+          console.log("____");
+          console.log("____");
           console.log(JSON.stringify(restaurant.name));
           for (let i = 0; i < restaurant.sockets.length; i++) {
+            console.log("JJJJJJ");
+            console.log(socketTypeFav);
+            console.log(restaurant.sockets[i].type);
+            console.log(restaurant.sockets[i].availability);
+            console.log(restaurant.sockets[i].status);
+            console.log("JJJJJJ");
             if (
               restaurant.sockets[i].type === socketTypeFav &&
               restaurant.sockets[i].availability === "AVAILABLE" &&

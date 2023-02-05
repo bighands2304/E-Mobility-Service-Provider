@@ -56,32 +56,13 @@ export const startSessionRequest = async (rId, token) => {
 
 //ok?
 export const endSessionRequest = async (resId, token) => {
-  console.log("here");
-  console.log("here");
-  console.log("here");
-  console.log("here");
-  console.log("here");
-  console.log("here");
-  console.log("here");
-  console.log("here");
   const url = "/user/endSession";
   const obj = {
     reservationId: resId,
   };
-  try {
-    const customInstance = customFetch(token);
-    const resp = await customInstance.post(url, obj);
-    console.log(JSON.stringify(resp));
-    return resp;
-  } catch (err) {
-    console.log("BBBB");
-    console.log("BBBB");
-    console.log("BBBB");
-    console.log("BBBB");
-    console.log("BBBB");
-    console.log("BBBB");
-    console.log("BBBB");
-    console.log("BBBB");
-    console.log(JSON.stringify(err));
-  }
+
+  const customInstance = customFetch(token);
+  const resp = await customInstance.post(url, obj);
+  console.log(JSON.stringify(resp));
+  return resp;
 };

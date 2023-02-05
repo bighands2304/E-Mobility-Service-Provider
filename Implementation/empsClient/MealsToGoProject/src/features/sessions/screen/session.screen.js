@@ -4,6 +4,11 @@ import { SafeArea } from "../../../components/utility/safe-area.component";
 import { Text } from "../../../components/typography/text.component";
 import { ReservationContext } from "../../../services/reservation/reservation.context";
 import { Title } from "react-native-paper";
+import {
+  RedButton,
+  GreenButton,
+} from "../../../components/buttons/buttons.component";
+import { Spacer } from "../../../components/spacer/spacer.component";
 
 export const SessionsScreen = () => {
   const {
@@ -13,88 +18,102 @@ export const SessionsScreen = () => {
     doEndSession,
   } = useContext(ReservationContext);
 
-  /*
   const sortedReservations = reservations
     .filter((res) => res.type !== "DELETED")
     .sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
-    */
 
   return (
     <SafeArea>
-      <Text>Sessions</Text>
       <FlatList
-        data={reservations}
+        data={sortedReservations}
         keyExtractor={(item, index) =>
           Math.floor(Math.random() * 1000000).toString()
         }
         renderItem={({ item }) => (
-          <View>
-            {item.type === "EXPIRED" && (
-              <View>
-                <Text>Data: {item.startTime.split("T")[0]}</Text>
-                <Text>Status: {item.type}</Text>
+          <View style={styles2.itemContainer}>
+            <View style={styles2.textContainer}>
+              <View style={{ flexDirection: "column" }}>
+                {item.type === "EXPIRED" && (
+                  <>
+                    <Text>Date: {item.startTime.split("T")[0]}</Text>
+                    <Text>Status: {item.type}</Text>
+                  </>
+                )}
+                {item.type === "ENDED" && (
+                  <>
+                    <Text>Date: {item.startTime.split("T")[0]}</Text>
+                    <Text>Price: {item.price} $</Text>
+                    <Text>Status: {item.type}</Text>
+                  </>
+                )}
+                {item.type === "RESERVED" && (
+                  <>
+                    <Title> Active Rervation:</Title>
+                    <Spacer></Spacer>
+                    <Spacer></Spacer>
+                    <Spacer></Spacer>
+                    <Spacer></Spacer>
+                    <Text>
+                      Remaining time:{" "}
+                      {Math.floor(
+                        (new Date(item.expiryDate).getTime() -
+                          new Date().getTime()) /
+                          60000
+                      )}{" "}
+                      minutes
+                    </Text>
+                    <Text>Address: {item.cp.address}</Text>
+                    <Text>CP: {item.cp.name}</Text>
+                    <Text>Socket Number: {item.socketId}</Text>
+                  </>
+                )}
+                {item.type === "ACTIVE" && (
+                  <>
+                    <Title> Active Charging Session:</Title>
+                    <Spacer></Spacer>
+                    <Spacer></Spacer>
+                    <Spacer></Spacer>
+                    <Spacer></Spacer>
+                    <Text></Text>
+                    <Text>Battery Percentage: {item.batteryPercentage}</Text>
+                    <Text>Socket: {item.socketId}</Text>
+                  </>
+                )}
               </View>
-            )}
-            {item.type === "ENDED" && (
-              <View>
-                <Text>Data: {item.startTime.split("T")[0]}</Text>
-                <Text>Price: {item.price}</Text>
-              </View>
-            )}
-            {item.type === "RESERVED" && (
-              <View>
-                <Text>
-                  Remaining time:{" "}
-                  {Math.floor(
-                    (new Date(item.expiryDate).getTime() -
-                      new Date().getTime()) /
-                      60000
-                  )}{" "}
-                  minutes
-                </Text>
-                <Text>Address: {item.cp.address}</Text>
-                <Text>CP: {item.cp.name}</Text>
-                <Text>Socket Number: {item.socketId}</Text>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Button
-                    title="Delete"
-                    color="red"
+            </View>
+            <View style={styles2.buttonContainer}>
+              {item.type === "RESERVED" && (
+                <>
+                  <RedButton
                     onPress={() => doReservationDelete(item.id)}
+                    title={"Delete"}
                   />
-                  <Button
-                    title="Start Charging Process"
-                    color="green"
+                  <GreenButton
                     onPress={() => doStartChargingProcess(item.id)}
+                    title={"Start Charging Process"}
                   />
-                </View>
-              </View>
-            )}
-            {item.type === "ACTIVE" && (
-              <View>
-                <Text>Battery Percentage: {item.batteryPercentage}</Text>
-                <Text>Socket: {item.socketId}</Text>
-                <Button
-                  title="End Session"
-                  color="red"
+                </>
+              )}
+              {item.type === "ACTIVE" && (
+                <RedButton
                   onPress={() => doEndSession(item.id)}
+                  title={"End Session"}
                 />
-              </View>
-            )}
+              )}
+            </View>
+            <View style={styles2.separator} />
           </View>
         )}
       />
+      <View style={styles2.separator} />
     </SafeArea>
   );
 };
+
 const styles2 = StyleSheet.create({
   itemContainer: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: "column",
     alignItems: "center",
     padding: 10,
     position: "relative",
@@ -103,8 +122,8 @@ const styles2 = StyleSheet.create({
     flex: 1,
   },
   buttonContainer: {
-    position: "absolute",
-    right: 0,
+    position: "relative",
+    width: "100%",
   },
   separator: {
     height: 1,
