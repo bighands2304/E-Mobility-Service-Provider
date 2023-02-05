@@ -57,7 +57,7 @@ public class DSOManager implements ApplicationListener<ToggleDsoSelectionOptimiz
         if (dsoOffer.isInUse()) {
             return true;
         }
-        changeDsoProvider(cpId, dsoOffer, offerTimeSlot);
+        changeDsoProvider(dsoOffer.getChargingPointId(), dsoOffer, offerTimeSlot);
         return true;
     }
 

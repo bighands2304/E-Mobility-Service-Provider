@@ -103,4 +103,5 @@ class OscpConnection:
             except requests.ConnectionError:
                 print(f"Oscp connection with cp = {self.cp_id} is failed")
                 return
-            time.sleep(3600)
+            else:
+                time.sleep(1800)
