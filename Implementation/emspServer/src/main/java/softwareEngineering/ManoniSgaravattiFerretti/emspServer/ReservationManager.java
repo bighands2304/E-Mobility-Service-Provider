@@ -28,10 +28,16 @@ public class ReservationManager {
 
     @PostMapping("/makeReservation")
     public ResponseEntity<?> makeReservation(@RequestBody Map<String,String> payload){
+        for (Reservation r: reservationService.getReservationsByUserId(Long.parseLong(payload.get("userId")))) {
+            if (r.getType().equals("ACTIVE") || r.getType().equals("RESERVED"))
+                return ResponseEntity.badRequest().body("A reservation is already active");
+        }
+
         //Collect the payload
         Long userId = Long.parseLong(payload.get("userId"));
         String cpId = payload.get("cpId");
         String socketId = payload.get("socketId");
+        String tariffId = payload.get("tariffId");
 
         LocalDateTime reserveTime=LocalDateTime.now();
         //Create the reservation
@@ -43,6 +49,7 @@ public class ReservationManager {
         reservation.setSocketId(socketId);
         reservation.setStartTime(reserveTime);
         reservation.setExpiryDate(reserveTime.plusMinutes(20));
+        reservation.setTariffId(tariffId);
 
         //Save the reservation in the DB
         reservationService.save(reservation);
