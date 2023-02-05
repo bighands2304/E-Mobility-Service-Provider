@@ -67,7 +67,7 @@ public class LoginManager {
 
     @PostMapping("/api/CPO/changePassword")
     public ResponseEntity<CPO> changePassword(@AuthenticationPrincipal CPO cpo,
-                                            @RequestBody @Valid ChangePasswordDTO changePasswordDTO) {
+                                              @RequestBody @Valid ChangePasswordDTO changePasswordDTO) {
         logger.info("Change password from cpo: " + cpo.getCpoCode());
         try{
             authenticationManager.authenticate(

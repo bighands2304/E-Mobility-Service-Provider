@@ -1,5 +1,7 @@
 package softwareengineering.manonisgaravattiferretti.cpmsServer.energyManager;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
@@ -7,6 +9,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.ChargingPoint;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.DSOOffer;
+import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.entities.OfferTimeSlot;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.ChargingPointService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.businessModel.services.DSOOfferService;
 import softwareengineering.manonisgaravattiferretti.cpmsServer.dataWarehouse.service.EnergyConsumptionService;
@@ -24,6 +27,7 @@ public class DSOSelectionOptimizer {
     private final DSOOfferService dsoOfferService;
     private final EnergyConsumptionService energyConsumptionService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final Logger logger = LoggerFactory.getLogger(DSOSelectionOptimizer.class);
 
     @Autowired
     public DSOSelectionOptimizer(ChargingPointService chargingPointService,
@@ -49,27 +53,33 @@ public class DSOSelectionOptimizer {
 
     @Async
     void optimizeCp(String cpId, LocalDateTime now, LocalDateTime oneWeekAgo) {
-        // todo: change
+        logger.info("Optimizing Dso selection for cp with id = " + cpId);
         double meanConsumption = energyConsumptionService.findMeanConsumption(cpId, oneWeekAgo, now);
         List<DSOOffer> dsoOffers = dsoOfferService.findOffersOfCp(cpId);
         if (dsoOffers.size() <= 1) {
             return;
         }
-        List<String> dsoIds = dsoOffers.stream().map(DSOOffer::getDsoId).distinct().toList();
-        List<DSOOffer> bestDsoOffers = new ArrayList<>();
-        for (String dsoId: dsoIds) {
-            Optional<DSOOffer> bestOffer = dsoOffers.stream()
-                    .filter(dsoOffer -> dsoOffer.getCapacity() > meanConsumption && dsoOffer.getDsoId().equals(dsoId))
-                    .reduce((a, b) -> (a.getPrice() > b.getPrice()) ? b : a);
-            bestOffer.ifPresent(bestDsoOffers::add);
+        List<OfferTimeSlot> timeSlots = dsoOffers.stream().map(DSOOffer::getAvailableTimeSlot).distinct().toList();
+        for (OfferTimeSlot offerTimeSlot: timeSlots) {
+            List<DSOOffer> offers = dsoOffers.stream().filter(offer -> offer.getCapacity() >= meanConsumption)
+                    .filter(dsoOffer -> dsoOffer.getAvailableTimeSlot().equals(offerTimeSlot)).toList();
+            Optional<DSOOffer> bestOffer = offers.stream().reduce((a, b) -> (a.getPrice() < b.getPrice()) ? a : b);
+            bestOffer.ifPresentOrElse(offer -> {
+                if (!offer.isInUse()) {
+                    DSOOptimizerEvent dsoOptimizerEvent = new DSOOptimizerEvent(this, offer);
+                    applicationEventPublisher.publishEvent(dsoOptimizerEvent);
+                }
+            }, () -> {
+                Optional<DSOOffer> best = dsoOffers.stream().filter(dsoOffer -> dsoOffer.getAvailableTimeSlot().equals(offerTimeSlot))
+                        .reduce((a, b) -> (a.getPrice() <= b.getPrice()) ? a : b);
+                best.ifPresent(offer -> {
+                    if (!offer.isInUse()) {
+                        DSOOptimizerEvent dsoOptimizerEvent = new DSOOptimizerEvent(this, offer);
+                        applicationEventPublisher.publishEvent(dsoOptimizerEvent);
+                    }
+                });
+            });
         }
-        Optional<DSOOffer> bestGlobalOffer = bestDsoOffers.stream().reduce((a, b) -> (a.getPrice() > b.getPrice()) ? b : a);
-        bestGlobalOffer.ifPresent(bestOffer -> {
-            if (!bestOffer.isInUse()) {
-                DSOOptimizerEvent dsoOptimizerEvent = new DSOOptimizerEvent(this, bestOffer);
-                applicationEventPublisher.publishEvent(dsoOptimizerEvent);
-            }
-        });
     }
 
     @Scheduled(fixedRate = 600000000)
