@@ -56,7 +56,7 @@ class RegistrationManagerTest {
                         .with(csrf())
                         .content(body).contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+                        .andReturn().getResponse();
 
         // Verify the results
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
