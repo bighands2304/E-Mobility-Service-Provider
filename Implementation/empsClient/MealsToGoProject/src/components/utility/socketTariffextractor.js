@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 
 export const socketTariff = (cp) => {
-  console.log("here modified soxket before" + JSON.stringify(cp.sockets));
   let modifiedSockets = cp.sockets
     .filter((socket) => socket.availability === "AVAILABLE")
     .map((socket) => {
@@ -18,6 +17,5 @@ export const socketTariff = (cp) => {
       });
       return socket;
     });
-  console.log("here modified soxket after" + JSON.stringify(modifiedSockets));
   return modifiedSockets;
 };

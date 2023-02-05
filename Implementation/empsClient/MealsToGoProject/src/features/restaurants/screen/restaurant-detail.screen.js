@@ -7,15 +7,14 @@ import { RestaurantInfoCard } from "../component/restaurant-info-card.component"
 
 import { SafeArea } from "../../../components/utility/safe-area.component";
 import { socketTariff } from "../../../components/utility/socketTariffextractor";
-import { RestaurantsContext } from "../../../services/restaurants/restaurants.context";
+import { ReservationContext } from "../../../services/reservation/reservation.context";
 
 export const RestaurantDetailScreen = ({ navigation, route }) => {
-  const { doReservation } = useContext(RestaurantsContext);
+  const { doReservation } = useContext(ReservationContext);
 
   const { restaurant } = route.params;
 
   const newTariffSocket = socketTariff(restaurant);
-  console.log("new tariffs" + JSON.stringify(newTariffSocket));
 
   return (
     <SafeArea>

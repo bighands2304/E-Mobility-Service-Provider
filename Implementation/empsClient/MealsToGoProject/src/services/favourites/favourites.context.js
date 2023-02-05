@@ -8,30 +8,27 @@ export const FavouritesContext = createContext();
 export const FavouritesContextProvider = ({ children }) => {
   const { user } = useContext(AuthenticationContext);
   const { vehicles } = useContext(VehicleContext);
-  const [favourites, setFavourites] = useState([]);
+  const [favourite, setFavourite] = useState([]);
+  const [socketF, setsocketF] = useState([]);
 
-  let count = vehicles.filter(
-    (vehicles) => vehicles.isFavourite === true
-  ).length;
-
-  let favVehicle;
-  if (count === 1) {
-    favVehicle = vehicles.filter((vehicles) => vehicles.isFavourite === true);
-    // console.log("fav ==> " + JSON.stringify(favVehicle));
-  }
-
-  const add = () => {
-    console.log("dummy");
+  const SetNewF = () => {
+    vehicles.forEach((vehicle) => {
+      if (vehicle.isFavourite) {
+        console.log(vehicle.SocketType);
+        setsocketF(vehicle.SocketType);
+        setFavourite(vehicle);
+      }
+    });
   };
 
-  const remove = () => {
-    console.log("dummy");
-  };
+  useEffect(() => {
+    if (vehicles) {
+      SetNewF();
+    }
+  }, [vehicles]);
 
   return (
-    <FavouritesContext.Provider
-      value={{ favVehicle, addToFavourites: add, removeFromFavourites: remove }}
-    >
+    <FavouritesContext.Provider value={{ favourite, socketF }}>
       {children}
     </FavouritesContext.Provider>
   );

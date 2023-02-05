@@ -36,28 +36,6 @@ export const RestaurantsContextProvider = ({ children }) => {
     });
   };
 
-  const doReservation = (socketId, cpId) => {
-    setIsLoading(true);
-    doReservationRequest(socketId, cpId, id, token)
-      .then((results) => {
-        createOnButtonAlert("Suchess", "Reservation created");
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        createOnButtonAlert("An Error Occurred", "Retry Later");
-        console.log("l");
-        console.log("l");
-        console.log("l");
-        console.log("l");
-        console.log("l");
-        console.log(err);
-        console.log(JSON.stringify(err));
-
-        setIsLoading(false);
-        setError(err);
-      });
-  };
-
   useEffect(() => {
     if (location) {
       const locationString = `${location.lat},${location.lng}`;
@@ -71,7 +49,6 @@ export const RestaurantsContextProvider = ({ children }) => {
         restaurants,
         isLoading,
         error,
-        doReservation,
       }}
     >
       {children}

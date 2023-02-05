@@ -11,6 +11,7 @@ import { FavouritesContextProvider } from "../../services/favourites/favourites.
 import { RestaurantsContextProvider } from "../../services/restaurants/restaurants.context";
 import { LocationContextProvider } from "../../services/location/location.context";
 import { VehicleContextProvider } from "../../services/vehicles/mock/vehcile.context";
+import { ReservationContextProvider } from "../../services/reservation/reservation.context";
 
 const Tab = createBottomTabNavigator();
 
@@ -40,13 +41,15 @@ export const AppNavigator = () => (
     <FavouritesContextProvider>
       <LocationContextProvider>
         <RestaurantsContextProvider>
-          <Tab.Navigator screenOptions={createScreenOptions}>
-            <Tab.Screen name="Vehicles" component={VehicleNavigator} />
-            <Tab.Screen name="Stations" component={RestaurantsNavigator} />
-            <Tab.Screen name="Map" component={MapScreen} />
-            <Tab.Screen name="Sessions" component={SessionsScreen} />
-            <Tab.Screen name="Settings" component={SettingsNavigator} />
-          </Tab.Navigator>
+          <ReservationContextProvider>
+            <Tab.Navigator screenOptions={createScreenOptions}>
+              <Tab.Screen name="Vehicles" component={VehicleNavigator} />
+              <Tab.Screen name="Stations" component={RestaurantsNavigator} />
+              <Tab.Screen name="Map" component={MapScreen} />
+              <Tab.Screen name="Sessions" component={SessionsScreen} />
+              <Tab.Screen name="Settings" component={SettingsNavigator} />
+            </Tab.Navigator>
+          </ReservationContextProvider>
         </RestaurantsContextProvider>
       </LocationContextProvider>
     </FavouritesContextProvider>
